@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-3">
-        <h1 class="h3 mb-0 text-gray-800">{{ __('Sicurezza') }}</h1>
+    <div class="mb-4 mt-3">
+        <h1 class="h3 mb-0 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Sicurezza') }}</h1>
     </div>
 
     @include('partials.flash')
 
-    <div class="card shadow mb-4">
+    <div class="card mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 fw-bold text-primary">{{ __('Cambia password') }}</h6>
+            <h6 class="m-0" style="color: #10b981;">{{ __('Cambia password') }}</h6>
         </div>
         <div class="card-body">
             <form method="POST" action="{{ route('user-password.update') }}">
@@ -35,21 +35,21 @@
     </div>
 
     @if ($canManageTwoFactor)
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">{{ __('Autenticazione a due fattori') }}</h6>
+                <h6 class="m-0" style="color: #10b981;">{{ __('Autenticazione a due fattori') }}</h6>
             </div>
             <div class="card-body">
                 @if (! $twoFactorEnabled)
-                    <p class="small text-muted mb-3">{{ __('Attiva 2FA per richiedere un codice dall’app di autenticazione al login.') }}</p>
+                    <p class="small" style="color: #94a3b8;">{{ __("Attiva 2FA per richiedere un codice dall'app di autenticazione al login.") }}</p>
                     @if ($pendingTwoFactorConfirm ?? false)
-                        <div id="pa-two-factor-qr" class="mb-3 p-3 bg-light rounded text-center" style="min-height: 200px;" data-qr-url="{{ route('two-factor.qr-code') }}"></div>
+                        <div id="pa-two-factor-qr" class="mb-3 p-3 rounded text-center" style="background: #f8fafc; min-height: 200px;" data-qr-url="{{ route('two-factor.qr-code') }}"></div>
                         <p class="small mb-3">{{ __('Inserisci il codice a 6 cifre per confermare.') }}</p>
                         <form method="POST" action="{{ route('two-factor.confirm') }}" class="d-flex flex-wrap align-items-end gap-2 mb-4">
                             @csrf
                             <div>
                                 <label for="code" class="visually-hidden">{{ __('Codice') }}</label>
-                                <input id="code" type="text" name="code" maxlength="6" class="form-control" required autocomplete="one-time-code" placeholder="{{ __('Codice') }}">
+                                <input id="code" type="text" name="code" maxlength="6" class="form-control" required autocomplete="one-time-code" placeholder="{{ __('Codice') }}" style="font-family: 'JetBrains Mono', monospace;">
                             </div>
                             <button type="submit" class="btn btn-primary">{{ __('Conferma') }}</button>
                         </form>
@@ -60,7 +60,7 @@
                         </form>
                     @endif
                 @else
-                    <p class="small text-muted mb-3">{{ __('Il login richiederà un codice dalla tua app di autenticazione.') }}</p>
+                    <p class="small" style="color: #94a3b8;">{{ __('Il login richiederà un codice dalla tua app di autenticazione.') }}</p>
                     <div id="pa-recovery-codes" class="small font-monospace mb-3" data-codes-url="{{ route('two-factor.recovery-codes') }}"></div>
                     <form method="POST" action="{{ route('two-factor.regenerate-recovery-codes') }}" class="mb-3">
                         @csrf

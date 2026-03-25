@@ -20,12 +20,12 @@
 @endphp
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-column flex-lg-row mt-3">
-        <div class="mb-3 mb-lg-0">
-            <h1 class="h3 mb-1 text-gray-800">{{ $site['name'] }}</h1>
-            <p class="text-muted small mb-0">{{ __('Periodo') }}: {{ $period['from'] }} — {{ $period['to'] }}</p>
+    <div class="d-flex flex-column flex-lg-row align-items-start justify-content-between mb-4 mt-3 gap-3">
+        <div>
+            <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ $site['name'] }}</h1>
+            <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
         </div>
-        <div class="d-flex flex-wrap">
+        <div class="d-flex flex-wrap gap-1">
             @foreach ($rangeLabels as $key => $label)
                 @php
                     $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
@@ -35,7 +35,7 @@
                         $rangeQuery['tab'] = 'goals';
                     }
                 @endphp
-                <a href="{{ route('sites.show', $rangeQuery) }}" class="btn btn-sm mb-1 me-1 {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
+                <a href="{{ route('sites.show', $rangeQuery) }}" class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
             @endforeach
         </div>
     </div>
@@ -56,7 +56,7 @@
     <ul class="nav nav-tabs mb-4" id="siteStatsTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a
-                class="nav-link fw-bold {{ $summaryTabActive ? 'active' : '' }}"
+                class="nav-link {{ $summaryTabActive ? 'active' : '' }}"
                 id="site-tab-summary"
                 href="{{ $tabSummaryHref }}"
                 role="tab"
@@ -66,7 +66,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <a
-                class="nav-link fw-bold {{ $detailTabActive ? 'active' : '' }}"
+                class="nav-link {{ $detailTabActive ? 'active' : '' }}"
                 id="site-tab-detail"
                 href="{{ $tabDetailHref }}"
                 role="tab"
@@ -76,7 +76,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <a
-                class="nav-link fw-bold {{ $goalsTabActive ? 'active' : '' }}"
+                class="nav-link {{ $goalsTabActive ? 'active' : '' }}"
                 id="site-tab-goals"
                 href="{{ $tabGoalsHref }}"
                 role="tab"
@@ -96,22 +96,23 @@
         >
             <div class="row">
                 @php $icons = ['fa-users', 'fa-eye', 'fa-clock', 'fa-up-right-from-square']; @endphp
+                @php $iconColors = ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6']; @endphp
                 @foreach ([
-                    ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors']), 'raw' => null],
-                    ['label' => __('Visualizzazioni'), 'val' => number_format($stats['total_pageviews']), 'raw' => null],
-                    ['label' => __('Tempo medio in pagina'), 'val' => \App\Support\DurationFormatter::formatSeconds($stats['avg_duration_seconds']), 'raw' => null],
-                    ['label' => __('Click in uscita'), 'val' => number_format($stats['outbound_clicks']), 'raw' => null],
+                    ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors'])],
+                    ['label' => __('Visualizzazioni'), 'val' => number_format($stats['total_pageviews'])],
+                    ['label' => __('Tempo medio in pagina'), 'val' => \App\Support\DurationFormatter::formatSeconds($stats['avg_duration_seconds'])],
+                    ['label' => __('Click in uscita'), 'val' => number_format($stats['outbound_clicks'])],
                 ] as $idx => $box)
                     <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-{{ $statBorders[$idx] }} shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col me-2">
-                                        <div class="text-xs fw-bold text-{{ $statBorders[$idx] }} text-uppercase mb-1">{{ $box['label'] }}</div>
-                                        <div class="h5 mb-0 fw-bold text-gray-800">{{ $box['val'] }}</div>
+                        <div class="card border-left-{{ $statBorders[$idx] }} h-100">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div class="text-xs fw-medium text-uppercase mb-1" style="color: #94a3b8; letter-spacing: 0.05em;">{{ $box['label'] }}</div>
+                                        <div class="h5 mb-0 fw-bold font-monospace" style="color: #0f172a;">{{ $box['val'] }}</div>
                                     </div>
-                                    <div class="col-auto">
-                                        <i class="fas {{ $icons[$idx] }} fa-2x text-gray-300"></i>
+                                    <div style="color: {{ $iconColors[$idx] }}; opacity: 0.3; font-size: 1.5rem;">
+                                        <i class="fas {{ $icons[$idx] }}"></i>
                                     </div>
                                 </div>
                             </div>
@@ -121,10 +122,10 @@
             </div>
 
             @if (!empty($site_chart_payload['labels']) && $summaryTabActive)
-                <div class="card shadow mb-4">
+                <div class="card mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">{{ __('Andamento') }}</h6>
-                        <small class="text-muted">{{ __('Visualizzazioni per giorno') }}</small>
+                        <h6 class="m-0" style="color: #10b981;">{{ __('Andamento') }}</h6>
+                        <small style="color: #94a3b8;">{{ __('Visualizzazioni per giorno') }}</small>
                     </div>
                     <div class="card-body">
                         <div class="pa-site-trend-chart-wrap">
@@ -195,9 +196,9 @@
                 'range' => $range,
             ])
 
-            <div class="card shadow mb-4">
+            <div class="card mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 fw-bold text-primary">{{ __('Paese') }}</h6>
+                    <h6 class="m-0" style="color: #10b981;">{{ __('Paese') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -229,13 +230,13 @@
             aria-labelledby="site-tab-goals"
             tabindex="0"
         >
-    <div class="card shadow mb-4">
+    <div class="card mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 fw-bold text-primary">{{ __('Goal') }}</h6>
+            <h6 class="m-0" style="color: #10b981;">{{ __('Goal') }}</h6>
         </div>
         <div class="card-body">
-            <p class="small text-muted">{{ __('Conta quante volte viene inviato un evento con un certo nome (uguale a quello in indiestats.track sul sito).') }}</p>
-            <p class="small text-muted mb-2">{{ __('Eventi:') }} <code class="user-select-all">window.indiestats.track('nome_evento', { opzionale: 'valore' })</code></p>
+            <p class="small" style="color: #94a3b8;">{{ __('Conta quante volte viene inviato un evento con un certo nome (uguale a quello in indiestats.track sul sito).') }}</p>
+            <p class="small mb-2" style="color: #94a3b8;">{{ __('Eventi:') }} <code class="user-select-all">window.indiestats.track('nome_evento', { opzionale: 'valore' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
@@ -285,10 +286,10 @@
         </div>
     </div>
 
-    <div class="card shadow mb-4">
+    <div class="card mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 fw-bold text-primary">{{ __('Eventi') }}</h6>
-            <small class="text-muted">{{ __('Tutti i nomi inviati con indiestats.track nel periodo') }}</small>
+            <h6 class="m-0" style="color: #10b981;">{{ __('Eventi') }}</h6>
+            <small style="color: #94a3b8;">{{ __('Tutti i nomi inviati con indiestats.track nel periodo') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -312,10 +313,10 @@
         </div>
     </div>
 
-    <div class="card shadow mb-4">
+    <div class="card mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 fw-bold text-primary">{{ __('Dettaglio eventi') }}</h6>
-            <small class="text-muted">{{ __('Eventi nel periodo con payload salvato e ripulito lato server (paginazione server)') }}</small>
+            <h6 class="m-0" style="color: #10b981;">{{ __('Dettaglio eventi') }}</h6>
+            <small style="color: #94a3b8;">{{ __('Eventi nel periodo con payload salvato e ripulito lato server (paginazione server)') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -349,8 +350,8 @@
     @if (!empty($site_chart_payload['labels']) && $summaryTabActive)
         <script>
             (function () {
-                var primary = 'rgb(78, 115, 223)';
-                var primaryFill = 'rgba(78, 115, 223, 0.08)';
+                var primary = 'rgb(16, 185, 129)';
+                var primaryFill = 'rgba(16, 185, 129, 0.06)';
                 var cfg = @json($site_chart_payload);
 
                 function run() {
@@ -371,11 +372,11 @@
                                     data: cfg.data,
                                     borderColor: primary,
                                     backgroundColor: primaryFill,
-                                    borderWidth: 2,
+                                    borderWidth: 1.5,
                                     pointRadius: 0,
                                     pointHoverRadius: 3,
                                     fill: true,
-                                    tension: 0.3,
+                                    tension: 0.4,
                                 },
                             ],
                         },
@@ -383,29 +384,38 @@
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: { display: false },
-                                tooltip: { intersect: false, mode: 'index' },
+                                tooltip: {
+                                    intersect: false,
+                                    mode: 'index',
+                                    backgroundColor: '#0f172a',
+                                    titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                                    bodyFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                                    padding: 8,
+                                    cornerRadius: 6,
+                                },
                             },
                             scales: {
                                 x: {
-                                    grid: { display: false, drawBorder: false },
+                                    grid: { display: false },
                                     ticks: {
                                         maxRotation: 0,
                                         maxTicksLimit: 12,
-                                        font: { size: 10 },
-                                        color: '#858796',
+                                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                                        color: '#94a3b8',
                                     },
+                                    border: { display: false },
                                 },
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
                                         precision: 0,
-                                        font: { size: 10 },
-                                        color: '#858796',
+                                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                                        color: '#94a3b8',
                                     },
                                     grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)',
-                                        drawBorder: false,
+                                        color: '#f1f5f9',
                                     },
+                                    border: { display: false },
                                 },
                             },
                         },

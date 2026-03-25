@@ -1,18 +1,46 @@
-@import "@fontsource/nunito/300.css";
-@import "@fontsource/nunito/400.css";
-@import "@fontsource/nunito/600.css";
-@import "@fontsource/nunito/700.css";
-@import "@fontsource/nunito/800.css";
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
 
-$primary: #4e73df;
+$primary: #10b981;
+$success: #10b981;
+$info: #06b6d4;
+$warning: #f59e0b;
+$danger: #ef4444;
+$secondary: #64748b;
+$dark: #0f172a;
+$light: #f1f5f9;
+$body-bg: #f8fafc;
+$body-color: #334155;
+$border-color: #e2e8f0;
+$card-border-color: #e2e8f0;
+$card-cap-bg: transparent;
+
+$font-family-sans-serif: "Inter", system-ui, -apple-system, sans-serif;
+$font-family-monospace: "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+$font-size-base: 0.875rem;
+$headings-font-weight: 600;
+$border-radius: 0.5rem;
+$border-radius-sm: 0.375rem;
+$border-radius-lg: 0.75rem;
+$input-border-color: #cbd5e1;
+$input-focus-border-color: #10b981;
+$input-focus-box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
+$btn-border-radius: 0.375rem;
+$card-border-radius: 0.75rem;
+$nav-tabs-border-color: #e2e8f0;
+$nav-tabs-link-active-color: #10b981;
+$nav-tabs-link-active-border-color: #e2e8f0 #e2e8f0 #fff;
+
 @import "bootstrap/scss/bootstrap";
-
 @import "@fortawesome/fontawesome-free/css/all.min.css";
-
 @import "theme";
 @import "overrides";
-
 @import "datatables.net-bs5/css/dataTables.bootstrap5.css";
 @import "datatables.net-responsive-bs5/css/responsive.bootstrap5.css";
-
 @import "tom-select/dist/css/tom-select.bootstrap5.css";

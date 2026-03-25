@@ -14,20 +14,21 @@
 
 @section('content')
     <div class="mb-4 mt-3">
-        <div class="d-flex flex-wrap justify-content-start justify-content-lg-end mb-3">
+        <div class="d-flex flex-wrap justify-content-start justify-content-lg-end mb-3 gap-1">
             @foreach ($rangeLabels as $key => $label)
-                <a href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}" class="btn btn-sm mb-1 me-1 {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
+                <a href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}" class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
             @endforeach
         </div>
-        <h1 class="h3 mb-1 text-gray-800">{{ __('Dashboard') }}</h1>
-        <p class="text-muted small mb-0">{{ __('Periodo') }}: {{ $period['from'] }} — {{ $period['to'] }}</p>
+        <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Dashboard') }}</h1>
+        <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
     </div>
 
     @include('partials.flash')
 
     @if (empty($sites))
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-body text-center py-5">
+                <div class="mb-3" style="font-size: 2rem; color: #cbd5e1;"><i class="fas fa-chart-line"></i></div>
                 <p class="text-muted mb-3">{{ __('Non hai ancora siti. Aggiungine uno per vedere le statistiche qui.') }}</p>
                 <a href="{{ route('sites.index') }}" class="btn btn-primary">{{ __('Vai ai siti') }}</a>
             </div>
@@ -36,19 +37,19 @@
         <div class="row">
             @foreach ($sites as $site)
                 <div class="col-xl-4 col-lg-6 mb-4">
-                    <div class="card shadow h-100 border-left-primary overflow-hidden">
+                    <div class="card h-100 border-left-primary overflow-hidden">
                         <div class="card-body position-relative pb-3">
                             <div class="d-flex justify-content-between align-items-start mb-2 pe-2">
-                                <h2 class="h5 fw-bold text-gray-800 mb-0">{{ $site['name'] }}</h2>
-                                <span class="badge rounded-pill bg-light text-primary border" title="{{ __('Visualizzazioni') }}">{{ number_format($site['total_pageviews']) }}</span>
+                                <h2 class="h6 fw-bold mb-0" style="color: #0f172a;">{{ $site['name'] }}</h2>
+                                <span class="badge rounded-pill" style="background: rgba(16,185,129,0.08); color: #10b981; font-size: 0.7rem;" title="{{ __('Visualizzazioni') }}">{{ number_format($site['total_pageviews']) }}</span>
                             </div>
-                            <p class="text-xs text-muted mb-3">
-                                {{ __('Visitatori unici') }}: <span class="fw-bold text-gray-700">{{ number_format($site['unique_visitors']) }}</span>
+                            <p class="text-xs mb-3" style="color: #94a3b8;">
+                                {{ __('Visitatori unici') }}: <span class="fw-bold" style="color: #334155;">{{ number_format($site['unique_visitors']) }}</span>
                             </p>
                             <div class="pa-dashboard-chart-wrap mb-2">
                                 <canvas id="chart-site-{{ $site['id'] }}" aria-hidden="true"></canvas>
                             </div>
-                            <p class="text-xs text-center text-primary mb-0 fw-bold">
+                            <p class="text-xs text-center mb-0 fw-bold" style="color: #10b981;">
                                 <i class="fas fa-arrow-right me-1"></i>{{ __('Apri statistiche') }}
                             </p>
                             <a href="{{ route('sites.show', array_merge(['site' => $site['public_key'], 'range' => $range], $analytics_filters->toQueryArray())) }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
@@ -64,8 +65,8 @@
     @if (! empty($sites))
         <script>
             (function () {
-                var primary = 'rgb(78, 115, 223)';
-                var primaryFill = 'rgba(78, 115, 223, 0.08)';
+                var primary = 'rgb(16, 185, 129)';
+                var primaryFill = 'rgba(16, 185, 129, 0.06)';
                 var payload = @json($chartPayload);
 
                 function run() {
@@ -87,11 +88,11 @@
                                     data: cfg.data,
                                     borderColor: primary,
                                     backgroundColor: primaryFill,
-                                    borderWidth: 2,
+                                    borderWidth: 1.5,
                                     pointRadius: 0,
                                     pointHoverRadius: 3,
                                     fill: true,
-                                    tension: 0.3,
+                                    tension: 0.4,
                                 },
                             ],
                         },
@@ -99,29 +100,38 @@
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: { display: false },
-                                tooltip: { intersect: false, mode: 'index' },
+                                tooltip: {
+                                    intersect: false,
+                                    mode: 'index',
+                                    backgroundColor: '#0f172a',
+                                    titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                                    bodyFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                                    padding: 8,
+                                    cornerRadius: 6,
+                                },
                             },
                             scales: {
                                 x: {
-                                    grid: { display: false, drawBorder: false },
+                                    grid: { display: false },
                                     ticks: {
                                         maxRotation: 0,
                                         maxTicksLimit: 8,
-                                        font: { size: 10 },
-                                        color: '#858796',
+                                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                                        color: '#94a3b8',
                                     },
+                                    border: { display: false },
                                 },
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
                                         precision: 0,
-                                        font: { size: 10 },
-                                        color: '#858796',
+                                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                                        color: '#94a3b8',
                                     },
                                     grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)',
-                                        drawBorder: false,
+                                        color: '#f1f5f9',
                                     },
+                                    border: { display: false },
                                 },
                             },
                         },

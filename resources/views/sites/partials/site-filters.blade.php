@@ -18,7 +18,7 @@
         <input type="hidden" name="tab" value="{{ $siteTab }}">
     @endif
 
-    <div class="accordion shadow" id="pa-site-filters-accordion">
+    <div class="accordion" id="pa-site-filters-accordion">
         <div class="accordion-item border-0">
             <h2 class="accordion-header" id="pa-site-filters-heading">
                 <button
@@ -30,11 +30,11 @@
                     aria-controls="pa-site-filters-collapse"
                 >
                     <span class="d-flex flex-column flex-sm-row align-items-sm-center gap-1 gap-sm-3 text-start w-100 pe-2">
-                        <span class="fw-bold text-primary">{{ __('Filtri') }}</span>
+                        <span class="fw-bold" style="color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">{{ __('Filtri') }}</span>
                         @if ($filtersActive)
-                            <span class="badge bg-primary rounded-pill">{{ $filterActiveCount }} {{ $filterActiveCount === 1 ? __('filtro attivo') : __('filtri attivi') }}</span>
+                            <span class="badge rounded-pill" style="background: rgba(16,185,129,0.1); color: #10b981;">{{ $filterActiveCount }} {{ $filterActiveCount === 1 ? __('filtro attivo') : __('filtri attivi') }}</span>
                         @endif
-                        <span class="small text-muted fw-normal">{{ __('Restringono KPI, grafico e tabelle al periodo selezionato') }}</span>
+                        <span class="small fw-normal" style="color: #94a3b8;">{{ __('Restringono KPI, grafico e tabelle al periodo selezionato') }}</span>
                     </span>
                 </button>
             </h2>
@@ -44,7 +44,7 @@
                 aria-labelledby="pa-site-filters-heading"
                 data-bs-parent="#pa-site-filters-accordion"
             >
-                <div class="accordion-body border-top px-3 py-2">
+                <div class="accordion-body border-top px-3 py-2" style="border-color: #f1f5f9 !important;">
                     <div class="d-flex flex-wrap justify-content-end gap-2 mb-2">
                         <button type="submit" class="btn btn-sm btn-primary">{{ __('Applica') }}</button>
                         <a href="{{ $filterResetUrl }}" class="btn btn-sm btn-outline-secondary">{{ __('Azzera filtri') }}</a>

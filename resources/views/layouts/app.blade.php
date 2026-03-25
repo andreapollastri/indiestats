@@ -12,14 +12,14 @@
 <body id="page-top">
     <div id="wrapper">
         <div class="sidebar-backdrop d-md-none" id="sidebarBackdrop" aria-hidden="true"></div>
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('dashboard') }}">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-chart-line"></i>
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-arrow-trend-up"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">{{ config('app.name') }}</div>
+                <div class="sidebar-brand-text">{{ config('app.name') }}</div>
             </a>
-            <div class="sidebar-heading px-3 text-truncate small text-uppercase text-white-50" title="{{ Auth::user()->email }}">
+            <div class="sidebar-heading px-3 text-truncate small" title="{{ Auth::user()->email }}">
                 {{ Auth::user()->email }}
             </div>
             <hr class="sidebar-divider my-0">
@@ -65,8 +65,8 @@
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <div class="d-md-none border-bottom bg-white py-2 px-3 mb-4">
-                    <button id="sidebarToggleTop" class="btn btn-link text-gray-600 p-1" type="button" aria-label="Menu">
+                <div class="d-md-none border-bottom py-2 px-3 mb-4" style="background: #fff;">
+                    <button id="sidebarToggleTop" class="btn btn-link p-1" style="color: #64748b;" type="button" aria-label="Menu">
                         <i class="fas fa-bars fa-lg"></i>
                     </button>
                 </div>
@@ -76,10 +76,10 @@
                 </div>
             </div>
 
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; {{ config('app.name') }} {{ date('Y') }}</span>
+                        <span>&copy; {{ config('app.name') }} {{ date('Y') }}</span>
                     </div>
                 </div>
             </footer>

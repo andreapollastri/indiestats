@@ -1,13 +1,169 @@
-// Personalizzazioni sopra il tema
+// Overrides for the minimal nerd theme
 
+// Remove all shadows globally
+.shadow,
+.shadow-sm,
+.shadow-lg {
+    box-shadow: none !important;
+}
+
+// Cards: flat with subtle border
+.card {
+    border: 1px solid #e2e8f0;
+    box-shadow: none;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+        border-color: #cbd5e1;
+    }
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 0.875rem 1.25rem;
+
+    h6 {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+    }
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+// Buttons
+.btn {
+    font-weight: 500;
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    border-radius: 0.375rem;
+    padding: 0.4rem 0.875rem;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background: #10b981;
+    border-color: #10b981;
+
+    &:hover, &:focus {
+        background: #059669;
+        border-color: #059669;
+    }
+}
+
+.btn-outline-primary {
+    color: #10b981;
+    border-color: #10b981;
+
+    &:hover, &:focus {
+        background: #10b981;
+        border-color: #10b981;
+        color: #fff;
+    }
+}
+
+.btn-outline-secondary {
+    color: #64748b;
+    border-color: #cbd5e1;
+
+    &:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #334155;
+    }
+}
+
+.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.625rem;
+}
+
+.btn-light {
+    background: #fff;
+    border-color: #e2e8f0;
+    color: #334155;
+
+    &:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+}
+
+// Form controls
+.form-control,
+.form-select {
+    border-color: #e2e8f0;
+    font-size: 0.8125rem;
+    border-radius: 0.375rem;
+
+    &:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1);
+    }
+}
+
+.form-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+// Nav tabs
+.nav-tabs {
+    border-bottom: 1px solid #e2e8f0;
+
+    .nav-link {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.775rem;
+        font-weight: 500;
+        color: #64748b;
+        border: none;
+        padding: 0.5rem 1rem;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: transparent;
+            transition: background 0.15s;
+        }
+
+        &:hover {
+            color: #334155;
+            border-color: transparent;
+        }
+
+        &.active {
+            color: #10b981;
+            background: transparent;
+            border-color: transparent;
+
+            &::after {
+                background: #10b981;
+            }
+        }
+    }
+}
+
+// Sidebar divider override
 .sidebar hr.sidebar-divider {
     margin: 0;
 }
 
+// Dashboard chart wrappers
 .pa-dashboard-chart-wrap {
     position: relative;
-    height: 160px;
-    /* I click passano al .stretched-link della card; il grafico resta visibile */
+    height: 140px;
     pointer-events: none;
 }
 
@@ -26,16 +182,12 @@
     max-width: 100%;
 }
 
-.table-responsive .table {
-    font-size: 0.875rem;
-}
-
-/* Statistiche sito: tipografia uniforme (DataTables + intestazioni) */
-$pa-dt-font-size: 0.875rem;
+// DataTables styling
+$pa-dt-font-size: 0.8125rem;
 
 .card-body .dt-container {
     font-size: $pa-dt-font-size;
-    line-height: 1.4;
+    line-height: 1.5;
 
     .dt-length,
     .dt-search,
@@ -52,6 +204,7 @@ $pa-dt-font-size: 0.875rem;
 
     .dt-paging .page-link {
         font-size: $pa-dt-font-size;
+        border-radius: 0.25rem;
     }
 }
 
@@ -59,29 +212,86 @@ table.table.pa-site-dt {
     thead > tr > th,
     tbody > tr > td {
         font-size: $pa-dt-font-size;
-        line-height: 1.4;
+        line-height: 1.5;
         vertical-align: middle;
+        border-color: #f1f5f9;
     }
 
     thead > tr > th {
-        font-weight: 600;
-        color: #5a5c69;
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 500;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: #f8fafc;
+        border-bottom-color: #e2e8f0;
     }
 
-    /* celle monospace (numeri / percorsi): stessa dimensione del testo base */
+    tbody > tr {
+        &:hover {
+            background: #f8fafc;
+        }
+
+        td {
+            padding: 0.5rem 0.75rem;
+        }
+    }
+
     tbody td.font-monospace,
     thead th.font-monospace {
         font-size: $pa-dt-font-size;
     }
 }
 
-.font-monospace {
-    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+// Tables general
+.table {
+    border-color: #f1f5f9;
+    font-size: $pa-dt-font-size;
+
+    > thead > tr > th {
+        border-bottom-width: 1px;
+    }
 }
 
-/* Filtri analytics: dropdown Tom Select nel wrapper (non body), evita tagli e sovrapposizioni */
-#pa-site-filters-form .accordion-body {
-    overflow: visible;
+.table-bordered {
+    border-color: #f1f5f9;
+
+    > :not(caption) > * > * {
+        border-color: #f1f5f9;
+    }
+}
+
+// Monospace
+.font-monospace {
+    font-family: "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+// Filters
+#pa-site-filters-form .accordion {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: none;
+
+    .accordion-button {
+        font-size: 0.8125rem;
+        background: transparent;
+        box-shadow: none;
+
+        &:not(.collapsed) {
+            background: transparent;
+            color: #10b981;
+        }
+
+        &::after {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+    }
+
+    .accordion-body {
+        overflow: visible;
+    }
 }
 
 #pa-site-filters-form .ts-wrapper.dropdown-active {
@@ -89,9 +299,10 @@ table.table.pa-site-dt {
     z-index: 1000;
 }
 
+// Progress bars
 .pa-bar-track {
-    height: 28px;
-    background: #eaecf4;
+    height: 24px;
+    background: #f1f5f9;
     border-radius: 0.25rem;
     overflow: hidden;
     flex: 1 1 auto;
@@ -100,32 +311,37 @@ table.table.pa-site-dt {
 
 .pa-bar-fill {
     height: 100%;
-    background: #4e73df;
+    background: #10b981;
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    font-family: "JetBrains Mono", monospace;
     color: #fff;
     min-width: 2rem;
 }
 
+// Sidebar form button
 #accordionSidebar .nav-item form.w-100 {
     display: block;
 }
 
 #accordionSidebar .nav-item form .nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    padding: 1rem;
-    width: 100%;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.6rem 1rem;
+    width: calc(100% - 1rem);
+    margin: 0.1rem 0.5rem;
     line-height: inherit;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 400;
     text-align: left;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease;
 }
 
 #accordionSidebar .nav-item form .nav-link:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
     text-decoration: none;
 }
 
@@ -136,18 +352,141 @@ table.table.pa-site-dt {
 
     #accordionSidebar.sidebar.toggled .nav-item form .nav-link {
         text-align: center;
-        padding: 0.75rem 1rem;
-        width: 6.5rem;
+        padding: 0.6rem 0.5rem;
+        width: calc(4.5rem - 1rem);
         margin-left: auto;
         margin-right: auto;
     }
 
     #accordionSidebar.sidebar.toggled .nav-item form .nav-link span {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         display: block;
+        margin-top: 0.15rem;
     }
 
     #accordionSidebar.sidebar.toggled .nav-item form .nav-link i {
         margin-right: 0;
+    }
+}
+
+// Alerts
+.alert {
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    border: 1px solid;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #065f46;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #991b1b;
+}
+
+// Badges
+.badge {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0;
+}
+
+// Modal
+.modal-content {
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    border-radius: 0.75rem;
+}
+
+.modal-header {
+    border-bottom-color: #f1f5f9;
+}
+
+.modal-footer {
+    border-top-color: #f1f5f9;
+}
+
+// Code
+code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.8em;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.06);
+    padding: 0.15em 0.35em;
+    border-radius: 0.25rem;
+}
+
+pre {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.775rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem !important;
+
+    code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+    }
+}
+
+// Stat cards
+.stat-value {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+}
+
+// Guest layout
+.guest-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+
+// White-50 text (for guest footer links)
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+// Tom Select overrides for nerd theme
+.ts-control {
+    font-size: 0.8125rem !important;
+    border-color: #e2e8f0 !important;
+    border-radius: 0.375rem !important;
+
+    &.focus {
+        border-color: #10b981 !important;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1) !important;
+    }
+}
+
+// Selection colors
+::selection {
+    background: rgba(16, 185, 129, 0.2);
+    color: #0f172a;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+        background: #94a3b8;
     }
 }
