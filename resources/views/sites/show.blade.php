@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @php
-    $maxDayPv = max(collect($stats['by_day'] ?? [])->pluck('pageviews')->max() ?? 0, 1);
     $countryLabel = function (?string $code): string {
         if (! $code) {
             return 'Sconosciuto';
@@ -64,22 +63,16 @@
         @endforeach
     </div>
 
-    @if (!empty($stats['by_day']))
+    @if (!empty($site_chart_payload['labels']))
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 fw-bold text-primary">{{ __('Andamento') }}</h6>
                 <small class="text-muted">{{ __('Visualizzazioni per giorno') }}</small>
             </div>
             <div class="card-body">
-                @foreach ($stats['by_day'] as $row)
-                    @php $w = max(8, ($row['pageviews'] / $maxDayPv) * 100); @endphp
-                    <div class="d-flex align-items-center small mb-2">
-                        <span class="text-muted font-monospace me-2" style="width: 7rem;">{{ $row['date'] }}</span>
-                        <div class="pa-bar-track">
-                            <div class="pa-bar-fill" style="width: {{ $w }}%;">{{ $row['pageviews'] }}</div>
-                        </div>
-                    </div>
-                @endforeach
+                <div class="pa-site-trend-chart-wrap">
+                    <canvas id="chart-site-trend" aria-hidden="true"></canvas>
+                </div>
             </div>
         </div>
     @endif
@@ -262,6 +255,51 @@
         </div>
     @endif
 
+    @if (!empty($stats['recent_tracking_events']))
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">{{ __('Eventi recenti') }}</h6>
+                <small class="text-muted">{{ __('Ultimi eventi nel periodo (max 100), con payload salvato e ripulito lato server') }}</small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm mb-0 w-100">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Data/ora') }}</th>
+                                <th>{{ __('Nome') }}</th>
+                                <th>{{ __('Percorso') }}</th>
+                                <th>{{ __('Visitatore') }}</th>
+                                <th>{{ __('Payload') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($stats['recent_tracking_events'] as $ev)
+                                <tr>
+                                    <td class="small text-nowrap font-monospace">{{ \Carbon\Carbon::parse($ev['created_at'])->timezone(config('app.timezone'))->format('d/m/Y H:i') }}</td>
+                                    <td class="font-monospace small">{{ $ev['name'] }}</td>
+                                    <td class="font-monospace small text-truncate" style="max-width: 12rem;" title="{{ $ev['path'] ?? '' }}">{{ $ev['path'] ?? '—' }}</td>
+                                    <td class="font-monospace small text-muted">{{ $ev['visitor_id_short'] }}</td>
+                                    <td class="small">
+                                        @if (!empty($ev['properties']))
+                                            <ul class="list-unstyled font-monospace mb-0">
+                                                @foreach ($ev['properties'] as $pk => $pv)
+                                                    <li><span class="text-muted">{{ $pk }}</span>: {{ $pv }}</li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-wrap justify-content-between align-items-center">
             <div>
@@ -275,3 +313,80 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    @if (!empty($site_chart_payload['labels']))
+        <script>
+            (function () {
+                var primary = 'rgb(78, 115, 223)';
+                var primaryFill = 'rgba(78, 115, 223, 0.08)';
+                var cfg = @json($site_chart_payload);
+
+                function run() {
+                    if (typeof Chart === 'undefined') {
+                        requestAnimationFrame(run);
+                        return;
+                    }
+                    var el = document.getElementById('chart-site-trend');
+                    if (!el) return;
+
+                    new Chart(el.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: cfg.labels,
+                            datasets: [
+                                {
+                                    label: @json(__('Visualizzazioni')),
+                                    data: cfg.data,
+                                    borderColor: primary,
+                                    backgroundColor: primaryFill,
+                                    borderWidth: 2,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 3,
+                                    fill: true,
+                                    tension: 0.3,
+                                },
+                            ],
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { intersect: false, mode: 'index' },
+                            },
+                            scales: {
+                                x: {
+                                    grid: { display: false, drawBorder: false },
+                                    ticks: {
+                                        maxRotation: 0,
+                                        maxTicksLimit: 12,
+                                        font: { size: 10 },
+                                        color: '#858796',
+                                    },
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0,
+                                        font: { size: 10 },
+                                        color: '#858796',
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)',
+                                        drawBorder: false,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', run);
+                } else {
+                    run();
+                }
+            })();
+        </script>
+    @endif
+@endpush

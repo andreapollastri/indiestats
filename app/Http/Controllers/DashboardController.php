@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Services\AnalyticsQueryService;
-use Carbon\CarbonInterface;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -37,7 +35,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function (Site $site) use ($analytics, $from, $to) {
                 $stats = $analytics->build($site->id, $from, $to);
-                $byDay = $this->fillDaySeries($stats['by_day'], $from, $to);
+                $byDay = $analytics->fillDaySeries($stats['by_day'], $from, $to);
 
                 return [
                     'id' => $site->id,
@@ -75,26 +73,5 @@ class DashboardController extends Controller
             'sites' => $sites,
             'chartPayload' => $chartPayload,
         ]);
-    }
-
-    /**
-     * @param  list<array{date: string, pageviews: int, visitors: int}>  $byDay
-     * @return list<array{date: string, pageviews: int}>
-     */
-    private function fillDaySeries(array $byDay, CarbonInterface $from, CarbonInterface $to): array
-    {
-        $map = collect($byDay)->keyBy('date');
-        $out = [];
-
-        foreach (CarbonPeriod::create($from->copy()->startOfDay(), $to->copy()->startOfDay()) as $day) {
-            $key = $day->toDateString();
-            $row = $map->get($key);
-            $out[] = [
-                'date' => $key,
-                'pageviews' => $row ? (int) $row['pageviews'] : 0,
-            ];
-        }
-
-        return $out;
     }
 }

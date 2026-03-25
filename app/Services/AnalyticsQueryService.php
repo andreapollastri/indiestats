@@ -7,10 +7,34 @@ use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Models\TrackingEvent;
 use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 
 class AnalyticsQueryService
 {
+    /**
+     * Riempie i giorni senza dati con zero (stesso formato della dashboard).
+     *
+     * @param  list<array{date: string, pageviews: int, visitors: int}>  $byDay
+     * @return list<array{date: string, pageviews: int}>
+     */
+    public function fillDaySeries(array $byDay, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $map = collect($byDay)->keyBy('date');
+        $out = [];
+
+        foreach (CarbonPeriod::create($from->copy()->startOfDay(), $to->copy()->startOfDay()) as $day) {
+            $key = $day->toDateString();
+            $row = $map->get($key);
+            $out[] = [
+                'date' => $key,
+                'pageviews' => $row ? (int) $row['pageviews'] : 0,
+            ];
+        }
+
+        return $out;
+    }
+
     /**
      * @return array{
      *   unique_visitors: int,
@@ -27,6 +51,13 @@ class AnalyticsQueryService
      *   by_utm_source: list<array{utm_source: string, pageviews: int, visitors: int}>,
      *   by_event_name: list<array{name: string, count: int, visitors: int}>,
      *   goals: list<array{id: int, label: string, event_name: string, count: int, unique_visitors: int}>,
+     *   recent_tracking_events: list<array{
+     *     created_at: string,
+     *     name: string,
+     *     path: string|null,
+     *     properties: array<string, string>|null,
+     *     visitor_id_short: string,
+     *   }>,
      * }
      */
     public function build(int $siteId, CarbonInterface $from, CarbonInterface $to): array
@@ -236,6 +267,31 @@ class AnalyticsQueryService
             })
             ->all();
 
+        $recentTrackingEvents = TrackingEvent::query()
+            ->where('site_id', $siteId)
+            ->whereBetween('created_at', [$from, $to])
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get()
+            ->map(function ($row) {
+                $vid = (string) $row->visitor_id;
+                $visitorShort = mb_strlen($vid) > 12
+                    ? mb_substr($vid, 0, 8).'…'
+                    : $vid;
+
+                /** @var array<string, string>|null $props */
+                $props = $row->properties;
+
+                return [
+                    'created_at' => $row->created_at->toIso8601String(),
+                    'name' => $row->name,
+                    'path' => $row->path,
+                    'properties' => $props,
+                    'visitor_id_short' => $visitorShort,
+                ];
+            })
+            ->all();
+
         return [
             'unique_visitors' => $uniqueVisitors,
             'total_pageviews' => $totalPageviews,
@@ -251,6 +307,7 @@ class AnalyticsQueryService
             'by_utm_source' => $byUtmSource,
             'by_event_name' => $byEventName,
             'goals' => $goalStats,
+            'recent_tracking_events' => $recentTrackingEvents,
         ];
     }
 }

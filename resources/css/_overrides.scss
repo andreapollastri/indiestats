@@ -16,6 +16,16 @@
     max-width: 100%;
 }
 
+.pa-site-trend-chart-wrap {
+    position: relative;
+    height: 220px;
+}
+
+.pa-site-trend-chart-wrap canvas {
+    display: block;
+    max-width: 100%;
+}
+
 .table-responsive .table {
     font-size: 0.875rem;
 }

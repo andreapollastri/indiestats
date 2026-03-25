@@ -6,6 +6,7 @@ use App\Models\Site;
 use App\Services\AnalyticsQueryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -82,6 +83,14 @@ class SiteController extends Controller
 
         $stats = $analytics->build($site->id, $from, $to);
 
+        $byDayFilled = $analytics->fillDaySeries($stats['by_day'], $from, $to);
+        $siteChartPayload = [
+            'labels' => collect($byDayFilled)->map(function (array $row) {
+                return Carbon::parse($row['date'])->translatedFormat('j M');
+            })->all(),
+            'data' => array_column($byDayFilled, 'pageviews'),
+        ];
+
         return view('sites.show', [
             'title' => $site->name.' · '.config('app.name'),
             'breadcrumbs' => [
@@ -101,6 +110,7 @@ class SiteController extends Controller
                 'from' => $from->toDateString(),
                 'to' => $to->toDateString(),
             ],
+            'site_chart_payload' => $siteChartPayload,
         ]);
     }
 

@@ -11,10 +11,12 @@
         "vite": "^6.2"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^6.7.2",
         "@fontsource/nunito": "^5.2.5",
+        "@fortawesome/fontawesome-free": "^6.7.2",
         "bootstrap": "^5.3.3",
         "chart.js": "^4.4.8",
+        "datatables.net-bs5": "^2.3.7",
+        "datatables.net-responsive-bs5": "^3.0.8",
         "jquery": "^3.7.1"
     }
 }

@@ -6,6 +6,7 @@ use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Models\Site;
 use App\Models\TrackingEvent;
+use App\Services\EventPayloadSanitizer;
 use App\Services\GeoIpService;
 use App\Services\ReferrerSourceService;
 use Illuminate\Http\JsonResponse;
@@ -155,6 +156,13 @@ class CollectController extends Controller
             return response()->json(['error' => 'origin not allowed'], 403);
         }
 
+        $name = EventPayloadSanitizer::sanitizeEventName($data['name']);
+        if ($name === '') {
+            return response()->json(['error' => 'invalid name'], 422);
+        }
+
+        $path = EventPayloadSanitizer::sanitizePath($data['path'] ?? null);
+
         $properties = $this->normalizeEventProperties($data['properties'] ?? null);
         if ($properties !== null) {
             $encoded = json_encode($properties);
@@ -166,8 +174,8 @@ class CollectController extends Controller
         TrackingEvent::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
-            'name' => trim($data['name']),
-            'path' => $data['path'] ?? null,
+            'name' => $name,
+            'path' => $path,
             'properties' => $properties,
             'created_at' => now(),
         ]);
@@ -191,15 +199,22 @@ class CollectController extends Controller
             if ($n >= 20) {
                 break;
             }
-            if (! is_string($k) || $k === '' || mb_strlen($k) > 64) {
+            if (! is_string($k)) {
+                continue;
+            }
+            $key = EventPayloadSanitizer::sanitizePropertyKey($k);
+            if ($key === null) {
                 continue;
             }
             if (is_bool($v)) {
-                $out[$k] = $v ? 'true' : 'false';
+                $out[$key] = $v ? 'true' : 'false';
             } elseif (is_int($v) || is_float($v)) {
-                $out[$k] = (string) $v;
+                if (is_float($v) && ! is_finite($v)) {
+                    continue;
+                }
+                $out[$key] = (string) $v;
             } elseif (is_string($v)) {
-                $out[$k] = mb_substr($v, 0, 255);
+                $out[$key] = EventPayloadSanitizer::sanitizePropertyStringValue($v);
             } else {
                 continue;
             }
