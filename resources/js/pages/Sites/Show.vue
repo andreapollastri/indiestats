@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { Check, Copy } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -66,6 +68,21 @@ const maxDayPv = computed(() =>
 
 function rangeUrl(r: string) {
     return `/sites/${props.site.id}?range=${encodeURIComponent(r)}`;
+}
+
+const snippetCopied = ref(false);
+let snippetCopiedTimer: ReturnType<typeof setTimeout> | null = null;
+
+function copyEmbedSnippet(text: string) {
+    void navigator.clipboard.writeText(text);
+    snippetCopied.value = true;
+    if (snippetCopiedTimer) {
+        clearTimeout(snippetCopiedTimer);
+    }
+    snippetCopiedTimer = setTimeout(() => {
+        snippetCopied.value = false;
+        snippetCopiedTimer = null;
+    }, 2000);
 }
 
 function countryLabel(code: string | null) {
@@ -165,7 +182,7 @@ function countryLabel(code: string | null) {
                 </div>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4">
                 <Card>
                     <CardHeader class="pb-2">
                         <CardDescription>Visitatori unici</CardDescription>
@@ -237,7 +254,7 @@ function countryLabel(code: string | null) {
                 </CardContent>
             </Card>
 
-            <div class="grid gap-6 lg:grid-cols-2">
+            <div class="flex flex-col gap-6">
                 <Card>
                     <CardHeader>
                         <CardTitle class="text-base">Pagine</CardTitle>
@@ -480,7 +497,7 @@ function countryLabel(code: string | null) {
                     </CardContent>
                 </Card>
 
-                <Card class="lg:col-span-2">
+                <Card>
                     <CardHeader>
                         <CardTitle class="text-base">Paese</CardTitle>
                     </CardHeader>
@@ -525,18 +542,43 @@ function countryLabel(code: string | null) {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle class="text-base">Snippet</CardTitle>
-                    <CardDescription>
-                        Incolla prima della chiusura di
-                        <code class="text-xs">&lt;/body&gt;</code>
-                    </CardDescription>
+                <CardHeader
+                    class="flex flex-row items-start justify-between gap-4 space-y-0"
+                >
+                    <div class="min-w-0 flex-1">
+                        <CardTitle class="text-base">Snippet</CardTitle>
+                        <CardDescription>
+                            Incolla prima della chiusura di
+                            <code class="text-xs">&lt;/body&gt;</code>
+                        </CardDescription>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        class="shrink-0 gap-2"
+                        type="button"
+                        @click="copyEmbedSnippet(site.embed_code)"
+                    >
+                        <Check
+                            v-if="snippetCopied"
+                            class="size-4 text-green-600 dark:text-green-400"
+                        />
+                        <Copy v-else class="size-4" />
+                        {{ snippetCopied ? 'Copiato' : 'Copia' }}
+                    </Button>
                 </CardHeader>
                 <CardContent>
-                    <pre
-                        class="bg-muted overflow-auto rounded-md p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap"
-                        >{{ site.embed_code }}</pre
+                    <div
+                        class="border-border bg-muted/40 rounded-lg border shadow-inner"
                     >
+                        <pre
+                            class="m-0 max-h-48 overflow-x-auto overflow-y-auto p-4 font-mono text-[13px] leading-relaxed"
+                            ><code
+                                class="text-foreground select-all whitespace-pre-wrap break-words"
+                                >{{ site.embed_code }}</code
+                            ></pre
+                        >
+                    </div>
                 </CardContent>
             </Card>
         </div>
