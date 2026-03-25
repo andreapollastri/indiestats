@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CollectController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\TrackerController;
@@ -8,7 +9,8 @@ use App\Http\Middleware\HandleTrackingCors;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'Welcome', [
+Route::view('/', 'welcome', [
+    'title' => config('app.name'),
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
@@ -31,7 +33,7 @@ Route::get('/i/{publicKey}.js', [TrackerController::class, 'script'])
     ->whereUuid('publicKey');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
-    Route::get('dashboard', [SiteController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show');

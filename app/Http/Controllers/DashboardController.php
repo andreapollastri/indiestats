@@ -1,0 +1,100 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Site;
+use App\Services\AnalyticsQueryService;
+use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\View\View;
+
+class DashboardController extends Controller
+{
+    public function index(Request $request, AnalyticsQueryService $analytics): View
+    {
+        $range = $request->query('range', '7d');
+        $allowed = ['today', '7d', '30d', '3m', '6m', '1y'];
+        if (! in_array($range, $allowed, true)) {
+            $range = '7d';
+        }
+
+        $from = match ($range) {
+            'today' => now()->startOfDay(),
+            '7d' => now()->subDays(7)->startOfDay(),
+            '30d' => now()->subDays(30)->startOfDay(),
+            '3m' => now()->subMonths(3)->startOfDay(),
+            '6m' => now()->subMonths(6)->startOfDay(),
+            '1y' => now()->subYear()->startOfDay(),
+            default => now()->subDays(7)->startOfDay(),
+        };
+        $to = now()->endOfDay();
+
+        $sites = Site::query()
+            ->where('user_id', $request->user()->id)
+            ->orderBy('name')
+            ->get()
+            ->map(function (Site $site) use ($analytics, $from, $to) {
+                $stats = $analytics->build($site->id, $from, $to);
+                $byDay = $this->fillDaySeries($stats['by_day'], $from, $to);
+
+                return [
+                    'id' => $site->id,
+                    'name' => $site->name,
+                    'unique_visitors' => $stats['unique_visitors'],
+                    'total_pageviews' => $stats['total_pageviews'],
+                    'by_day' => $byDay,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $chartPayload = collect($sites)->map(function (array $site) {
+            $labels = collect($site['by_day'])->map(function (array $row) {
+                return Carbon::parse($row['date'])->translatedFormat('j M');
+            })->all();
+
+            return [
+                'id' => $site['id'],
+                'labels' => $labels,
+                'data' => array_column($site['by_day'], 'pageviews'),
+            ];
+        })->values()->all();
+
+        return view('dashboard', [
+            'title' => __('Dashboard').' · '.config('app.name'),
+            'breadcrumbs' => [
+                ['title' => __('Dashboard'), 'href' => route('dashboard', ['range' => $range])],
+            ],
+            'range' => $range,
+            'period' => [
+                'from' => $from->toDateString(),
+                'to' => $to->toDateString(),
+            ],
+            'sites' => $sites,
+            'chartPayload' => $chartPayload,
+        ]);
+    }
+
+    /**
+     * @param  list<array{date: string, pageviews: int, visitors: int}>  $byDay
+     * @return list<array{date: string, pageviews: int}>
+     */
+    private function fillDaySeries(array $byDay, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $map = collect($byDay)->keyBy('date');
+        $out = [];
+
+        foreach (CarbonPeriod::create($from->copy()->startOfDay(), $to->copy()->startOfDay()) as $day) {
+            $key = $day->toDateString();
+            $row = $map->get($key);
+            $out[] = [
+                'date' => $key,
+                'pageviews' => $row ? (int) $row['pageviews'] : 0,
+            ];
+        }
+
+        return $out;
+    }
+}

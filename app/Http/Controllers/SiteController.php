@@ -6,12 +6,12 @@ use App\Models\Site;
 use App\Services\AnalyticsQueryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class SiteController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): View
     {
         $sites = Site::query()
             ->where('user_id', $request->user()->id)
@@ -26,7 +26,11 @@ class SiteController extends Controller
                 'created_at' => $s->created_at->toIso8601String(),
             ]);
 
-        return Inertia::render('Sites/Index', [
+        return view('sites.index', [
+            'title' => __('Siti').' · '.config('app.name'),
+            'breadcrumbs' => [
+                ['title' => __('Siti'), 'href' => route('sites.index')],
+            ],
             'sites' => $sites,
         ]);
     }
@@ -35,18 +39,27 @@ class SiteController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'allowed_domains' => 'nullable|string|max:2000',
+            'allowed_domains' => 'required|string|max:2000',
+        ], [
+            'allowed_domains.required' => __('Indica almeno un dominio consentito.'),
         ]);
+
+        $allowedDomains = trim($data['allowed_domains']);
+        if ($allowedDomains === '') {
+            throw ValidationException::withMessages([
+                'allowed_domains' => __('Indica almeno un dominio consentito.'),
+            ]);
+        }
 
         $request->user()->sites()->create([
             'name' => $data['name'],
-            'allowed_domains' => $data['allowed_domains'] ?? null,
+            'allowed_domains' => $allowedDomains,
         ]);
 
         return redirect()->route('sites.index')->with('success', 'Sito aggiunto.');
     }
 
-    public function show(Request $request, Site $site, AnalyticsQueryService $analytics): Response
+    public function show(Request $request, Site $site, AnalyticsQueryService $analytics): View
     {
         $this->authorize('view', $site);
 
@@ -69,7 +82,12 @@ class SiteController extends Controller
 
         $stats = $analytics->build($site->id, $from, $to);
 
-        return Inertia::render('Sites/Show', [
+        return view('sites.show', [
+            'title' => $site->name.' · '.config('app.name'),
+            'breadcrumbs' => [
+                ['title' => __('Siti'), 'href' => route('sites.index')],
+                ['title' => $site->name, 'href' => route('sites.show', $site)],
+            ],
             'site' => [
                 'id' => $site->id,
                 'name' => $site->name,

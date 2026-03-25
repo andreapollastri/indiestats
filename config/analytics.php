@@ -19,9 +19,9 @@ return [
     | Host aggiuntivi per validazione origine (collect API)
     |--------------------------------------------------------------------------
     |
-    | Quando allowed_domains è valorizzato sul sito, le richieste devono
-    | provenire da un host in quell’elenco. Qui puoi aggiungere host per
-    | sviluppo locale senza modificarli nel DB.
+    | Le richieste di raccolta devono provenire da un host nell’elenco
+    | allowed_domains del sito. Qui puoi aggiungere host per sviluppo locale
+    | senza modificarli nel DB.
     |
     | Se TRACKING_EXTRA_ALLOWED_HOSTS non è impostato in .env e APP_ENV=local,
     | si usano localhost e 127.0.0.1. Imposta la variabile (anche vuota) per

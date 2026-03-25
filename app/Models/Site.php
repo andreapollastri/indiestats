@@ -54,7 +54,7 @@ class Site extends Model
     public function isOriginAllowed(Request $request): bool
     {
         if (blank($this->allowed_domains)) {
-            return true;
+            return false;
         }
 
         $origin = $request->header('Origin');

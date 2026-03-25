@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->uuid('public_key')->unique();
-            $table->text('allowed_domains')->nullable()->comment('Comma-separated hostnames; empty = allow all');
+            $table->text('allowed_domains')->nullable()->comment('Comma-separated hostnames; required at creation');
             $table->timestamps();
         });
     }

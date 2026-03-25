@@ -8,8 +8,7 @@ use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 use Laravel\Fortify\Features;
 
 class SecurityController extends Controller implements HasMiddleware
@@ -28,20 +27,34 @@ class SecurityController extends Controller implements HasMiddleware
     /**
      * Show the user's security settings page.
      */
-    public function edit(TwoFactorAuthenticationRequest $request): Response
+    public function edit(TwoFactorAuthenticationRequest $request): View
     {
-        $props = [
-            'canManageTwoFactor' => Features::canManageTwoFactorAuthentication(),
-        ];
+        $user = $request->user();
 
-        if (Features::canManageTwoFactorAuthentication()) {
+        $canManageTwoFactor = Features::canManageTwoFactorAuthentication();
+        $twoFactorEnabled = false;
+        $requiresConfirmation = false;
+        $pendingTwoFactorConfirm = false;
+
+        if ($canManageTwoFactor) {
             $request->ensureStateIsValid();
 
-            $props['twoFactorEnabled'] = $request->user()->hasEnabledTwoFactorAuthentication();
-            $props['requiresConfirmation'] = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
+            $twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
+            $requiresConfirmation = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
+            $pendingTwoFactorConfirm = $user->two_factor_secret
+                && ! $user->two_factor_confirmed_at;
         }
 
-        return Inertia::render('settings/Security', $props);
+        return view('settings.security', [
+            'title' => __('Sicurezza').' · '.config('app.name'),
+            'breadcrumbs' => [
+                ['title' => __('Sicurezza'), 'href' => route('security.edit')],
+            ],
+            'canManageTwoFactor' => $canManageTwoFactor,
+            'twoFactorEnabled' => $twoFactorEnabled,
+            'requiresConfirmation' => $requiresConfirmation,
+            'pendingTwoFactorConfirm' => $pendingTwoFactorConfirm,
+        ]);
     }
 
     /**

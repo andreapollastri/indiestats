@@ -24,4 +24,17 @@ class DashboardTest extends TestCase
         $response = $this->get(route('dashboard'));
         $response->assertOk();
     }
+
+    public function test_dashboard_ok_with_one_site(): void
+    {
+        $user = User::factory()->create();
+        $user->sites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('dashboard'));
+        $response->assertOk();
+    }
 }

@@ -32,14 +32,6 @@ jobs:
           tools: composer:v2
           coverage: xdebug
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install Node Dependencies
-        run: npm i
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -48,9 +40,6 @@ jobs:
 
       - name: Generate Application Key
         run: php artisan key:generate
-
-      - name: Build Assets
-        run: npm run build
 
       - name: Tests
         run: ./vendor/bin/phpunit

@@ -1,0 +1,81 @@
+// Personalizzazioni sopra il tema
+
+.sidebar hr.sidebar-divider {
+    margin: 0;
+}
+
+.pa-dashboard-chart-wrap {
+    position: relative;
+    height: 160px;
+}
+
+.table-responsive .table {
+    font-size: 0.875rem;
+}
+
+.font-monospace {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.pa-bar-track {
+    height: 28px;
+    background: #eaecf4;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.pa-bar-fill {
+    height: 100%;
+    background: #4e73df;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    color: #fff;
+    min-width: 2rem;
+}
+
+#accordionSidebar .nav-item form.w-100 {
+    display: block;
+}
+
+#accordionSidebar .nav-item form .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    width: 100%;
+    line-height: inherit;
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+#accordionSidebar .nav-item form .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    text-decoration: none;
+}
+
+@media (min-width: 768px) {
+    #accordionSidebar.sidebar.toggled .nav-item form.w-100 {
+        text-align: center;
+    }
+
+    #accordionSidebar.sidebar.toggled .nav-item form .nav-link {
+        text-align: center;
+        padding: 0.75rem 1rem;
+        width: 6.5rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #accordionSidebar.sidebar.toggled .nav-item form .nav-link span {
+        font-size: 0.65rem;
+        display: block;
+    }
+
+    #accordionSidebar.sidebar.toggled .nav-item form .nav-link i {
+        margin-right: 0;
+    }
+}
