@@ -1,6 +1,7 @@
 import jQuery from 'jquery';
 import * as bootstrap from 'bootstrap';
 import { Chart, registerables } from 'chart.js';
+import './site-stats-datatables.js';
 
 window.$ = window.jQuery = jQuery;
 window.bootstrap = bootstrap;

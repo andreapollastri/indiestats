@@ -102,7 +102,6 @@ class SiteController extends Controller
                 'name' => $site->name,
                 'public_key' => $site->public_key,
                 'allowed_domains' => $site->allowed_domains,
-                'embed_code' => $this->embedCode($site),
             ],
             'stats' => $stats,
             'range' => $range,

@@ -108,13 +108,14 @@ class CollectController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function outbound(Request $request): JsonResponse
+    public function outbound(Request $request, ReferrerSourceService $referrerService): JsonResponse
     {
         $data = $request->validate([
             'site_key' => 'required|uuid',
             'visitor_id' => 'required|string|max:64',
             'from_path' => 'required|string|max:2048',
             'target_url' => 'required|string|max:2048',
+            'referrer' => 'nullable|string|max:2048',
         ]);
 
         $site = Site::query()->where('public_key', $data['site_key'])->first();
@@ -126,24 +127,30 @@ class CollectController extends Controller
             return response()->json(['error' => 'origin not allowed'], 403);
         }
 
+        $referrerUrl = $data['referrer'] ?? null;
+        $analysis = $referrerService->analyze($referrerUrl);
+
         OutboundClick::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
             'from_path' => $data['from_path'],
             'target_url' => $data['target_url'],
+            'referrer_url' => $referrerUrl,
+            'referrer_source' => $analysis['source'],
             'created_at' => now(),
         ]);
 
         return response()->json(['ok' => true]);
     }
 
-    public function event(Request $request): JsonResponse
+    public function event(Request $request, ReferrerSourceService $referrerService): JsonResponse
     {
         $data = $request->validate([
             'site_key' => 'required|uuid',
             'visitor_id' => 'required|string|max:64',
             'name' => 'required|string|max:128',
             'path' => 'nullable|string|max:2048',
+            'referrer' => 'nullable|string|max:2048',
             'properties' => 'nullable|array|max:20',
         ]);
 
@@ -171,11 +178,16 @@ class CollectController extends Controller
             }
         }
 
+        $referrerUrl = $data['referrer'] ?? null;
+        $analysis = $referrerService->analyze($referrerUrl);
+
         TrackingEvent::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
             'name' => $name,
             'path' => $path,
+            'referrer_url' => $referrerUrl,
+            'referrer_source' => $analysis['source'],
             'properties' => $properties,
             'created_at' => now(),
         ]);

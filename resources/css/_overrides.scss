@@ -30,6 +30,51 @@
     font-size: 0.875rem;
 }
 
+/* Statistiche sito: tipografia uniforme (DataTables + intestazioni) */
+$pa-dt-font-size: 0.875rem;
+
+.card-body .dt-container {
+    font-size: $pa-dt-font-size;
+    line-height: 1.4;
+
+    .dt-length,
+    .dt-search,
+    .dt-info,
+    .dt-processing,
+    .dt-paging {
+        font-size: inherit;
+    }
+
+    .form-control,
+    .form-select {
+        font-size: $pa-dt-font-size;
+    }
+
+    .dt-paging .page-link {
+        font-size: $pa-dt-font-size;
+    }
+}
+
+table.table.pa-site-dt {
+    thead > tr > th,
+    tbody > tr > td {
+        font-size: $pa-dt-font-size;
+        line-height: 1.4;
+        vertical-align: middle;
+    }
+
+    thead > tr > th {
+        font-weight: 600;
+        color: #5a5c69;
+    }
+
+    /* celle monospace (numeri / percorsi): stessa dimensione del testo base */
+    tbody td.font-monospace,
+    thead th.font-monospace {
+        font-size: $pa-dt-font-size;
+    }
+}
+
 .font-monospace {
     font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }

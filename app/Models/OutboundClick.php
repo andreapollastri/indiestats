@@ -14,6 +14,8 @@ class OutboundClick extends Model
         'visitor_id',
         'from_path',
         'target_url',
+        'referrer_url',
+        'referrer_source',
         'created_at',
     ];
 

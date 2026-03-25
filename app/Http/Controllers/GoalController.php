@@ -29,7 +29,7 @@ class GoalController extends Controller
             'event_name' => trim($data['event_name']),
         ]);
 
-        return redirect()->back()->with('success', 'Goal salvato.');
+        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', 'Goal salvato.');
     }
 
     public function destroy(Request $request, Site $site, Goal $goal): RedirectResponse
@@ -44,6 +44,18 @@ class GoalController extends Controller
 
         $goal->delete();
 
-        return redirect()->back()->with('success', 'Goal eliminato.');
+        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', 'Goal eliminato.');
+    }
+
+    private function redirectToSiteShowGoalsTab(Request $request, Site $site): RedirectResponse
+    {
+        $range = $request->query('range') ?? $request->input('range');
+        $allowed = ['today', '7d', '30d', '3m', '6m', '1y'];
+        $params = ['site' => $site, 'tab' => 'goals'];
+        if (is_string($range) && $range !== '' && in_array($range, $allowed, true)) {
+            $params['range'] = $range;
+        }
+
+        return redirect()->route('sites.show', $params);
     }
 }

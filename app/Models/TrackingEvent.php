@@ -14,6 +14,8 @@ class TrackingEvent extends Model
         'visitor_id',
         'name',
         'path',
+        'referrer_url',
+        'referrer_source',
         'properties',
         'created_at',
     ];
