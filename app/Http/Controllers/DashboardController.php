@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Services\AnalyticsQueryService;
+use App\Support\AnalyticsFilters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -29,12 +30,14 @@ class DashboardController extends Controller
         };
         $to = now()->endOfDay();
 
+        $filters = AnalyticsFilters::fromRequest($request);
+
         $sites = Site::query()
             ->where('user_id', $request->user()->id)
             ->orderBy('name')
             ->get()
-            ->map(function (Site $site) use ($analytics, $from, $to) {
-                $stats = $analytics->build($site->id, $from, $to);
+            ->map(function (Site $site) use ($analytics, $from, $to, $filters) {
+                $stats = $analytics->build($site->id, $from, $to, $filters);
                 $byDay = $analytics->fillDaySeries($stats['by_day'], $from, $to);
 
                 return [
@@ -64,7 +67,7 @@ class DashboardController extends Controller
         return view('dashboard', [
             'title' => __('Dashboard').' · '.config('app.name'),
             'breadcrumbs' => [
-                ['title' => __('Dashboard'), 'href' => route('dashboard', ['range' => $range])],
+                ['title' => __('Dashboard'), 'href' => route('dashboard', array_merge(['range' => $range], $filters->toQueryArray()))],
             ],
             'range' => $range,
             'period' => [
@@ -73,6 +76,7 @@ class DashboardController extends Controller
             ],
             'sites' => $sites,
             'chartPayload' => $chartPayload,
+            'analytics_filters' => $filters,
         ]);
     }
 }

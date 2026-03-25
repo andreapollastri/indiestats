@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @php
+    $analytics_filters = $analytics_filters ?? new \App\Support\AnalyticsFilters;
     $rangeLabels = [
         'today' => __('Oggi'),
         '7d' => __('7 giorni'),
@@ -15,7 +16,7 @@
     <div class="mb-4 mt-3">
         <div class="d-flex flex-wrap justify-content-start justify-content-lg-end mb-3">
             @foreach ($rangeLabels as $key => $label)
-                <a href="{{ route('dashboard', ['range' => $key]) }}" class="btn btn-sm mb-1 me-1 {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
+                <a href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}" class="btn btn-sm mb-1 me-1 {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
             @endforeach
         </div>
         <h1 class="h3 mb-1 text-gray-800">{{ __('Dashboard') }}</h1>
@@ -50,7 +51,7 @@
                             <p class="text-xs text-center text-primary mb-0 fw-bold">
                                 <i class="fas fa-arrow-right me-1"></i>{{ __('Apri statistiche') }}
                             </p>
-                            <a href="{{ route('sites.show', $site['public_key']) }}?range={{ $range }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
+                            <a href="{{ route('sites.show', array_merge(['site' => $site['public_key'], 'range' => $range], $analytics_filters->toQueryArray())) }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
                         </div>
                     </div>
                 </div>

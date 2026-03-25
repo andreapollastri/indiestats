@@ -102,6 +102,23 @@ final class AnalyticsFilters
     }
 
     /**
+     * Per query su outbound_clicks: path e provenienza si applicano alle colonne from_path / referrer_source;
+     * non vanno ripetuti nel sottoinsieme visitor_id da page_views.
+     */
+    public function withoutPathAndSource(): self
+    {
+        return new self(
+            source: null,
+            path: null,
+            utm: $this->utm,
+            event: $this->event,
+            device: $this->device,
+            country: $this->country,
+            searchQuery: $this->searchQuery,
+        );
+    }
+
+    /**
      * @param  array<string, mixed>  $base
      * @return array<string, mixed>
      */

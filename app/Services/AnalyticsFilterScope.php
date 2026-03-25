@@ -29,9 +29,6 @@ class AnalyticsFilterScope
         }
     }
 
-    /**
-     * @param  Builder|\Illuminate\Database\Query\Builder  $q
-     */
     private function applyPageViewRowConditions(Builder|QueryBuilder $q, AnalyticsFilters $filters): void
     {
         if ($filters->source !== null) {
@@ -55,7 +52,8 @@ class AnalyticsFilterScope
     }
 
     /**
-     * Per outbound: visitor_id deve soddisfare filtri page view e (se presente) evento.
+     * Outbound: path e provenienza si applicano alle righe (from_path, referrer_source);
+     * utm/dispositivo/paese/query ed evento restringono i visitor come per le altre metriche.
      */
     public function constrainVisitorForOutbound(
         Builder $q,
@@ -69,7 +67,14 @@ class AnalyticsFilterScope
             return;
         }
 
-        $pv = $filters->withoutEvent();
+        if ($filters->path !== null) {
+            $q->where('from_path', $filters->path);
+        }
+        if ($filters->source !== null) {
+            $q->where('referrer_source', $filters->source);
+        }
+
+        $pv = $filters->withoutEvent()->withoutPathAndSource();
 
         if ($pv->hasPageViewRowFilters()) {
             $q->whereIn($visitorColumn, function ($sub) use ($siteId, $from, $to, $pv): void {
