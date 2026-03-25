@@ -133,11 +133,25 @@ Il file `.js` è generato dinamicamente e contiene la chiave pubblica del sito.
 
 ### 4. Dashboard per sito
 
-Apri il sito dalla lista: puoi filtrare il **periodo** con i pulsanti (oggi, 7 / 30 giorni, **3 / 6 mesi**, **1 anno**). Nella dashboard trovi **visitatori unici**, **visualizzazioni**, **tempo medio in pagina**, **click in uscita**, andamento giornaliero, top pagine, sorgenti, browser, dispositivo, paese, **UTM source**, **query di ricerca** (motori di ricerca o parametri `q` / `query` / `s` sulla URL).
+Apri il sito dalla lista: puoi filtrare il **periodo** con i pulsanti (oggi, 7 / 30 giorni, **3 / 6 mesi**, **1 anno**). Nella dashboard trovi **visitatori unici**, **visualizzazioni**, **tempo medio in pagina**, **click in uscita**, andamento giornaliero, top pagine, sorgenti, browser, dispositivo, paese, **UTM source**, **query di ricerca** (motori di ricerca o parametri `q` / `query` / `s` sulla URL), **eventi custom** e **goal** (vedi sotto).
+
+### Eventi e goal (minimo)
+
+Dopo lo snippet dello script, sul sito tracciato puoi inviare eventi da JavaScript:
+
+```js
+window.indiestats.track('nome_evento');
+window.indiestats.track('nome_evento', { chiave: 'valore' });
+```
+
+- Gli **eventi** sono elencati nel periodo selezionato (nome, conteggi, visitatori unici).
+- I **goal** sono configurati in dashboard: **nome** (solo etichetta) e **nome evento** (`nome_evento` deve coincidere con la stringa passata a `track('…')`). Per ogni goal vedi quante volte è stato registrato l’evento e quanti visitatori distinti.
+
+Proprietà opzionali: oggetto **piatto**, fino a 20 chiavi, valori stringa/numero/booleano (normalizzati lato server).
 
 ### Conservazione dati (1 anno)
 
-Le tabelle di analytics conservano al massimo **365 giorni** di eventi (pageview e click in uscita). Il comando `php artisan analytics:prune` elimina i record più vecchi; è **pianificato ogni giorno alle 03:15** quando usi lo scheduler Laravel.
+Le tabelle di analytics conservano al massimo **365 giorni** di dati di **pageview**, **click in uscita** ed **eventi custom** (i record dei goal sono solo le definizioni; non scadono). Il comando `php artisan analytics:prune` elimina i record più vecchi; è **pianificato ogni giorno alle 03:15** quando usi lo scheduler Laravel.
 
 - Variabile opzionale: `ANALYTICS_RETENTION_DAYS` (default `365`) in `.env`.
 - In produzione aggiungi al **cron** del server:
@@ -154,6 +168,7 @@ In locale puoi eseguire manualmente: `php artisan analytics:prune`.
 - Identificativo visitatore in **localStorage** (prima parte, senza cookie di terze parti lato analytics).
 - Durata approssimativa sulla pagina all’uscita (tab nascosta / chiusura).
 - Click su link che portano **fuori** dal dominio corrente.
+- **Eventi custom** con nome e proprietà opzionali (`indiestats.track`).
 
 ## Endpoint pubblici (riferimento)
 
@@ -163,6 +178,7 @@ In locale puoi eseguire manualmente: `php artisan analytics:prune`.
 | `POST` | `/collect/pageview` | Registrazione visualizzazione |
 | `POST` | `/collect/duration` | Aggiornamento durata |
 | `POST` | `/collect/outbound` | Click in uscita |
+| `POST` | `/collect/event` | Evento custom (`name`, opz. `properties`) |
 | `GET` | `/collect/pixel.gif` | Fallback noscript (tracking limitato) |
 
 Le richieste `POST` su `/collect/*` sono escluse dal token CSRF e hanno CORS aperto per consentire il caricamento da siti esterni. Sono applicati **rate limit** sulle route di raccolta.

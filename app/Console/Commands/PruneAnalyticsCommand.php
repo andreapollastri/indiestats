@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\OutboundClick;
 use App\Models\PageView;
+use App\Models\TrackingEvent;
 use Illuminate\Console\Command;
 
 class PruneAnalyticsCommand extends Command
@@ -19,8 +20,9 @@ class PruneAnalyticsCommand extends Command
 
         $pv = PageView::query()->where('created_at', '<', $cutoff)->delete();
         $out = OutboundClick::query()->where('created_at', '<', $cutoff)->delete();
+        $ev = TrackingEvent::query()->where('created_at', '<', $cutoff)->delete();
 
-        $this->info("Eliminati {$pv} pageview e {$out} click in uscita anteriori a {$cutoff->toDateTimeString()}.");
+        $this->info("Eliminati {$pv} pageview, {$out} click in uscita e {$ev} eventi anteriori a {$cutoff->toDateTimeString()}.");
 
         return self::SUCCESS;
     }

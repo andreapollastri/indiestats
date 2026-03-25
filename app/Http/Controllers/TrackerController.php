@@ -18,6 +18,7 @@ class TrackerController extends Controller
 (function(){
 var K={$key};
 var B={$base};
+if(location.protocol==='https:'&&B.indexOf('http:')===0){console.warn('[IndieStats] Page is HTTPS but APP_URL is HTTP: the browser blocks script and API calls (mixed content). Use HTTPS for the API (e.g. Herd/Valet) or test over HTTP.');}
 var S='is_vid_'+K.replace(/-/g,'').slice(0,12);
 function vid(){
 try{
@@ -87,9 +88,38 @@ if(u.hostname===location.hostname)return;
 beacon('/collect/outbound',{site_key:K,visitor_id:vid(),from_path:location.pathname+location.search,target_url:a.href});
 }catch(err){}
 },true);
+<<<<<<< Updated upstream
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sendPageview);}
 else{sendPageview();}
 window.addEventListener('beforeunload',sendDuration);
+=======
+if(document.readyState==='complete')sendPageview();
+else window.addEventListener('load',sendPageview);
+var NS='indiestats';
+window[NS]=window[NS]||{};
+window[NS].track=function(name,props){
+if(!name||typeof name!=='string')return;
+var n=name.trim().slice(0,128);
+if(!n)return;
+var p=null;
+if(props&&typeof props==='object'&&!Array.isArray(props)){
+p={};
+var k,i=0;
+for(k in props){
+if(i>=20)break;
+if(!Object.prototype.hasOwnProperty.call(props,k))continue;
+if(typeof k!=='string'||k.length>64)continue;
+var v=props[k];
+if(typeof v==='boolean')p[k]=v;
+else if(typeof v==='number'&&isFinite(v))p[k]=v;
+else if(typeof v==='string')p[k]=v.slice(0,255);
+i++;
+}
+if(Object.keys(p).length===0)p=null;
+}
+beacon('/collect/event',{site_key:K,visitor_id:vid(),name:n,path:currentPath(),properties:p});
+};
+>>>>>>> Stashed changes
 })();
 JS;
 

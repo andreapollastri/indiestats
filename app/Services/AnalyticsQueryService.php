@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Goal;
 use App\Models\OutboundClick;
 use App\Models\PageView;
+use App\Models\TrackingEvent;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -23,6 +25,8 @@ class AnalyticsQueryService
      *   outbound_clicks: int,
      *   by_search_query: list<array{query: string, pageviews: int, visitors: int}>,
      *   by_utm_source: list<array{utm_source: string, pageviews: int, visitors: int}>,
+     *   by_event_name: list<array{name: string, count: int, visitors: int}>,
+     *   goals: list<array{id: int, label: string, event_name: string, count: int, unique_visitors: int}>,
      * }
      */
     public function build(int $siteId, CarbonInterface $from, CarbonInterface $to): array
@@ -195,6 +199,43 @@ class AnalyticsQueryService
             ])
             ->all();
 
+        $byEventName = TrackingEvent::query()
+            ->where('site_id', $siteId)
+            ->whereBetween('created_at', [$from, $to])
+            ->select('name')
+            ->selectRaw('COUNT(*) as count')
+            ->selectRaw('COUNT(DISTINCT visitor_id) as visitors')
+            ->groupBy('name')
+            ->orderByDesc('count')
+            ->limit(50)
+            ->get()
+            ->map(fn ($row) => [
+                'name' => $row->name,
+                'count' => (int) $row->count,
+                'visitors' => (int) $row->visitors,
+            ])
+            ->all();
+
+        $goalStats = Goal::query()
+            ->where('site_id', $siteId)
+            ->orderBy('label')
+            ->get()
+            ->map(function (Goal $g) use ($siteId, $from, $to) {
+                $scope = fn () => TrackingEvent::query()
+                    ->where('site_id', $siteId)
+                    ->where('name', $g->event_name)
+                    ->whereBetween('created_at', [$from, $to]);
+
+                return [
+                    'id' => $g->id,
+                    'label' => $g->label,
+                    'event_name' => $g->event_name,
+                    'count' => (int) $scope()->count(),
+                    'unique_visitors' => (int) $scope()->selectRaw('COUNT(DISTINCT visitor_id) as c')->value('c'),
+                ];
+            })
+            ->all();
+
         return [
             'unique_visitors' => $uniqueVisitors,
             'total_pageviews' => $totalPageviews,
@@ -208,6 +249,8 @@ class AnalyticsQueryService
             'outbound_clicks' => $outboundClicks,
             'by_search_query' => $bySearchQuery,
             'by_utm_source' => $byUtmSource,
+            'by_event_name' => $byEventName,
+            'goals' => $goalStats,
         ];
     }
 }

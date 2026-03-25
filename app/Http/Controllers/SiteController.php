@@ -101,6 +101,7 @@ class SiteController extends Controller
         $k = $site->public_key;
 
         return '<script async src="'.$base.'/i/'.$k.'.js"></script>'."\n"
+            .'<!-- Eventi: window.indiestats.track(\'nome_evento\', { opzionale: \'valore\' }) -->'."\n"
             .'<noscript><img src="'.$base.'/collect/pixel.gif?k='.$k.'&p=/" width="1" height="1" alt="" /></noscript>';
     }
 }

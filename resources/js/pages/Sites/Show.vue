@@ -1,7 +1,12 @@
 <script setup lang="ts">
+<<<<<<< Updated upstream
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { Check, Copy } from 'lucide-vue-next';
+=======
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
+>>>>>>> Stashed changes
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +16,8 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import type { BreadcrumbItem } from '@/types';
 
 type Breakdown = {
@@ -27,6 +34,20 @@ type CountryRow = Breakdown & { code: string | null };
 type SearchRow = Breakdown & { query: string };
 type UtmRow = Breakdown & { utm_source: string };
 
+type EventNameRow = {
+    name: string;
+    count: number;
+    visitors: number;
+};
+
+type GoalStatRow = {
+    id: number;
+    label: string;
+    event_name: string;
+    count: number;
+    unique_visitors: number;
+};
+
 type Stats = {
     unique_visitors: number;
     total_pageviews: number;
@@ -40,6 +61,8 @@ type Stats = {
     outbound_clicks: number;
     by_search_query: SearchRow[];
     by_utm_source: UtmRow[];
+    by_event_name: EventNameRow[];
+    goals: GoalStatRow[];
 };
 
 type SitePayload = {
@@ -95,6 +118,27 @@ function countryLabel(code: string | null) {
     } catch {
         return code;
     }
+}
+
+const goalForm = useForm({
+    label: '',
+    event_name: '',
+});
+
+function submitGoal() {
+    goalForm.post(`/sites/${props.site.id}/goals`, {
+        preserveScroll: true,
+        onSuccess: () => goalForm.reset(),
+    });
+}
+
+function destroyGoal(goalId: number) {
+    if (!confirm('Eliminare questo goal?')) {
+        return;
+    }
+    router.delete(`/sites/${props.site.id}/goals/${goalId}`, {
+        preserveScroll: true,
+    });
 }
 </script>
 
@@ -530,6 +574,173 @@ function countryLabel(code: string | null) {
                                     </td>
                                     <td class="py-2 pr-2 text-right tabular-nums">
                                         {{ row.pageviews }}
+                                    </td>
+                                    <td class="py-2 text-right tabular-nums">
+                                        {{ row.visitors }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-2">
+                <Card class="lg:col-span-2">
+                    <CardHeader>
+                        <CardTitle class="text-base">Goal</CardTitle>
+                        <CardDescription>
+                            Conta quante volte viene inviato un
+                            <strong>evento</strong> con un certo nome (uguale a
+                            quello in
+                            <code class="text-xs">indiestats.track('…')</code>
+                            sul sito).
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent class="space-y-6">
+                        <form
+                            class="flex max-w-xl flex-col gap-3 sm:flex-row sm:items-end"
+                            @submit.prevent="submitGoal"
+                        >
+                            <div class="grid flex-1 gap-2">
+                                <Label for="g-label">Nome in dashboard</Label>
+                                <Input
+                                    id="g-label"
+                                    v-model="goalForm.label"
+                                    required
+                                    placeholder="Iscrizione completata"
+                                    autocomplete="off"
+                                />
+                            </div>
+                            <div class="grid flex-1 gap-2">
+                                <Label for="g-ev">Nome evento</Label>
+                                <Input
+                                    id="g-ev"
+                                    v-model="goalForm.event_name"
+                                    required
+                                    placeholder="signup_complete"
+                                    class="font-mono text-sm"
+                                    autocomplete="off"
+                                />
+                            </div>
+                            <Button
+                                type="submit"
+                                :disabled="goalForm.processing"
+                            >
+                                Aggiungi
+                            </Button>
+                        </form>
+                        <p
+                            v-if="goalForm.errors.label"
+                            class="text-destructive text-sm"
+                        >
+                            {{ goalForm.errors.label }}
+                        </p>
+                        <p
+                            v-if="goalForm.errors.event_name"
+                            class="text-destructive text-sm"
+                        >
+                            {{ goalForm.errors.event_name }}
+                        </p>
+                        <div
+                            v-if="stats.goals.length === 0"
+                            class="text-muted-foreground text-sm"
+                        >
+                            Nessun goal. Gli eventi inviati da
+                            <code class="text-xs">window.indiestats.track</code>
+                            compaiono anche nella tabella “Eventi” sotto.
+                        </div>
+                        <div v-else class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="text-muted-foreground border-b">
+                                        <th class="py-2 pr-2 font-medium">
+                                            Goal
+                                        </th>
+                                        <th class="py-2 pr-2 font-mono text-xs font-medium">
+                                            evento
+                                        </th>
+                                        <th class="py-2 pr-2 text-right font-medium">
+                                            Volte
+                                        </th>
+                                        <th class="py-2 pr-2 text-right font-medium">
+                                            Visitatori
+                                        </th>
+                                        <th class="py-2 text-right font-medium">
+                                            —
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="g in stats.goals"
+                                        :key="g.id"
+                                        class="border-b border-border/60"
+                                    >
+                                        <td class="py-2 pr-2">{{ g.label }}</td>
+                                        <td
+                                            class="text-muted-foreground max-w-[140px] truncate py-2 pr-2 font-mono text-xs"
+                                            :title="g.event_name"
+                                        >
+                                            {{ g.event_name }}
+                                        </td>
+                                        <td class="py-2 pr-2 text-right tabular-nums">
+                                            {{ g.count }}
+                                        </td>
+                                        <td class="py-2 pr-2 text-right tabular-nums">
+                                            {{ g.unique_visitors }}
+                                        </td>
+                                        <td class="py-2 text-right">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                class="text-destructive"
+                                                @click="destroyGoal(g.id)"
+                                            >
+                                                Rimuovi
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card v-if="stats.by_event_name.length" class="lg:col-span-2">
+                    <CardHeader>
+                        <CardTitle class="text-base">Eventi</CardTitle>
+                        <CardDescription
+                            >Tutti i nomi inviati con
+                            <code class="text-xs">indiestats.track</code> nel
+                            periodo</CardDescription
+                        >
+                    </CardHeader>
+                    <CardContent class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-muted-foreground border-b">
+                                    <th class="py-2 pr-2 font-medium">Nome</th>
+                                    <th class="py-2 pr-2 text-right font-medium">
+                                        Volte
+                                    </th>
+                                    <th class="py-2 text-right font-medium">
+                                        Visitatori
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="row in stats.by_event_name"
+                                    :key="row.name"
+                                    class="border-b border-border/60"
+                                >
+                                    <td class="py-2 pr-2 font-mono text-xs">
+                                        {{ row.name }}
+                                    </td>
+                                    <td class="py-2 pr-2 text-right tabular-nums">
+                                        {{ row.count }}
                                     </td>
                                     <td class="py-2 text-right tabular-nums">
                                         {{ row.visitors }}

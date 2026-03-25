@@ -41,6 +41,16 @@ class Site extends Model
         return $this->hasMany(OutboundClick::class);
     }
 
+    public function trackingEvents(): HasMany
+    {
+        return $this->hasMany(TrackingEvent::class);
+    }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
     public function isOriginAllowed(Request $request): bool
     {
         if (blank($this->allowed_domains)) {
@@ -65,11 +75,14 @@ class Site extends Model
         }
 
         $targetHost = strtolower(preg_replace('/^www\./', '', $targetHost));
-        $hosts = array_map('trim', explode(',', $this->allowed_domains));
+        $hosts = array_merge(
+            array_map('trim', explode(',', $this->allowed_domains)),
+            config('analytics.tracking_extra_allowed_hosts', [])
+        );
 
-        foreach ($hosts as $h) {
-            $h = strtolower(preg_replace('/^www\./', '', $h));
-            if ($h === '') {
+        foreach ($hosts as $raw) {
+            $h = self::normalizeAllowedHostEntry($raw);
+            if ($h === null || $h === '') {
                 continue;
             }
             if ($targetHost === $h || str_ends_with($targetHost, '.'.$h)) {
@@ -78,5 +91,33 @@ class Site extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Accetta host "puliti" o URL completi (es. https://web.ap.it.test/path) salvati per errore in allowed_domains.
+     */
+    protected static function normalizeAllowedHostEntry(string $raw): ?string
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return null;
+        }
+
+        if (str_contains($raw, '://')) {
+            $host = parse_url($raw, PHP_URL_HOST);
+        } else {
+            $beforePath = strtok($raw, '/');
+            $host = $beforePath !== false
+                ? parse_url('http://'.$beforePath, PHP_URL_HOST)
+                : null;
+        }
+
+        if (! is_string($host) || $host === '') {
+            return null;
+        }
+
+        $host = strtolower($host);
+
+        return preg_replace('/^www\./', '', $host) ?: null;
     }
 }

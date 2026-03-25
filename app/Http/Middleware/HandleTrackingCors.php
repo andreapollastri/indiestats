@@ -29,17 +29,16 @@ class HandleTrackingCors
      */
     private function headers(Request $request): array
     {
-        $headers = [
+        $requested = $request->header('Access-Control-Request-Headers');
+        $allowHeaders = (is_string($requested) && trim($requested) !== '')
+            ? $requested
+            : 'Content-Type, Accept, Authorization, X-Requested-With, X-CSRF-TOKEN, X-XSRF-TOKEN';
+
+        return [
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Access-Control-Allow-Headers' => $allowHeaders,
             'Access-Control-Max-Age' => '86400',
         ];
-
-        if ($request->isMethod('OPTIONS')) {
-            $headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept, X-Requested-With';
-        }
-
-        return $headers;
     }
 }

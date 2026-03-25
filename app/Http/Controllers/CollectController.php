@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Models\Site;
+use App\Models\TrackingEvent;
 use App\Services\GeoIpService;
 use App\Services\ReferrerSourceService;
 use Illuminate\Http\JsonResponse;
@@ -133,6 +134,79 @@ class CollectController extends Controller
         ]);
 
         return response()->json(['ok' => true]);
+    }
+
+    public function event(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'site_key' => 'required|uuid',
+            'visitor_id' => 'required|string|max:64',
+            'name' => 'required|string|max:128',
+            'path' => 'nullable|string|max:2048',
+            'properties' => 'nullable|array|max:20',
+        ]);
+
+        $site = Site::query()->where('public_key', $data['site_key'])->first();
+        if (! $site) {
+            return response()->json(['error' => 'unknown site'], 404);
+        }
+
+        if (! $site->isOriginAllowed($request)) {
+            return response()->json(['error' => 'origin not allowed'], 403);
+        }
+
+        $properties = $this->normalizeEventProperties($data['properties'] ?? null);
+        if ($properties !== null) {
+            $encoded = json_encode($properties);
+            if ($encoded === false || strlen($encoded) > 4096) {
+                return response()->json(['error' => 'properties too large'], 422);
+            }
+        }
+
+        TrackingEvent::query()->create([
+            'site_id' => $site->id,
+            'visitor_id' => $data['visitor_id'],
+            'name' => trim($data['name']),
+            'path' => $data['path'] ?? null,
+            'properties' => $properties,
+            'created_at' => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $input
+     * @return array<string, string>|null
+     */
+    private function normalizeEventProperties(?array $input): ?array
+    {
+        if ($input === null || $input === []) {
+            return null;
+        }
+
+        $out = [];
+        $n = 0;
+        foreach ($input as $k => $v) {
+            if ($n >= 20) {
+                break;
+            }
+            if (! is_string($k) || $k === '' || mb_strlen($k) > 64) {
+                continue;
+            }
+            if (is_bool($v)) {
+                $out[$k] = $v ? 'true' : 'false';
+            } elseif (is_int($v) || is_float($v)) {
+                $out[$k] = (string) $v;
+            } elseif (is_string($v)) {
+                $out[$k] = mb_substr($v, 0, 255);
+            } else {
+                continue;
+            }
+            $n++;
+        }
+
+        return $out === [] ? null : $out;
     }
 
     public function pixel(Request $request, ReferrerSourceService $referrerService, GeoIpService $geo): Response
