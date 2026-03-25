@@ -34,7 +34,7 @@ function beacon(path,body){
 var url=B+path;
 var blob=new Blob([JSON.stringify(body)],{type:'application/json'});
 if(navigator.sendBeacon&&navigator.sendBeacon(url,blob))return;
-fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true});
+fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true,credentials:'omit'});
 }
 var pvId=null;
 var start=Date.now();
@@ -88,11 +88,9 @@ if(u.hostname===location.hostname)return;
 beacon('/collect/outbound',{site_key:K,visitor_id:vid(),from_path:location.pathname+location.search,target_url:a.href});
 }catch(err){}
 },true);
-<<<<<<< Updated upstream
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sendPageview);}
 else{sendPageview();}
 window.addEventListener('beforeunload',sendDuration);
-=======
 if(document.readyState==='complete')sendPageview();
 else window.addEventListener('load',sendPageview);
 var NS='indiestats';
@@ -119,7 +117,6 @@ if(Object.keys(p).length===0)p=null;
 }
 beacon('/collect/event',{site_key:K,visitor_id:vid(),name:n,path:currentPath(),properties:p});
 };
->>>>>>> Stashed changes
 })();
 JS;
 

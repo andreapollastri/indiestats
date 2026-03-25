@@ -7,6 +7,13 @@
 .pa-dashboard-chart-wrap {
     position: relative;
     height: 160px;
+    /* I click passano al .stretched-link della card; il grafico resta visibile */
+    pointer-events: none;
+}
+
+.pa-dashboard-chart-wrap canvas {
+    display: block;
+    max-width: 100%;
 }
 
 .table-responsive .table {

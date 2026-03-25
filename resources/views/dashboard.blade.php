@@ -67,9 +67,14 @@
                 var primaryFill = 'rgba(78, 115, 223, 0.08)';
                 var payload = @json($chartPayload);
 
-                payload.forEach(function (cfg) {
+                function run() {
+                    if (typeof Chart === 'undefined') {
+                        requestAnimationFrame(run);
+                        return;
+                    }
+                    payload.forEach(function (cfg) {
                     var el = document.getElementById('chart-site-' + cfg.id);
-                    if (!el || typeof Chart === 'undefined') return;
+                    if (!el) return;
 
                     new Chart(el.getContext('2d'), {
                         type: 'line',
@@ -120,7 +125,14 @@
                             },
                         },
                     });
-                });
+                    });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', run);
+                } else {
+                    run();
+                }
             })();
         </script>
     @endif
