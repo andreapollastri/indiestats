@@ -10,13 +10,7 @@
         '1y' => '1 anno',
     ];
     $statBorders = ['primary', 'success', 'info', 'warning'];
-    $siteTab = request()->query('tab', 'summary');
-    if (request()->query('analytics') === 'detail') {
-        $siteTab = 'detail';
-    }
-    if (! in_array($siteTab, ['summary', 'detail', 'goals'], true)) {
-        $siteTab = 'summary';
-    }
+    $siteTab = $site_tab ?? 'summary';
     if ($errors->has('label') || $errors->has('event_name')) {
         $siteTab = 'goals';
     }
@@ -34,7 +28,7 @@
         <div class="d-flex flex-wrap">
             @foreach ($rangeLabels as $key => $label)
                 @php
-                    $rangeQuery = ['site' => $site['id'], 'range' => $key];
+                    $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
                     if ($siteTab === 'detail') {
                         $rangeQuery['tab'] = 'detail';
                     } elseif ($siteTab === 'goals') {
@@ -48,16 +42,18 @@
 
     @include('partials.flash')
 
+    @include('sites.partials.site-filters')
+
     @php
-        $dtUrl = route('sites.stats.datatables', $site['id']);
+        $dtUrl = route('sites.stats.datatables', $site['public_key']);
     @endphp
 
     @php
-        $tabSummaryHref = route('sites.show', ['site' => $site['id'], 'range' => $range]);
-        $tabDetailHref = route('sites.show', ['site' => $site['id'], 'range' => $range, 'tab' => 'detail']);
-        $tabGoalsHref = route('sites.show', ['site' => $site['id'], 'range' => $range, 'tab' => 'goals']);
+        $tabSummaryHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range]));
+        $tabDetailHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'detail']));
+        $tabGoalsHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'goals']));
     @endphp
-    <ul class="nav nav-tabs mb-4 border-bottom-0" id="siteStatsTabs" role="tablist">
+    <ul class="nav nav-tabs mb-4" id="siteStatsTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a
                 class="nav-link fw-bold {{ $summaryTabActive ? 'active' : '' }}"
@@ -90,7 +86,7 @@
         </li>
     </ul>
 
-    <div class="tab-content" id="siteStatsTabContent">
+    <div class="tab-content pt-3" id="siteStatsTabContent">
         <div
             class="tab-pane fade {{ $summaryTabActive ? 'show active' : '' }}"
             id="tab-site-summary"
@@ -239,9 +235,14 @@
         </div>
         <div class="card-body">
             <p class="small text-muted">{{ __('Conta quante volte viene inviato un evento con un certo nome (uguale a quello in indiestats.track sul sito).') }}</p>
-            <form method="POST" action="{{ route('sites.goals.store', $site['id']) }}" class="mb-4">
+            <p class="small text-muted mb-2">{{ __('Eventi:') }} <code class="user-select-all">window.indiestats.track('nome_evento', { opzionale: 'valore' })</code></p>
+            <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
+                <input type="hidden" name="tab" value="goals">
+                @foreach ($analytics_filters->toQueryArray() as $fk => $fv)
+                    <input type="hidden" name="{{ $fk }}" value="{{ $fv }}">
+                @endforeach
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="g-label" class="form-label">{{ __('Nome in dashboard') }}</label>

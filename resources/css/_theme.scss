@@ -52,6 +52,7 @@ body {
 
 .sidebar-brand {
     height: 4.375rem;
+    color: #fff;
     text-decoration: none;
     font-size: 1rem;
     font-weight: 800;
@@ -60,6 +61,11 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.05rem;
     z-index: 1;
+
+    &:hover,
+    &:focus-visible {
+        color: #fff;
+    }
 }
 
 .sidebar-brand-icon {
@@ -238,34 +244,71 @@ body {
 
 @media (max-width: 767.98px) {
     .sidebar {
-        width: 100%;
-        min-height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1040;
+        width: min(18rem, 85vw);
+        min-height: 100vh;
+        margin: 0;
+        padding-bottom: 1rem;
+        overflow-y: auto;
+        box-shadow: 0.15rem 0 1.75rem 0 rgba(58, 59, 69, 0.35);
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    body.sidebar-mobile-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1030;
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+    }
+
+    body.sidebar-mobile-open .sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    body.sidebar-mobile-open {
+        overflow: hidden;
     }
 }
 
-body.sidebar-toggled .sidebar {
-    width: 6.5rem !important;
-}
+@media (min-width: 768px) {
+    body.sidebar-toggled .sidebar {
+        width: 6.5rem !important;
+    }
 
-body.sidebar-toggled .sidebar .sidebar-brand .sidebar-brand-text {
-    display: none;
-}
+    body.sidebar-toggled .sidebar .sidebar-brand .sidebar-brand-text {
+        display: none;
+    }
 
-body.sidebar-toggled .sidebar .sidebar-heading {
-    text-align: center;
-}
+    body.sidebar-toggled .sidebar .sidebar-heading {
+        text-align: center;
+    }
 
-body.sidebar-toggled .sidebar .nav-item .nav-link {
-    text-align: center;
-    padding: 0.75rem 1rem;
-    width: 6.5rem;
-}
+    body.sidebar-toggled .sidebar .nav-item .nav-link {
+        text-align: center;
+        padding: 0.75rem 1rem;
+        width: 6.5rem;
+    }
 
-body.sidebar-toggled .sidebar .nav-item .nav-link span {
-    font-size: 0.65rem;
-    display: block;
-}
+    body.sidebar-toggled .sidebar .nav-item .nav-link span {
+        font-size: 0.65rem;
+        display: block;
+    }
 
-body.sidebar-toggled .sidebar .nav-item .nav-link i {
-    margin-right: 0;
+    body.sidebar-toggled .sidebar .nav-item .nav-link i {
+        margin-right: 0;
+    }
 }

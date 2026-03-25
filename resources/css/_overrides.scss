@@ -79,6 +79,16 @@ table.table.pa-site-dt {
     font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* Filtri analytics: dropdown Tom Select nel wrapper (non body), evita tagli e sovrapposizioni */
+#pa-site-filters-form .accordion-body {
+    overflow: visible;
+}
+
+#pa-site-filters-form .ts-wrapper.dropdown-active {
+    position: relative;
+    z-index: 1000;
+}
+
 .pa-bar-track {
     height: 28px;
     background: #eaecf4;

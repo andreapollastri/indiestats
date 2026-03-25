@@ -123,7 +123,7 @@ Per ogni sito viene mostrato un **embed code** del tipo:
 
 ```html
 <script async src="https://TUO-APP-URL/i/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"></script>
-<noscript><img src="https://TUO-APP-URL/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&p=/" width="1" height="1" alt="" /></noscript>
+<noscript><img src="https://TUO-APP-URL/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&p=/" width="1" height="1" /></noscript>
 ```
 
 - Sostituisci `TUO-APP-URL` con l’origine reale della tua installazione (deve coincidere con `APP_URL`).

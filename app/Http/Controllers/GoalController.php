@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Goal;
 use App\Models\Site;
+use App\Support\AnalyticsFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -51,7 +52,10 @@ class GoalController extends Controller
     {
         $range = $request->query('range') ?? $request->input('range');
         $allowed = ['today', '7d', '30d', '3m', '6m', '1y'];
-        $params = ['site' => $site, 'tab' => 'goals'];
+        $params = array_merge(
+            ['site' => $site, 'tab' => 'goals'],
+            AnalyticsFilters::fromRequest($request)->toQueryArray()
+        );
         if (is_string($range) && $range !== '' && in_array($range, $allowed, true)) {
             $params['range'] = $range;
         }

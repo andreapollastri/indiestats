@@ -44,14 +44,14 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-start mb-2">
                         <div>
                             <h2 class="h5 mb-1 fw-bold">
-                                <a href="{{ route('sites.show', $site['id']) }}" class="text-gray-800 text-decoration-none">{{ $site['name'] }}</a>
+                                <a href="{{ route('sites.show', $site['public_key']) }}" class="text-gray-800 text-decoration-none">{{ $site['name'] }}</a>
                             </h2>
                             <p class="small font-monospace text-muted mb-0">{{ $site['public_key'] }}</p>
                         </div>
                         <div class="d-flex flex-wrap align-items-center">
-                            <a href="{{ route('sites.show', $site['id']) }}" class="btn btn-outline-primary btn-sm me-1 mb-1">{{ __('Statistiche') }}</a>
+                            <a href="{{ route('sites.show', $site['public_key']) }}" class="btn btn-outline-primary btn-sm me-1 mb-1">{{ __('Statistiche') }}</a>
                             <button type="button" class="btn btn-outline-secondary btn-sm me-1 mb-1" data-copy="{{ $site['embed_code'] }}" data-copy-done="{{ __('Copiato') }}" title="{{ __('Copia snippet') }}"><i class="fas fa-copy"></i></button>
-                            <button type="button" class="btn btn-outline-danger btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#deleteSiteModal" data-delete-url="{{ route('sites.destroy', $site['id']) }}" data-site-name="{{ e($site['name']) }}" title="{{ __('Elimina') }}" aria-label="{{ __('Elimina') }}">
+                            <button type="button" class="btn btn-outline-danger btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#deleteSiteModal" data-delete-url="{{ route('sites.destroy', $site['public_key']) }}" data-site-name="{{ e($site['name']) }}" title="{{ __('Elimina') }}" aria-label="{{ __('Elimina') }}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

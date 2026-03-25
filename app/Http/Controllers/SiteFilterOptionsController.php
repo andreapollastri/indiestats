@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Site;
-use App\Services\SiteStatsDataTableService;
+use App\Services\SiteFilterOptionsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class SiteStatsDataTablesController extends Controller
+class SiteFilterOptionsController extends Controller
 {
-    public function __invoke(Request $request, Site $site, SiteStatsDataTableService $tables): JsonResponse
+    public function __invoke(Request $request, Site $site, SiteFilterOptionsService $options): JsonResponse
     {
         $this->authorize('view', $site);
 
         $validated = $request->validate([
-            'type' => 'required|string|in:paths,utm,search,source,browser,device,country,outbound,goals,event_names,events',
+            'type' => 'required|string|in:source,path,utm,event,device,country,search',
             'range' => 'required|string|in:today,7d,30d,3m,6m,1y',
+            'q' => 'nullable|string|max:256',
         ]);
 
         $range = $validated['range'];
@@ -30,8 +31,20 @@ class SiteStatsDataTablesController extends Controller
         };
         $to = now()->endOfDay();
 
-        $payload = $tables->handle($request, $site, $from, $to);
+        $q = isset($validated['q']) ? trim($validated['q']) : null;
+        if ($q === '') {
+            $q = null;
+        }
 
-        return response()->json($payload);
+        $results = $options->options(
+            $site->id,
+            $validated['type'],
+            $from,
+            $to,
+            $q,
+            50
+        );
+
+        return response()->json(['results' => $results]);
     }
 }

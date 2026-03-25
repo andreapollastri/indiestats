@@ -10,6 +10,11 @@ use Illuminate\Support\Str;
 
 class Site extends Model
 {
+    public function getRouteKeyName(): string
+    {
+        return 'public_key';
+    }
+
     protected $fillable = [
         'user_id',
         'name',

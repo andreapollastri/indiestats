@@ -1,4 +1,5 @@
 import DataTable from 'datatables.net-responsive-bs5';
+import { getPaAnalyticsFilterParams } from './site-filters.js';
 
 /** Traduzioni inline (evita errori TN/21 da caricamento i18n via CDN/CORS). */
 const DT_IT = {
@@ -258,6 +259,11 @@ function init() {
                 data: function (d) {
                     d.range = range;
                     d.type = type;
+                    const filters = getPaAnalyticsFilterParams();
+                    Object.keys(filters).forEach(function (k) {
+                        d[k] = filters[k];
+                    });
+                    return d;
                 },
             },
         });

@@ -39,6 +39,7 @@ class DashboardController extends Controller
 
                 return [
                     'id' => $site->id,
+                    'public_key' => $site->public_key,
                     'name' => $site->name,
                     'unique_visitors' => $stats['unique_visitors'],
                     'total_pageviews' => $stats['total_pageviews'],

@@ -2,6 +2,7 @@ import jQuery from 'jquery';
 import * as bootstrap from 'bootstrap';
 import { Chart, registerables } from 'chart.js';
 import './site-stats-datatables.js';
+import './site-filters.js';
 
 window.$ = window.jQuery = jQuery;
 window.bootstrap = bootstrap;
@@ -12,16 +13,69 @@ window.Chart = Chart;
     'use strict';
 
     jQuery(function () {
-        jQuery('#sidebarToggle, #sidebarToggleTop').on('click', function (e) {
+        function isMobileSidebar() {
+            return window.matchMedia('(max-width: 767.98px)').matches;
+        }
+
+        function closeMobileSidebar() {
+            jQuery('body').removeClass('sidebar-mobile-open');
+            const bd = document.getElementById('sidebarBackdrop');
+            if (bd) {
+                bd.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        function openMobileSidebar() {
+            jQuery('body').addClass('sidebar-mobile-open');
+            const bd = document.getElementById('sidebarBackdrop');
+            if (bd) {
+                bd.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        jQuery('#sidebarToggle').on('click', function (e) {
             e.preventDefault();
             jQuery('body').toggleClass('sidebar-toggled');
             jQuery('.sidebar').toggleClass('toggled');
+        });
+
+        jQuery('#sidebarToggleTop').on('click', function (e) {
+            e.preventDefault();
+            if (jQuery('body').hasClass('sidebar-mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
+
+        jQuery('#sidebarBackdrop').on('click', function () {
+            closeMobileSidebar();
+        });
+
+        jQuery('#accordionSidebar').on('click', 'a[href]', function () {
+            if (isMobileSidebar()) {
+                closeMobileSidebar();
+            }
+        });
+
+        jQuery('#accordionSidebar').on('click', 'form button[type="submit"]', function () {
+            if (isMobileSidebar()) {
+                closeMobileSidebar();
+            }
+        });
+
+        jQuery(document).on('keydown', function (e) {
+            if (e.key === 'Escape' && jQuery('body').hasClass('sidebar-mobile-open')) {
+                closeMobileSidebar();
+            }
         });
 
         jQuery(window).on('resize', function () {
             if (jQuery(window).width() < 768) {
                 jQuery('body').removeClass('sidebar-toggled');
                 jQuery('.sidebar').removeClass('toggled');
+            } else {
+                closeMobileSidebar();
             }
         });
 

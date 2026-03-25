@@ -1,5 +1,5 @@
 @php
-    $dtUrl = route('sites.stats.datatables', $site['id']);
+    $dtUrl = route('sites.stats.datatables', $site['public_key']);
 @endphp
 <div class="card shadow mb-4">
     <div class="card-header py-3">

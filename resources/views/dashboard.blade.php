@@ -50,7 +50,7 @@
                             <p class="text-xs text-center text-primary mb-0 fw-bold">
                                 <i class="fas fa-arrow-right me-1"></i>{{ __('Apri statistiche') }}
                             </p>
-                            <a href="{{ route('sites.show', $site['id']) }}?range={{ $range }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
+                            <a href="{{ route('sites.show', $site['public_key']) }}?range={{ $range }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
                         </div>
                     </div>
                 </div>

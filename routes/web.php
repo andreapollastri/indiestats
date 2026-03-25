@@ -4,6 +4,7 @@ use App\Http\Controllers\CollectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteFilterOptionsController;
 use App\Http\Controllers\SiteStatsDataTablesController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Middleware\HandleTrackingCors;
@@ -37,11 +38,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
-    Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show');
-    Route::get('sites/{site}/stats/datatables', SiteStatsDataTablesController::class)->name('sites.stats.datatables');
-    Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy');
-    Route::post('sites/{site}/goals', [GoalController::class, 'store'])->name('sites.goals.store');
-    Route::delete('sites/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('sites.goals.destroy');
+    Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show')->whereUuid('site');
+    Route::get('sites/{site}/stats/datatables', SiteStatsDataTablesController::class)->name('sites.stats.datatables')->whereUuid('site');
+    Route::get('sites/{site}/stats/filter-options', SiteFilterOptionsController::class)->name('sites.stats.filter-options')->whereUuid('site');
+    Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy')->whereUuid('site');
+    Route::post('sites/{site}/goals', [GoalController::class, 'store'])->name('sites.goals.store')->whereUuid('site');
+    Route::delete('sites/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('sites.goals.destroy')->whereUuid('site');
 });
 
 require __DIR__.'/settings.php';

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Services\AnalyticsQueryService;
+use App\Services\SiteFilterOptionsService;
+use App\Support\AnalyticsFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -60,7 +62,7 @@ class SiteController extends Controller
         return redirect()->route('sites.index')->with('success', 'Sito aggiunto.');
     }
 
-    public function show(Request $request, Site $site, AnalyticsQueryService $analytics): View
+    public function show(Request $request, Site $site, AnalyticsQueryService $analytics, SiteFilterOptionsService $filterOptions): View
     {
         $this->authorize('view', $site);
 
@@ -81,7 +83,22 @@ class SiteController extends Controller
         };
         $to = now()->endOfDay();
 
-        $stats = $analytics->build($site->id, $from, $to);
+        $filters = AnalyticsFilters::fromRequest($request);
+        $stats = $analytics->build($site->id, $from, $to, $filters);
+
+        $siteTab = $request->query('tab', 'summary');
+        if ($request->query('analytics') === 'detail') {
+            $siteTab = 'detail';
+        }
+        if (! in_array($siteTab, ['summary', 'detail', 'goals'], true)) {
+            $siteTab = 'summary';
+        }
+        $errorsBag = $request->session()->get('errors');
+        if ($errorsBag instanceof \Illuminate\Support\ViewErrorBag && ($errorsBag->has('label') || $errorsBag->has('event_name'))) {
+            $siteTab = 'goals';
+        }
+
+        $filterPresets = $filterOptions->presetsForAll($site->id, $from, $to);
 
         $byDayFilled = $analytics->fillDaySeries($stats['by_day'], $from, $to);
         $siteChartPayload = [
@@ -110,6 +127,9 @@ class SiteController extends Controller
                 'to' => $to->toDateString(),
             ],
             'site_chart_payload' => $siteChartPayload,
+            'analytics_filters' => $filters,
+            'filter_presets' => $filterPresets,
+            'site_tab' => $siteTab,
         ]);
     }
 
@@ -128,7 +148,6 @@ class SiteController extends Controller
         $k = $site->public_key;
 
         return '<script async src="'.$base.'/i/'.$k.'.js"></script>'."\n"
-            .'<!-- Eventi: window.indiestats.track(\'nome_evento\', { opzionale: \'valore\' }) -->'."\n"
-            .'<noscript><img src="'.$base.'/collect/pixel.gif?k='.$k.'&p=/" width="1" height="1" alt="" /></noscript>';
+            .'<noscript><img src="'.$base.'/collect/pixel.gif?k='.$k.'&p=/" width="1" height="1" /></noscript>';
     }
 }

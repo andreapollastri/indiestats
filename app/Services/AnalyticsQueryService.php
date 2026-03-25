@@ -4,12 +4,16 @@ namespace App\Services;
 
 use App\Models\OutboundClick;
 use App\Models\PageView;
+use App\Support\AnalyticsFilters;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 
 class AnalyticsQueryService
 {
+    public function __construct(
+        private AnalyticsFilterScope $filterScope
+    ) {}
     /**
      * Riempie i giorni senza dati con zero (stesso formato della dashboard).
      *
@@ -42,10 +46,11 @@ class AnalyticsQueryService
      *   outbound_clicks: int,
      * }
      */
-    public function build(int $siteId, CarbonInterface $from, CarbonInterface $to): array
+    public function build(int $siteId, CarbonInterface $from, CarbonInterface $to, ?AnalyticsFilters $filters = null): array
     {
         $from = $from->copy()->startOfDay();
         $to = $to->copy()->endOfDay();
+        $filters = $filters ?? new AnalyticsFilters;
 
         $driver = DB::connection()->getDriverName();
         $dateExpr = match ($driver) {
@@ -53,26 +58,20 @@ class AnalyticsQueryService
             default => 'DATE(created_at)',
         };
 
-        $uniqueVisitors = (int) PageView::query()
-            ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+        $pvBase = PageView::query();
+        $this->filterScope->applyToPageViews($pvBase, $siteId, $from, $to, $filters);
+
+        $uniqueVisitors = (int) (clone $pvBase)
             ->selectRaw('COUNT(DISTINCT visitor_id) as c')
             ->value('c');
 
-        $totalPageviews = (int) PageView::query()
-            ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
-            ->count();
+        $totalPageviews = (int) (clone $pvBase)->count();
 
-        $avgDuration = PageView::query()
-            ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+        $avgDuration = (clone $pvBase)
             ->whereNotNull('duration_seconds')
             ->avg('duration_seconds');
 
-        $byDay = PageView::query()
-            ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+        $byDay = (clone $pvBase)
             ->selectRaw("{$dateExpr} as d")
             ->selectRaw('COUNT(*) as pageviews')
             ->selectRaw('COUNT(DISTINCT visitor_id) as visitors')
@@ -86,10 +85,11 @@ class AnalyticsQueryService
             ])
             ->all();
 
-        $outboundClicks = (int) OutboundClick::query()
+        $outboundBase = OutboundClick::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
-            ->count();
+            ->whereBetween('created_at', [$from, $to]);
+        $this->filterScope->constrainVisitorForOutbound($outboundBase, 'visitor_id', $siteId, $from, $to, $filters);
+        $outboundClicks = (int) $outboundBase->count();
 
         return [
             'unique_visitors' => $uniqueVisitors,
