@@ -43,16 +43,10 @@
                     <span>{{ __('Siti') }}</span>
                 </a>
             </li>
-            <li class="nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('profile.edit') }}">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>{{ __('Profilo') }}</span>
-                </a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('security.*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('security.edit') }}">
-                    <i class="fas fa-fw fa-shield-halved"></i>
-                    <span>{{ __('Sicurezza') }}</span>
+            <li class="nav-item {{ request()->routeIs('account.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('account.edit') }}">
+                    <i class="fas fa-fw fa-user-circle"></i>
+                    <span>{{ __('Account') }}</span>
                 </a>
             </li>
             <hr class="sidebar-divider">

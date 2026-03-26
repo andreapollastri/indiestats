@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureWelcomeEmailVerificationMail();
     }
 
     /**
@@ -43,5 +46,20 @@ class AppServiceProvider extends ServiceProvider
             ->symbols()
             ->uncompromised(),
         );
+    }
+
+    /**
+     * Email di benvenuto con link firmato per confermare l'indirizzo email.
+     */
+    protected function configureWelcomeEmailVerificationMail(): void
+    {
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url): MailMessage {
+            return (new MailMessage)
+                ->subject(__('Benvenuto in :app — conferma la tua email', ['app' => config('app.name')]))
+                ->greeting(__('Ciao :name!', ['name' => $notifiable->name]))
+                ->line(__('Grazie per esserti registrato. Per attivare il tuo account conferma il tuo indirizzo email cliccando il pulsante qui sotto.'))
+                ->action(__('Conferma indirizzo email'), $url)
+                ->line(__('Se non hai creato un account su :app, ignora questa email.', ['app' => config('app.name')]));
+        });
     }
 }

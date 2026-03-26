@@ -16,9 +16,19 @@ class ProfileUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(route('profile.edit'));
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->get(route('account.edit'));
 
-        $response->assertOk();
+        $response->assertOk()->assertViewIs('settings.account');
+    }
+
+    public function test_legacy_settings_profile_url_redirects_to_account(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/settings/profile')
+            ->assertRedirect('/settings/account');
     }
 
     public function test_profile_information_can_be_updated()
@@ -34,7 +44,7 @@ class ProfileUpdateTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('profile.edit'));
+            ->assertRedirect(route('account.edit'));
 
         $user->refresh();
 
@@ -56,7 +66,7 @@ class ProfileUpdateTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('profile.edit'));
+            ->assertRedirect(route('account.edit'));
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
@@ -85,14 +95,14 @@ class ProfileUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->from(route('profile.edit'))
+            ->from(route('account.edit'))
             ->delete(route('profile.destroy'), [
                 'password' => 'wrong-password',
             ]);
 
         $response
             ->assertSessionHasErrors('password')
-            ->assertRedirect(route('profile.edit'));
+            ->assertRedirect(route('account.edit'));
 
         $this->assertNotNull($user->fresh());
     }

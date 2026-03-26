@@ -127,28 +127,111 @@ window.Chart = Chart;
             .catch(function () {});
     }
 
-    const rc = document.getElementById('pa-recovery-codes');
-    if (rc && rc.dataset.codesUrl) {
-        fetch(rc.dataset.codesUrl, {
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            credentials: 'same-origin',
-        })
-            .then(function (r) {
-                return r.json();
+    (function initTwoFactorRecoveryCodes() {
+        const wrap = document.getElementById('pa-recovery-codes-wrap');
+        if (!wrap || !wrap.dataset.codesUrl) {
+            return;
+        }
+
+        const userId = wrap.dataset.userId || '0';
+        const storageKey = 'indiestats_2fa_recovery_ack_' + userId;
+
+        const codesEl = document.getElementById('pa-recovery-codes');
+        const hiddenHint = document.getElementById('pa-recovery-codes-hidden-hint');
+        const actionsEl = document.getElementById('pa-recovery-codes-actions');
+        const dismissBtn = document.getElementById('pa-recovery-codes-dismiss');
+        const copyBtn = document.getElementById('pa-recovery-codes-copy');
+        const regenForm = document.getElementById('pa-regenerate-recovery-form');
+
+        if (!codesEl || !hiddenHint || !actionsEl || !dismissBtn) {
+            return;
+        }
+
+        let lastCodes = [];
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function showHiddenState() {
+            codesEl.classList.add('d-none');
+            codesEl.innerHTML = '';
+            actionsEl.classList.add('d-none');
+            hiddenHint.classList.remove('d-none');
+            lastCodes = [];
+        }
+
+        function showCodesState(codes) {
+            lastCodes = codes.slice();
+            codesEl.innerHTML = codes
+                .map(function (c) {
+                    return '<code class="d-block mb-1 user-select-all">' + escapeHtml(c) + '</code>';
+                })
+                .join('');
+            codesEl.classList.remove('d-none');
+            hiddenHint.classList.add('d-none');
+            actionsEl.classList.remove('d-none');
+        }
+
+        if (localStorage.getItem(storageKey) === '1') {
+            showHiddenState();
+        } else {
+            fetch(wrap.dataset.codesUrl, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
             })
-            .then(function (codes) {
-                if (!Array.isArray(codes) || !codes.length) return;
-                rc.innerHTML = codes
-                    .map(function (c) {
-                        return '<code class="d-block mb-1">' + c + '</code>';
-                    })
-                    .join('');
-            })
-            .catch(function () {});
-    }
+                .then(function (r) {
+                    return r.json();
+                })
+                .then(function (codes) {
+                    if (!Array.isArray(codes) || !codes.length) {
+                        return;
+                    }
+                    showCodesState(codes);
+                })
+                .catch(function () {});
+        }
+
+        dismissBtn.addEventListener('click', function () {
+            localStorage.setItem(storageKey, '1');
+            showHiddenState();
+        });
+
+        if (copyBtn && navigator.clipboard) {
+            copyBtn.addEventListener('click', function () {
+                if (!lastCodes.length) {
+                    return;
+                }
+                const labelCopied = wrap.dataset.labelCopied || 'Copiato';
+                const labelCopy = wrap.dataset.labelCopy || 'Copia tutti';
+                navigator.clipboard.writeText(lastCodes.join('\n')).then(function () {
+                    const orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML =
+                        '<i class="fas fa-check me-1"></i>' + escapeHtml(labelCopied);
+                    setTimeout(function () {
+                        copyBtn.innerHTML = orig;
+                    }, 2000);
+                });
+            });
+        }
+
+        if (regenForm) {
+            regenForm.addEventListener('submit', function () {
+                try {
+                    localStorage.removeItem(storageKey);
+                } catch (e) {
+                    /* ignore */
+                }
+            });
+        }
+    })();
 
     const deleteSiteModal = document.getElementById('deleteSiteModal');
     if (deleteSiteModal && typeof jQuery !== 'undefined') {

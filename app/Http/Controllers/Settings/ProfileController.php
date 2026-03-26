@@ -5,29 +5,11 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile settings page.
-     */
-    public function edit(Request $request): View
-    {
-        return view('settings.profile', [
-            'title' => __('Profilo').' · '.config('app.name'),
-            'breadcrumbs' => [
-                ['title' => __('Profilo'), 'href' => route('profile.edit')],
-            ],
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
-        ]);
-    }
-
     /**
      * Update the user's profile information.
      */
@@ -41,7 +23,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return to_route('profile.edit');
+        return to_route('account.edit');
     }
 
     /**

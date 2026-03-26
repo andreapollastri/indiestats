@@ -100,6 +100,11 @@ body {
     text-overflow: ellipsis;
 }
 
+.sidebar .pa-sidebar-account-sub .nav-link {
+    padding-left: 1.5rem;
+    font-size: 0.78rem;
+}
+
 .sidebar-user-block {
     margin: 0.35rem 0.75rem 0.5rem;
     padding: 0.65rem 0.75rem;
@@ -315,6 +320,10 @@ body {
         display: none;
     }
 
+    .sidebar.toggled .sidebar-heading-account {
+        display: none;
+    }
+
     .sidebar.toggled .nav-item .nav-link {
         text-align: center;
         padding: 0.6rem 0.5rem;
@@ -416,6 +425,10 @@ body {
     }
 
     body.sidebar-toggled .sidebar .sidebar-user-block {
+        display: none;
+    }
+
+    body.sidebar-toggled .sidebar .sidebar-heading-account {
         display: none;
     }
 

@@ -25,9 +25,9 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user)
             ->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('security.edit'))
+            ->get(route('account.edit'))
             ->assertOk()
-            ->assertViewIs('settings.security')
+            ->assertViewIs('settings.account')
             ->assertViewHas('canManageTwoFactor', true)
             ->assertViewHas('twoFactorEnabled', false);
     }
@@ -44,7 +44,7 @@ class SecurityTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get(route('security.edit'));
+            ->get(route('account.edit'));
 
         $response->assertRedirect(route('password.confirm'));
     }
@@ -61,9 +61,9 @@ class SecurityTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('security.edit'))
+            ->get(route('account.edit'))
             ->assertOk()
-            ->assertViewIs('settings.security');
+            ->assertViewIs('settings.account');
     }
 
     public function test_security_page_renders_without_two_factor_when_feature_is_disabled()
@@ -75,9 +75,9 @@ class SecurityTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->get(route('security.edit'))
+            ->get(route('account.edit'))
             ->assertOk()
-            ->assertViewIs('settings.security')
+            ->assertViewIs('settings.account')
             ->assertViewHas('canManageTwoFactor', false);
     }
 
@@ -87,7 +87,7 @@ class SecurityTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->from(route('security.edit'))
+            ->from(route('account.edit'))
             ->put(route('user-password.update'), [
                 'current_password' => 'password',
                 'password' => 'Valid-Test-P@ssw0rd',
@@ -96,7 +96,7 @@ class SecurityTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('security.edit'));
+            ->assertRedirect(route('account.edit'));
 
         $this->assertTrue(Hash::check('Valid-Test-P@ssw0rd', $user->refresh()->password));
     }
@@ -107,7 +107,7 @@ class SecurityTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->from(route('security.edit'))
+            ->from(route('account.edit'))
             ->put(route('user-password.update'), [
                 'current_password' => 'wrong-password',
                 'password' => 'Another-Valid-P@ss1',
@@ -116,6 +116,24 @@ class SecurityTest extends TestCase
 
         $response
             ->assertSessionHasErrors('current_password')
-            ->assertRedirect(route('security.edit'));
+            ->assertRedirect(route('account.edit'));
+    }
+
+    public function test_pending_two_factor_setup_can_be_cancelled(): void
+    {
+        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+
+        $user = User::factory()->create();
+        $user->forceFill([
+            'two_factor_secret' => encrypt('test-secret-key'),
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+        ])->save();
+
+        $response = $this->actingAs($user)->post(route('security.two-factor.cancel-setup'), []);
+
+        $response->assertRedirect(route('account.edit'));
+        $response->assertSessionHas('success');
+        $this->assertNull($user->fresh()->two_factor_secret);
     }
 }

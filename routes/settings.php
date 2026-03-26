@@ -1,20 +1,30 @@
 <?php
 
+use App\Http\Controllers\Settings\AccountController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
+use App\Http\Middleware\RequirePasswordForTwoFactorAccountPage;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', '/settings/profile');
+    Route::redirect('settings', '/settings/account');
 
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('settings/account', [AccountController::class, 'edit'])
+        ->middleware(RequirePasswordForTwoFactorAccountPage::class)
+        ->name('account.edit');
+
+    Route::redirect('settings/profile', '/settings/account');
+    Route::redirect('settings/security', '/settings/account');
+
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('settings/security', [SecurityController::class, 'edit'])->name('security.edit');
+    Route::post('settings/security/two-factor/cancel-setup', [SecurityController::class, 'cancelTwoFactorSetup'])
+        ->middleware('throttle:12,1')
+        ->name('security.two-factor.cancel-setup');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
         ->middleware('throttle:6,1')
