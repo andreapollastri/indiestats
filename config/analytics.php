@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Seed dati fake
+    |--------------------------------------------------------------------------
+    |
+    | Se true, il seeder FakeDataSeeder popola il database con dati di esempio
+    | (5 siti, ~3000 pageview per sito, click in uscita, eventi, goal).
+    | Imposta SEED_FAKE_DATA=true nel .env per abilitare.
+    |
+    */
+
+    'seed_fake_data' => (bool) env('SEED_FAKE_DATA', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Conservazione dati (giorni)
     |--------------------------------------------------------------------------
     |
