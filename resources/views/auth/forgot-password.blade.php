@@ -11,7 +11,7 @@
         <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;">{{ __('Inserisci la tua email per ricevere il link di reset.') }}</p>
     </div>
     @if (!empty($status))
-        <div class="alert alert-success small">{{ $status }}</div>
+        <div class="alert alert-success small">{{ __($status) }}</div>
     @endif
     <form method="POST" action="{{ route('password.email') }}">
         @csrf

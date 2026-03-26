@@ -52,9 +52,6 @@
                                 </ul>
                             </div>
                         @endif
-                        @if (session('status'))
-                            <div class="alert alert-success small mb-3">{{ session('status') }}</div>
-                        @endif
                         @yield('content')
                     </div>
                 </div>

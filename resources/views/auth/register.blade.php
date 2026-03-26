@@ -5,6 +5,9 @@
         <h1 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.25rem;">{{ __('Crea un account') }}</h1>
         <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;">{{ __('Inizia a tracciare in pochi secondi') }}</p>
     </div>
+    @if (!empty($status))
+        <div class="alert alert-success small">{{ __($status) }}</div>
+    @endif
     <form method="POST" action="{{ route('register.store') }}">
         @csrf
         <div class="mb-3">

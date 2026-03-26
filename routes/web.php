@@ -59,3 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 });
 
 require __DIR__.'/settings.php';
+
+/*
+| Fortify registra POST /forgot-password senza throttle nominato: lo aggiungiamo qui.
+| refreshNameLookups() è necessario perché la lookup per nome può non essere ancora popolata.
+*/
+Route::getRoutes()->refreshNameLookups();
+Route::getRoutes()->getByName('password.email')?->middleware(['throttle:password-reset-email']);

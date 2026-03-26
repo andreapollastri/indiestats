@@ -26,7 +26,7 @@
                 <button type="submit" class="btn btn-outline-secondary btn-sm">{{ __('Invia di nuovo la mail di verifica') }}</button>
             </form>
             @if ($status === 'verification-link-sent')
-                <p class="small mt-2 mb-0" style="color: #10b981;">{{ __('Nuovo link inviato.') }}</p>
+                <p class="small mt-2 mb-0" style="color: #10b981;">{{ __('verification-link-sent') }}</p>
             @endif
         @endif
     </div>

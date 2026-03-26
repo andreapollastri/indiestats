@@ -69,8 +69,9 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => view('auth.register', [
+        Fortify::registerView(fn (Request $request) => view('auth.register', [
             'title' => __('Registrati').' · '.config('app.name'),
+            'status' => $request->session()->get('status'),
         ]));
 
         Fortify::twoFactorChallengeView(fn () => view('auth.two-factor-challenge', [
@@ -95,6 +96,27 @@ class FortifyServiceProvider extends ServiceProvider
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
+        });
+
+        RateLimiter::for('password-reset-email', function (Request $request) {
+            $minutes = max(1, (int) config('auth_email.resend_minutes', 15));
+            $email = Str::transliterate(Str::lower((string) $request->input(Fortify::email(), '')));
+
+            return Limit::perMinutes($minutes, 1)->by('password-reset-email:'.$email.'|'.$request->ip());
+        });
+
+        RateLimiter::for('verification-email', function (Request $request) {
+            $minutes = max(1, (int) config('auth_email.resend_minutes', 15));
+
+            if ($request->routeIs('verification.send')) {
+                $user = $request->user();
+
+                return Limit::perMinutes($minutes, 1)->by(
+                    'verification-send:'.($user?->getAuthIdentifier() ?? 'guest')
+                );
+            }
+
+            return Limit::perMinute(30)->by('verification-verify:'.$request->ip());
         });
     }
 }
