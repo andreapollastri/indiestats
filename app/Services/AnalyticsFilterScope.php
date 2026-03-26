@@ -157,7 +157,7 @@ class AnalyticsFilterScope
         $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, $eventNamed);
     }
 
-    /** Aggregazione per tag: filter_event restringe i visitatori come nei KPI, non solo le righe con quel name. */
+    /** Aggregazione per tag: filter_event restringe i visitatori come nelle metriche di riepilogo, non solo le righe con quel name. */
     public function applyToEventNamesAggregation(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
