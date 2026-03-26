@@ -26,7 +26,6 @@ class PruneAnalyticsTest extends TestCase
         ]);
 
         Config::set('analytics.retention_days', 30);
-        Config::set('analytics.retention_months', 12);
 
         PageView::create([
             'site_id' => $site->id,
@@ -82,7 +81,7 @@ class PruneAnalyticsTest extends TestCase
         $this->travelBack();
     }
 
-    public function test_prune_deletes_rows_older_than_retention_months_when_days_not_set(): void
+    public function test_prune_deletes_rows_older_than_default_retention_days(): void
     {
         $this->travelTo('2026-03-26 12:00:00');
 
@@ -92,22 +91,21 @@ class PruneAnalyticsTest extends TestCase
             'allowed_domains' => 'example.com',
         ]);
 
-        Config::set('analytics.retention_days', null);
-        Config::set('analytics.retention_months', 12);
+        Config::set('analytics.retention_days', 375);
 
         TrackingEvent::create([
             'site_id' => $site->id,
             'visitor_id' => 'v-old',
             'name' => 'signup',
             'path' => '/x',
-            'created_at' => now()->subMonths(13),
+            'created_at' => now()->subDays(376),
         ]);
         TrackingEvent::create([
             'site_id' => $site->id,
             'visitor_id' => 'v-new',
             'name' => 'signup',
             'path' => '/y',
-            'created_at' => now()->subMonths(6),
+            'created_at' => now()->subDays(374),
         ]);
 
         Artisan::call('analytics:prune');

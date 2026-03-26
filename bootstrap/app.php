@@ -33,6 +33,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (Schedule $schedule): void {
-        $schedule->command('analytics:prune')->dailyAt('03:15');
+        $schedule->command('analytics:prune')->dailyAt('02:00');
     })
     ->create();

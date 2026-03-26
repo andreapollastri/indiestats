@@ -29,12 +29,8 @@ class PruneAnalyticsCommand extends Command
 
     private function retentionCutoff(): CarbonInterface
     {
-        $days = config('analytics.retention_days');
+        $days = max(1, (int) config('analytics.retention_days', 375));
 
-        if ($days !== null) {
-            return now()->subDays(max(1, (int) $days));
-        }
-
-        return now()->subMonths(max(1, (int) config('analytics.retention_months', 12)));
+        return now()->subDays($days);
     }
 }

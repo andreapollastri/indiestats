@@ -156,19 +156,17 @@ window.downstage.track("nome_evento", { chiave: "valore" });
 
 Proprietà opzionali: oggetto **piatto**, fino a 20 chiavi, valori stringa/numero/booleano (normalizzati lato server).
 
-### Conservazione dati (12 mesi)
+### Conservazione dati (~1 anno + margine)
 
-Le tabelle di analytics conservano al massimo **12 mesi** di dati grezzi: **pageview**, **click in uscita** ed **eventi custom** (`tracking_events`). Le definizioni dei **goal** restano nel database e non vengono eliminate dal prune.
+Le tabelle di analytics conservano i dati grezzi per **375 giorni** per impostazione predefinita (circa un anno solare + **10 giorni** di margine): **pageview**, **click in uscita** ed **eventi custom** (`tracking_events`). Le definizioni dei **goal** restano nel database e non vengono eliminate dal prune.
 
-Il comando `php artisan analytics:prune` rimuove i record con `created_at` precedente al periodo di conservazione; è **pianificato ogni giorno alle 03:15** quando lo scheduler Laravel è attivo (richiede il cron che esegue `schedule:run`).
+Il comando `php artisan analytics:prune` elimina i record con `created_at` **anteriore** a *oggi meno N giorni* (default **375**), per **tutti i siti**. È **pianificato ogni notte alle 02:00** quando lo scheduler Laravel è attivo (richiede il cron che esegue `schedule:run`).
 
 **Configurazione (`.env`):**
 
 | Variabile | Comportamento |
 | --------- | ------------- |
-| *(nessuna)* | Si usa **`ANALYTICS_RETENTION_MONTHS`** con default **12**. |
-| `ANALYTICS_RETENTION_MONTHS` | Numero di mesi di conservazione (es. `12`). Ignorato se è impostato `ANALYTICS_RETENTION_DAYS`. |
-| `ANALYTICS_RETENTION_DAYS` | Se impostato, ha **priorità**: conservazione espressa in **giorni** (es. `90`), utile per policy legacy o test. |
+| `ANALYTICS_RETENTION_DAYS` | Numero di giorni di conservazione. **Default: 375** (se omesso). Esempio per test: `90`. |
 
 In produzione aggiungi al **cron** del server (una riga al minuto):
 
