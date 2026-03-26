@@ -184,10 +184,10 @@ From your website's JavaScript, you can send custom events:
 
 ```javascript
 // Basic event
-downstage.track('signup');
+indiestats.track('signup');
 
 // Event with properties (up to 20 key-value pairs)
-downstage.track('purchase', {
+indiestats.track('purchase', {
     plan: 'pro',
     price: '29.99',
     currency: 'USD'

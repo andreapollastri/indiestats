@@ -88,7 +88,7 @@
     "Click in uscita": "Clics sortants",
 
     "Eventi configurati": "Événements configurés",
-    "Descrizione in dashboard e tag inviato con downstage.track (stesso valore della stringa nel codice).": "Description dans le tableau de bord et tag envoyé avec downstage.track (même valeur que la chaîne dans le code).",
+    "Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).": "Description dans le tableau de bord et tag envoyé avec indiestats.track (même valeur que la chaîne dans le code).",
     "Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.": "Comptages et visiteurs dans le tableau : période entière ci-dessus, sans les filtres analytiques.",
     "Esempio:": "Exemple :",
     "Descrizione": "Description",
@@ -99,7 +99,7 @@
     "Aggiungi": "Ajouter",
     "Eliminare questo evento?": "Supprimer cet événement ?",
     "Rimuovi": "Supprimer",
-    "Tutti i tag inviati con downstage.track nel periodo": "Tous les tags envoyés avec downstage.track dans la période",
+    "Tutti i tag inviati con indiestats.track nel periodo": "Tous les tags envoyés avec indiestats.track dans la période",
     "Dettaglio eventi": "Détail des événements",
     "Singole occorrenze nel periodo; payload salvato e ripulito lato server (paginazione server)": "Occurrences individuelles dans la période ; payload stocké et nettoyé côté serveur (pagination serveur)",
     "Data/ora": "Date/heure",

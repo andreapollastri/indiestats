@@ -136,14 +136,14 @@ window.Chart = Chart;
             .catch(function () {});
     }
 
-    (function initTwoFactorRdownstage() {
+    (function initTwoFactorRecovery() {
         const wrap = document.getElementById("pa-recovery-codes-wrap");
         if (!wrap || !wrap.dataset.codesUrl) {
             return;
         }
 
         const userId = wrap.dataset.userId || "0";
-        const storageKey = "downstage_2fa_recovery_ack_" + userId;
+        const storageKey = "indiestats_2fa_recovery_ack_" + userId;
 
         const codesEl = document.getElementById("pa-recovery-codes");
         const hiddenHint = document.getElementById(

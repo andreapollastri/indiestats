@@ -88,7 +88,7 @@
     "Click in uscita": "Outbound clicks",
 
     "Eventi configurati": "Configured events",
-    "Descrizione in dashboard e tag inviato con downstage.track (stesso valore della stringa nel codice).": "Dashboard description and tag sent with downstage.track (same value as the string in the code).",
+    "Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).": "Dashboard description and tag sent with indiestats.track (same value as the string in the code).",
     "Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.": "Counts and visitors in the table: entire period above, without analytics filters.",
     "Esempio:": "Example:",
     "Descrizione": "Description",
@@ -99,7 +99,7 @@
     "Aggiungi": "Add",
     "Eliminare questo evento?": "Delete this event?",
     "Rimuovi": "Remove",
-    "Tutti i tag inviati con downstage.track nel periodo": "All tags sent with downstage.track in the period",
+    "Tutti i tag inviati con indiestats.track nel periodo": "All tags sent with indiestats.track in the period",
     "Dettaglio eventi": "Event detail",
     "Singole occorrenze nel periodo; payload salvato e ripulito lato server (paginazione server)": "Individual occurrences in the period; payload stored and sanitized server-side (server pagination)",
     "Data/ora": "Date/time",

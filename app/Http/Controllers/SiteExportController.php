@@ -71,7 +71,7 @@ class SiteExportController extends Controller
             abort(404);
         }
 
-        $safeName = 'downstage-'.Str::slug($site->name).'-'.$export->created_at->format('Y-m-d').'.xlsx';
+        $safeName = 'indiestats-'.Str::slug($site->name).'-'.$export->created_at->format('Y-m-d').'.xlsx';
 
         return Storage::disk('local')->download($export->file_path, $safeName);
     }

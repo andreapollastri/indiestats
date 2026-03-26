@@ -299,11 +299,11 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Eventi configurati') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con downstage.track (stesso valore della stringa nel codice).') }}</small>
+            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).') }}</small>
             <small class="d-block mt-1" style="color: #94a3b8;">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
         </div>
         <div class="card-body">
-            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.downstage.track('nome_tag', { opzionale: 'valore' })</code></p>
+            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
@@ -356,7 +356,7 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con downstage.track nel periodo') }}</small>
+            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con indiestats.track nel periodo') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
