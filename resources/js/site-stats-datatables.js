@@ -161,27 +161,46 @@ function tableConfig(type, csrf, tableEl) {
             return {
                 ...base,
                 order: [[0, 'desc']],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: 1 },
+                    { responsivePriority: 3, targets: 2 },
+                    { responsivePriority: 4, targets: 3 },
+                    { responsivePriority: 10, targets: 4 },
+                ],
                 columns: [
-                    { data: 'created_at', className: 'text-nowrap font-monospace' },
-                    { data: 'name', className: 'font-monospace' },
                     {
-                        data: 'path',
-                        className: 'font-monospace',
-                        render: function (d) {
-                            return escapeHtml(d || '—');
+                        data: 'created_at',
+                        className: 'text-nowrap font-monospace pa-col-datetime pa-dt-events-cell',
+                    },
+                    { data: 'name', className: 'font-monospace pa-dt-events-cell' },
+                    {
+                        data: 'visitor_id',
+                        className: 'pa-dt-visitor-id pa-dt-events-cell',
+                        render: function (d, cellType) {
+                            if (cellType !== 'display' && cellType !== 'filter') {
+                                return d || '';
+                            }
+                            const id = d || '—';
+                            return (
+                                '<span class="d-inline-block font-monospace text-break user-select-all pa-dt-visitor-id-inner">' +
+                                escapeHtml(id) +
+                                '</span>'
+                            );
                         },
                     },
                     {
-                        data: 'referrer_display',
-                        orderable: true,
+                        data: 'path',
+                        className: 'font-monospace pa-dt-events-cell',
                         render: function (d) {
-                            return d;
+                            return escapeHtml(d || '—');
                         },
                     },
                     {
                         data: 'payload_html',
                         orderable: false,
                         searchable: false,
+                        className: 'pa-dt-events-cell',
                         render: function (d) {
                             return d;
                         },
@@ -190,7 +209,7 @@ function tableConfig(type, csrf, tableEl) {
             };
         case 'goals': {
             const confirmMsg =
-                (tableEl && tableEl.dataset.paDtConfirmDelete) || 'Eliminare questo goal?';
+                (tableEl && tableEl.dataset.paDtConfirmDelete) || 'Eliminare questo evento?';
             const removeLabel = (tableEl && tableEl.dataset.paDtRemoveLabel) || 'Rimuovi';
             return {
                 ...base,
@@ -236,7 +255,7 @@ function init() {
         return;
     }
 
-    const csrf =
+    const csrfToken =
         document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     tables.forEach(function (table) {
@@ -247,7 +266,7 @@ function init() {
             return;
         }
 
-        const cfg = tableConfig(type, csrf, table);
+        const cfg = tableConfig(type, csrfToken, table);
         if (!cfg) {
             return;
         }
@@ -256,9 +275,13 @@ function init() {
             ...cfg,
             ajax: {
                 url: url,
+                type: 'POST',
                 data: function (d) {
                     d.range = range;
                     d.type = type;
+                    if (csrfToken) {
+                        d._token = csrfToken;
+                    }
                     const filters = getPaAnalyticsFilterParams();
                     Object.keys(filters).forEach(function (k) {
                         d[k] = filters[k];

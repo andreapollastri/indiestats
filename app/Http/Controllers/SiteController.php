@@ -9,6 +9,7 @@ use App\Support\AnalyticsFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -90,12 +91,12 @@ class SiteController extends Controller
         if ($request->query('analytics') === 'detail') {
             $siteTab = 'detail';
         }
-        if (! in_array($siteTab, ['summary', 'detail', 'goals'], true)) {
+        if (! in_array($siteTab, ['summary', 'detail', 'events'], true)) {
             $siteTab = 'summary';
         }
         $errorsBag = $request->session()->get('errors');
-        if ($errorsBag instanceof \Illuminate\Support\ViewErrorBag && ($errorsBag->has('label') || $errorsBag->has('event_name'))) {
-            $siteTab = 'goals';
+        if ($errorsBag instanceof ViewErrorBag && ($errorsBag->has('label') || $errorsBag->has('event_name'))) {
+            $siteTab = 'events';
         }
 
         $filterPresets = $filterOptions->presetsForAll($site->id, $from, $to);

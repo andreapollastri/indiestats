@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\DB;
 
 class AnalyticsFilterScope
 {
@@ -100,7 +101,11 @@ class AnalyticsFilterScope
     }
 
     /**
-     * Per tracking_events / event_names: se c'è già where('name', …) non duplicare il sottoinsieme evento.
+     * Filtri su dimensioni page view (source, path, utm, device, …): non basta
+     * restringere i visitor_id — ogni riga tracking_events deve essere attribuibile
+     * a una page_view nel periodo che soddisfa i filtri e precede (o coincide con) l'evento.
+     *
+     * Se c'è già where('name', …) sul main query, non duplicare il sottoinsieme evento su visitor_id.
      */
     public function constrainVisitorForTrackingEvents(
         Builder $q,
@@ -114,16 +119,16 @@ class AnalyticsFilterScope
             return;
         }
 
-        $pv = $filters->withoutEvent();
+        $pvFilters = $filters->withoutEvent();
 
-        if ($pv->hasPageViewRowFilters()) {
-            $q->whereIn('visitor_id', function ($sub) use ($siteId, $from, $to, $pv): void {
-                /** @var QueryBuilder $sub */
-                $sub->select('visitor_id')
-                    ->from('page_views')
-                    ->where('site_id', $siteId)
-                    ->whereBetween('created_at', [$from, $to]);
-                $this->applyPageViewRowConditions($sub, $pv);
+        if ($pvFilters->hasPageViewRowFilters()) {
+            $q->whereExists(function ($sub) use ($siteId, $from, $to, $pvFilters): void {
+                $sub->from('page_views as pv')
+                    ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
+                    ->where('pv.site_id', $siteId)
+                    ->whereBetween('pv.created_at', [$from, $to])
+                    ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
+                $this->applyPageViewRowConditions($sub, $pvFilters);
             });
         }
 
@@ -152,17 +157,13 @@ class AnalyticsFilterScope
         $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, $eventNamed);
     }
 
+    /** Aggregazione per tag: filter_event restringe i visitatori come nei KPI, non solo le righe con quel name. */
     public function applyToEventNamesAggregation(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
             ->whereBetween('created_at', [$from, $to]);
 
-        $eventNamed = $filters->event !== null;
-        if ($eventNamed) {
-            $q->where('name', $filters->event);
-        }
-
-        $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, $eventNamed);
+        $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, false);
     }
 
     public function applyToGoalsJoin(JoinClause $join, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
@@ -174,12 +175,12 @@ class AnalyticsFilterScope
         $pv = $filters->withoutEvent();
 
         if ($pv->hasPageViewRowFilters()) {
-            $join->whereIn('tracking_events.visitor_id', function ($sub) use ($siteId, $from, $to, $pv): void {
-                /** @var QueryBuilder $sub */
-                $sub->select('visitor_id')
-                    ->from('page_views')
-                    ->where('site_id', $siteId)
-                    ->whereBetween('created_at', [$from, $to]);
+            $join->whereExists(function ($sub) use ($siteId, $from, $to, $pv): void {
+                $sub->from('page_views as pv')
+                    ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
+                    ->where('pv.site_id', $siteId)
+                    ->whereBetween('pv.created_at', [$from, $to])
+                    ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
                 $this->applyPageViewRowConditions($sub, $pv);
             });
         }
@@ -194,5 +195,31 @@ class AnalyticsFilterScope
                     ->whereBetween('created_at', [$from, $to]);
             });
         }
+    }
+
+    /**
+     * Path della page view più recente nel periodo che soddisfa i filtri e precede l'evento
+     * (stessa logica dell'EXISTS su page_views). Usato per mostrare in dettaglio il percorso
+     * allineato al filtro (es. pathname+query) invece del solo path inviato con track().
+     */
+    public function attributingPageViewPathSubquery(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        AnalyticsFilters $pvFilters
+    ): ?QueryBuilder {
+        if (! $pvFilters->hasPageViewRowFilters()) {
+            return null;
+        }
+
+        $q = DB::table('page_views as pv')
+            ->select('pv.path')
+            ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
+            ->where('pv.site_id', $siteId)
+            ->whereBetween('pv.created_at', [$from, $to])
+            ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
+        $this->applyPageViewRowConditions($q, $pvFilters);
+
+        return $q->orderByDesc('pv.created_at')->limit(1);
     }
 }

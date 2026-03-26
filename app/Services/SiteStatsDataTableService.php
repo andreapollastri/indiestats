@@ -18,6 +18,7 @@ class SiteStatsDataTableService
     public function __construct(
         private AnalyticsFilterScope $filterScope
     ) {}
+
     /**
      * @return array<string, array{group: string, json_key: string, where: ?callable(Builder): void}>
      */
@@ -387,44 +388,58 @@ class SiteStatsDataTableService
 
         $base = TrackingEvent::query();
         $this->filterScope->applyToTrackingEvents($base, $siteId, $from, $to, $filters);
+
+        $pvFilters = $filters->withoutEvent();
+        $pathSub = $this->filterScope->attributingPageViewPathSubquery($siteId, $from, $to, $pvFilters);
+        $hasAttributingPath = $pathSub !== null;
+        if ($hasAttributingPath) {
+            $base->select('tracking_events.*')
+                ->selectRaw(
+                    'COALESCE(('.$pathSub->toSql().'), tracking_events.path) as path_for_display',
+                    $pathSub->getBindings()
+                );
+        }
+
         $base->when($like !== null, function (Builder $q) use ($like): void {
-                $q->where(function (Builder $w) use ($like): void {
-                    $w->where('name', 'like', $like)
-                        ->orWhere('path', 'like', $like)
-                        ->orWhere('referrer_url', 'like', $like)
-                        ->orWhere('referrer_source', 'like', $like);
-                });
+            $q->where(function (Builder $w) use ($like): void {
+                $w->where('name', 'like', $like)
+                    ->orWhere('path', 'like', $like)
+                    ->orWhere('visitor_id', 'like', $like)
+                    ->orWhere('referrer_url', 'like', $like)
+                    ->orWhere('referrer_source', 'like', $like);
             });
+        });
 
         $recordsTotal = (clone $base)->count();
         $recordsFiltered = (clone $base)->count();
 
         $dataQuery = clone $base;
 
-        $orderColumns = ['created_at', 'name', 'path', 'referrer_source', 'payload_html'];
+        $orderColumns = ['created_at', 'name', 'visitor_id', 'path', 'payload_html'];
         $orderBy = $orderColumns[$orderCol] ?? 'created_at';
         if ($orderBy === 'payload_html') {
             $orderBy = 'created_at';
         }
         if ($orderBy === 'path') {
-            $dataQuery->orderBy('path', $orderDir);
+            $dataQuery->orderBy($hasAttributingPath ? 'path_for_display' : 'path', $orderDir);
         } elseif ($orderBy === 'name') {
             $dataQuery->orderBy('name', $orderDir);
-        } elseif ($orderBy === 'referrer_source') {
-            $dataQuery->orderBy('referrer_source', $orderDir);
+        } elseif ($orderBy === 'visitor_id') {
+            $dataQuery->orderBy('visitor_id', $orderDir);
         } else {
             $dataQuery->orderBy('created_at', $orderDir);
         }
 
-        $rows = $dataQuery->offset($start)->limit($length)->get()->map(function ($row) {
+        $rows = $dataQuery->offset($start)->limit($length)->get()->map(function ($row) use ($hasAttributingPath) {
             /** @var array<string, string>|null $props */
             $props = $row->properties;
+            $pathVal = $hasAttributingPath ? ($row->path_for_display ?? $row->path) : $row->path;
 
             return [
                 'created_at' => $row->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i'),
                 'name' => $row->name,
-                'path' => $row->path ?? '—',
-                'referrer_display' => $this->formatReferrerDisplay($row->referrer_source, $row->referrer_url),
+                'visitor_id' => $row->visitor_id,
+                'path' => ($pathVal === null || $pathVal === '') ? '—' : (string) $pathVal,
                 'payload_html' => $this->formatPayloadHtml($props),
             ];
         })->all();
@@ -454,19 +469,6 @@ class SiteStatsDataTableService
         return '<ul class="list-unstyled font-monospace mb-0">'.implode('', $items).'</ul>';
     }
 
-    private function formatReferrerDisplay(?string $source, ?string $url): string
-    {
-        $src = ($source === null || $source === '') ? 'direct' : $source;
-        $label = '<span class="fw-semibold">'.e($src).'</span>';
-        if ($url === null || $url === '') {
-            return '<div class="small text-muted">'.$label.'</div>';
-        }
-
-        $trim = mb_strlen($url) > 96 ? mb_substr($url, 0, 93).'…' : $url;
-
-        return '<div class="small">'.$label.'</div><div class="font-monospace small text-break text-muted">'.e($trim).'</div>';
-    }
-
     /**
      * @return array{draw: int, recordsTotal: int, recordsFiltered: int, data: list<array<string, mixed>>}
      */
@@ -482,7 +484,7 @@ class SiteStatsDataTableService
         int $length,
         int $draw,
         string $range,
-        AnalyticsFilters $filters
+        AnalyticsFilters $filtersForUrls
     ): array {
         $like = $search !== '' ? '%'.addcslashes($search, '%_\\').'%' : null;
 
@@ -502,13 +504,14 @@ class SiteStatsDataTableService
         $orderBy = $orderMap[$orderCol] ?? 'goals.label';
 
         $scope = $this->filterScope;
+        $noAnalyticsFilters = new AnalyticsFilters;
         $query = DB::table('goals')
             ->where('goals.site_id', $siteId)
-            ->leftJoin('tracking_events', function ($join) use ($siteId, $from, $to, $filters, $scope): void {
+            ->leftJoin('tracking_events', function ($join) use ($siteId, $from, $to, $scope, $noAnalyticsFilters): void {
                 $join->on('tracking_events.name', '=', 'goals.event_name')
                     ->where('tracking_events.site_id', '=', $siteId)
                     ->whereBetween('tracking_events.created_at', [$from, $to]);
-                $scope->applyToGoalsJoin($join, $siteId, $from, $to, $filters);
+                $scope->applyToGoalsJoin($join, $siteId, $from, $to, $noAnalyticsFilters);
             })
             ->select('goals.id', 'goals.label', 'goals.event_name')
             ->selectRaw('COUNT(tracking_events.id) as event_count')
@@ -524,7 +527,7 @@ class SiteStatsDataTableService
             ->offset($start)
             ->limit($length);
 
-        $rows = $query->get()->map(function ($row) use ($sitePublicKey, $range, $filters) {
+        $rows = $query->get()->map(function ($row) use ($sitePublicKey, $range, $filtersForUrls) {
             return [
                 'label' => $row->label,
                 'event_name' => $row->event_name,
@@ -534,8 +537,8 @@ class SiteStatsDataTableService
                     'site' => $sitePublicKey,
                     'goal' => $row->id,
                     'range' => $range,
-                    'tab' => 'goals',
-                ], $filters->toQueryArray())),
+                    'tab' => 'events',
+                ], $filtersForUrls->toQueryArray())),
             ];
         })->all();
 

@@ -100,6 +100,51 @@ body {
     text-overflow: ellipsis;
 }
 
+.sidebar-user-block {
+    margin: 0.35rem 0.75rem 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.sidebar-user-label {
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $nd-text-muted;
+    opacity: 0.85;
+    margin-bottom: 0.2rem;
+}
+
+.sidebar-user-label--spaced {
+    margin-top: 0.55rem;
+    margin-bottom: 0.2rem;
+}
+
+.sidebar-user-value {
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-user-value--name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.sidebar-user-value--email {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 400;
+    color: rgba(248, 250, 252, 0.82);
+    opacity: 0.92;
+}
+
 .sidebar .nav-item {
     position: relative;
 }
@@ -266,10 +311,8 @@ body {
         display: none;
     }
 
-    .sidebar.toggled .sidebar-heading {
-        text-align: center;
-        font-size: 0;
-        &::first-letter { font-size: 0.6rem; }
+    .sidebar.toggled .sidebar-user-block {
+        display: none;
     }
 
     .sidebar.toggled .nav-item .nav-link {
@@ -333,6 +376,36 @@ body {
     }
 }
 
+// Mobile app top bar: menu a sinistra, marchio centrato e compatto
+.nd-mobile-topbar {
+    background: $nd-surface;
+
+    .btn-link {
+        z-index: 1;
+        color: #64748b;
+
+        &:hover,
+        &:focus-visible {
+            color: #475569;
+        }
+    }
+}
+
+.nd-mobile-topbar-brand {
+    font-size: 0.78rem;
+    letter-spacing: -0.02em;
+    max-width: min(14rem, calc(100vw - 5.5rem));
+
+    .fas {
+        font-size: 0.85rem;
+        color: $nd-accent;
+    }
+
+    span {
+        min-width: 0;
+    }
+}
+
 @media (min-width: 768px) {
     body.sidebar-toggled .sidebar {
         width: 4.5rem !important;
@@ -342,8 +415,8 @@ body {
         display: none;
     }
 
-    body.sidebar-toggled .sidebar .sidebar-heading {
-        text-align: center;
+    body.sidebar-toggled .sidebar .sidebar-user-block {
+        display: none;
     }
 
     body.sidebar-toggled .sidebar .nav-item .nav-link {

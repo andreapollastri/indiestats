@@ -32,14 +32,12 @@ export function readFilterConfig() {
 }
 
 /**
- * Parametri `filter_*` per AJAX DataTables: JSON inline + query string (stessa fonte della pagina).
+ * Parametri `filter_*` per AJAX DataTables: solo dalla query string visibile (location).
+ * Non usare il JSON `cfg.current`: dopo navigazione o modifica URL senza reload poteva restare
+ * un merge obsoleto e i totali delle tabelle non coincidevano con i filtri effettivi.
  */
 export function getPaAnalyticsFilterParams() {
     const out = {};
-    const cfg = readFilterConfig();
-    if (cfg && cfg.current && typeof cfg.current === 'object') {
-        Object.assign(out, cfg.current);
-    }
     try {
         const params = new URLSearchParams(window.location.search);
         FILTER_PARAM_KEYS.forEach(function (k) {

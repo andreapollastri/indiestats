@@ -12,11 +12,11 @@
     $statBorders = ['primary', 'success', 'info', 'warning'];
     $siteTab = $site_tab ?? 'summary';
     if ($errors->has('label') || $errors->has('event_name')) {
-        $siteTab = 'goals';
+        $siteTab = 'events';
     }
     $summaryTabActive = $siteTab === 'summary';
     $detailTabActive = $siteTab === 'detail';
-    $goalsTabActive = $siteTab === 'goals';
+    $eventsTabActive = $siteTab === 'events';
 @endphp
 
 @section('content')
@@ -31,8 +31,8 @@
                     $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
                     if ($siteTab === 'detail') {
                         $rangeQuery['tab'] = 'detail';
-                    } elseif ($siteTab === 'goals') {
-                        $rangeQuery['tab'] = 'goals';
+                    } elseif ($siteTab === 'events') {
+                        $rangeQuery['tab'] = 'events';
                     }
                 @endphp
                 <a href="{{ route('sites.show', $rangeQuery) }}" class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
@@ -51,7 +51,7 @@
     @php
         $tabSummaryHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range]));
         $tabDetailHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'detail']));
-        $tabGoalsHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'goals']));
+        $tabEventsHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'events']));
     @endphp
     <ul class="nav nav-tabs mb-4" id="siteStatsTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -76,13 +76,13 @@
         </li>
         <li class="nav-item" role="presentation">
             <a
-                class="nav-link {{ $goalsTabActive ? 'active' : '' }}"
-                id="site-tab-goals"
-                href="{{ $tabGoalsHref }}"
+                class="nav-link {{ $eventsTabActive ? 'active' : '' }}"
+                id="site-tab-events"
+                href="{{ $tabEventsHref }}"
                 role="tab"
-                aria-controls="tab-site-goals"
-                aria-selected="{{ $goalsTabActive ? 'true' : 'false' }}"
-            >{{ __('Goals') }}</a>
+                aria-controls="tab-site-events"
+                aria-selected="{{ $eventsTabActive ? 'true' : 'false' }}"
+            >{{ __('Eventi') }}</a>
         </li>
     </ul>
 
@@ -224,34 +224,35 @@
         </div>
 
         <div
-            class="tab-pane fade {{ $goalsTabActive ? 'show active' : '' }}"
-            id="tab-site-goals"
+            class="tab-pane fade {{ $eventsTabActive ? 'show active' : '' }}"
+            id="tab-site-events"
             role="tabpanel"
-            aria-labelledby="site-tab-goals"
+            aria-labelledby="site-tab-events"
             tabindex="0"
         >
     <div class="card mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0" style="color: #10b981;">{{ __('Goal') }}</h6>
+            <h6 class="m-0" style="color: #10b981;">{{ __('Eventi configurati') }}</h6>
+            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).') }}</small>
+            <small class="d-block mt-1" style="color: #94a3b8;">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
         </div>
         <div class="card-body">
-            <p class="small" style="color: #94a3b8;">{{ __('Conta quante volte viene inviato un evento con un certo nome (uguale a quello in indiestats.track sul sito).') }}</p>
-            <p class="small mb-2" style="color: #94a3b8;">{{ __('Eventi:') }} <code class="user-select-all">window.indiestats.track('nome_evento', { opzionale: 'valore' })</code></p>
+            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
-                <input type="hidden" name="tab" value="goals">
+                <input type="hidden" name="tab" value="events">
                 @foreach ($analytics_filters->toQueryArray() as $fk => $fv)
                     <input type="hidden" name="{{ $fk }}" value="{{ $fv }}">
                 @endforeach
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label for="g-label" class="form-label">{{ __('Nome in dashboard') }}</label>
+                        <label for="g-label" class="form-label">{{ __('Descrizione') }}</label>
                         <input id="g-label" name="label" type="text" class="form-control @error('label') is-invalid @enderror" value="{{ old('label') }}" required placeholder="{{ __('Iscrizione completata') }}" autocomplete="off">
                         @error('label')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
-                        <label for="g-ev" class="form-label">{{ __('Nome evento') }}</label>
+                        <label for="g-ev" class="form-label">{{ __('Tag') }}</label>
                         <input id="g-ev" name="event_name" type="text" class="form-control font-monospace @error('event_name') is-invalid @enderror" value="{{ old('event_name') }}" required placeholder="signup_complete" autocomplete="off">
                         @error('event_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
@@ -268,13 +269,13 @@
                     data-pa-dt-url="{{ $dtUrl }}"
                     data-pa-dt-type="goals"
                     data-pa-dt-range="{{ $range }}"
-                    data-pa-dt-confirm-delete="{{ __('Eliminare questo goal?') }}"
+                    data-pa-dt-confirm-delete="{{ __('Eliminare questo evento?') }}"
                     data-pa-dt-remove-label="{{ __('Rimuovi') }}"
                 >
                     <thead>
                         <tr>
-                            <th>{{ __('Goal') }}</th>
-                            <th class="font-monospace">{{ __('evento') }}</th>
+                            <th>{{ __('Descrizione') }}</th>
+                            <th class="font-monospace">{{ __('Tag') }}</th>
                             <th class="text-end">{{ __('Volte') }}</th>
                             <th class="text-end">{{ __('Visitatori') }}</th>
                             <th></th>
@@ -289,7 +290,7 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Tutti i nomi inviati con indiestats.track nel periodo') }}</small>
+            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con indiestats.track nel periodo') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -302,7 +303,7 @@
                 >
                     <thead>
                         <tr>
-                            <th>{{ __('Nome') }}</th>
+                            <th>{{ __('Tag') }}</th>
                             <th class="text-end">{{ __('Volte') }}</th>
                             <th class="text-end">{{ __('Visitatori') }}</th>
                         </tr>
@@ -316,12 +317,12 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Dettaglio eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Eventi nel periodo con payload salvato e ripulito lato server (paginazione server)') }}</small>
+            <small style="color: #94a3b8;">{{ __('Singole occorrenze nel periodo; payload salvato e ripulito lato server (paginazione server)') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table
-                    class="table table-bordered table-sm mb-0 w-100 pa-site-dt"
+                    class="table table-bordered table-sm mb-0 w-100 pa-site-dt pa-site-dt-events"
                     width="100%"
                     data-pa-dt-url="{{ $dtUrl }}"
                     data-pa-dt-type="events"
@@ -329,10 +330,10 @@
                 >
                     <thead>
                         <tr>
-                            <th>{{ __('Data/ora') }}</th>
-                            <th>{{ __('Nome') }}</th>
+                            <th class="pa-col-datetime">{{ __('Data/ora') }}</th>
+                            <th>{{ __('Tag') }}</th>
+                            <th class="pa-col-visitor-id">{{ __('Visitatore') }}</th>
                             <th>{{ __('Percorso') }}</th>
-                            <th>{{ __('Provenienza') }}</th>
                             <th>{{ __('Payload') }}</th>
                         </tr>
                     </thead>

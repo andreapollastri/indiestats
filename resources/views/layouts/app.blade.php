@@ -7,6 +7,7 @@
     <title>{{ $title ?? config('app.name') }}</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
 <body id="page-top">
@@ -19,8 +20,15 @@
                 </div>
                 <div class="sidebar-brand-text">{{ config('app.name') }}</div>
             </a>
-            <div class="sidebar-heading px-3 text-truncate small" title="{{ Auth::user()->email }}">
-                {{ Auth::user()->email }}
+            <div class="sidebar-user-block" role="region" aria-label="{{ __('Account') }}">
+                <div class="sidebar-user-label">{{ __('Nome') }}</div>
+                <div class="sidebar-user-value sidebar-user-value--name text-truncate" title="{{ Auth::user()->name }}">
+                    {{ Auth::user()->name }}
+                </div>
+                <div class="sidebar-user-label sidebar-user-label--spaced">{{ __('Email') }}</div>
+                <div class="sidebar-user-value sidebar-user-value--email text-truncate" title="{{ Auth::user()->email }}">
+                    {{ Auth::user()->email }}
+                </div>
             </div>
             <hr class="sidebar-divider my-0">
             <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -65,10 +73,24 @@
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <div class="d-md-none border-bottom py-2 px-3 mb-4" style="background: #fff;">
-                    <button id="sidebarToggleTop" class="btn btn-link p-1" style="color: #64748b;" type="button" aria-label="Menu">
+                <div class="nd-mobile-topbar d-md-none border-bottom py-2 mb-4 position-relative">
+                    <button
+                        id="sidebarToggleTop"
+                        class="btn btn-link position-absolute top-50 start-0 translate-middle-y ms-2 p-2 border-0"
+                        type="button"
+                        aria-label="{{ __('Menu') }}"
+                    >
                         <i class="fas fa-bars fa-lg"></i>
                     </button>
+                    <div class="text-center px-5">
+                        <a
+                            href="{{ route('dashboard') }}"
+                            class="nd-mobile-topbar-brand text-decoration-none d-inline-flex align-items-center justify-content-center gap-1 py-1 min-w-0"
+                        >
+                            <i class="fas fa-arrow-trend-up flex-shrink-0" aria-hidden="true"></i>
+                            <span class="fw-bold text-dark text-truncate">{{ config('app.name') }}</span>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="container-fluid">

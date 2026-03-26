@@ -56,7 +56,7 @@ class CollectController extends Controller
         $pageView = PageView::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
-            'path' => $data['path'],
+            'path' => EventPayloadSanitizer::normalizeStoredPath($data['path']),
             'referrer_url' => $referrerUrl,
             'referrer_source' => $analysis['source'],
             'utm_source' => $data['utm_source'] ?? null,
@@ -133,7 +133,7 @@ class CollectController extends Controller
         OutboundClick::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
-            'from_path' => $data['from_path'],
+            'from_path' => EventPayloadSanitizer::normalizeStoredPath($data['from_path']),
             'target_url' => $data['target_url'],
             'referrer_url' => $referrerUrl,
             'referrer_source' => $analysis['source'],
@@ -168,7 +168,8 @@ class CollectController extends Controller
             return response()->json(['error' => 'invalid name'], 422);
         }
 
-        $path = EventPayloadSanitizer::sanitizePath($data['path'] ?? null);
+        $rawPath = EventPayloadSanitizer::sanitizePath($data['path'] ?? null);
+        $path = $rawPath === null ? null : EventPayloadSanitizer::normalizeStoredPath($rawPath);
 
         $properties = $this->normalizeEventProperties($data['properties'] ?? null);
         if ($properties !== null) {
@@ -252,7 +253,7 @@ class CollectController extends Controller
             return $this->gifResponse();
         }
 
-        $path = $data['p'] ?? '/';
+        $path = EventPayloadSanitizer::normalizeStoredPath($data['p'] ?? '/');
         $referrerUrl = $request->header('Referer');
 
         $analysis = $referrerService->analyze($referrerUrl);

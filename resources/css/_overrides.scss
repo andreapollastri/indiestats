@@ -472,6 +472,57 @@ pre {
     color: #0f172a;
 }
 
+// Dettaglio eventi: tipografia compatta e uniforme; data/ora stretta, visitatore più largo
+table.table.pa-site-dt.pa-site-dt-events {
+    thead > tr > th {
+        font-size: 0.65rem;
+        padding: 0.4rem 0.5rem;
+    }
+
+    tbody > tr > td {
+        font-size: 0.75rem;
+        line-height: 1.4;
+        padding: 0.4rem 0.5rem;
+        vertical-align: top;
+    }
+
+    tbody td.font-monospace,
+    thead th.font-monospace {
+        font-size: 0.75rem;
+    }
+
+    // HTML da server (referrer .small, payload ul): stessa scala del resto
+    tbody .small,
+    tbody small {
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    tbody td ul.list-unstyled {
+        font-size: inherit;
+        margin-bottom: 0;
+    }
+
+    th.pa-col-datetime,
+    td.pa-col-datetime {
+        min-width: 10.75rem;
+        white-space: nowrap;
+    }
+
+    th.pa-col-visitor-id,
+    td.pa-dt-visitor-id {
+        min-width: 15rem;
+        max-width: 24rem;
+        width: 22%;
+    }
+
+    .pa-dt-visitor-id-inner {
+        font-size: inherit;
+        line-height: 1.35;
+        word-break: break-all;
+    }
+}
+
 // Scrollbar styling
 ::-webkit-scrollbar {
     width: 6px;
