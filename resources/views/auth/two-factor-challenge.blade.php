@@ -7,8 +7,8 @@
                 <i class="fas fa-shield-halved"></i>
             </span>
         </div>
-        <h1 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.25rem;">{{ __('Autenticazione 2FA') }}</h1>
-        <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;" id="pa-tfa-desc">{{ __("Inserisci il codice a 6 cifre dall'app di autenticazione.") }}</p>
+        <h1 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.25rem;">{{ __('guest.two_factor.heading') }}</h1>
+        <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;" id="pa-tfa-desc">{{ __('guest.two_factor.otp_description') }}</p>
     </div>
     <form method="POST" action="{{ route('two-factor.login.store') }}" id="pa-tfa-form-otp">
         @csrf
@@ -16,19 +16,19 @@
             <input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" class="form-control text-center @error('code') is-invalid @enderror" autocomplete="one-time-code" autofocus placeholder="000000" style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; letter-spacing: 0.4em; padding: 0.75rem;">
             @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
-        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('Verifica') }}</button>
+        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('guest.two_factor.verify') }}</button>
     </form>
     <form method="POST" action="{{ route('two-factor.login.store') }}" class="d-none" id="pa-tfa-form-recovery">
         @csrf
         <div class="mb-4">
-            <label for="recovery_code" class="form-label">{{ __('Codice di recupero') }}</label>
-            <input type="text" name="recovery_code" id="recovery_code" class="form-control @error('recovery_code') is-invalid @enderror" autocomplete="off" placeholder="{{ __('Codice di recupero') }}" style="font-family: 'JetBrains Mono', monospace;">
+            <label for="recovery_code" class="form-label">{{ __('guest.two_factor.recovery_code') }}</label>
+            <input type="text" name="recovery_code" id="recovery_code" class="form-control @error('recovery_code') is-invalid @enderror" autocomplete="off" placeholder="{{ __('guest.two_factor.recovery_code') }}" style="font-family: 'JetBrains Mono', monospace;">
             @error('recovery_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
-        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('Verifica') }}</button>
+        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('guest.two_factor.verify') }}</button>
     </form>
     <div class="text-center mt-3">
-        <button type="button" class="btn btn-link btn-sm p-0" id="pa-tfa-toggle" style="color: #10b981; text-decoration: none; font-weight: 500; font-size: 0.8rem;">{{ __('Usa un codice di recupero') }}</button>
+        <button type="button" class="btn btn-link btn-sm p-0" id="pa-tfa-toggle" style="color: #10b981; text-decoration: none; font-weight: 500; font-size: 0.8rem;">{{ __('guest.two_factor.use_recovery') }}</button>
     </div>
 @endsection
 
@@ -47,12 +47,12 @@
         recForm.classList.toggle('d-none', !useRecovery);
         if (desc) {
             desc.textContent = useRecovery
-                ? @json(__('Inserisci uno dei codici di recupero.'))
-                : @json(__("Inserisci il codice a 6 cifre dall'app di autenticazione."));
+                ? @json(__('guest.two_factor.recovery_description'))
+                : @json(__('guest.two_factor.otp_description'));
         }
         toggle.textContent = useRecovery
-            ? @json(__("Usa il codice dall'app"))
-            : @json(__('Usa un codice di recupero'));
+            ? @json(__('guest.two_factor.use_app_code'))
+            : @json(__('guest.two_factor.use_recovery'));
         if (useRecovery) {
             document.getElementById('recovery_code').focus();
         } else {

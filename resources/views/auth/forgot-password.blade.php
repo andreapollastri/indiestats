@@ -7,8 +7,8 @@
                 <i class="fas fa-key"></i>
             </span>
         </div>
-        <h1 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.25rem;">{{ __('Password dimenticata') }}</h1>
-        <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;">{{ __('Inserisci la tua email per ricevere il link di reset.') }}</p>
+        <h1 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.25rem;">{{ __('guest.forgot_password.heading') }}</h1>
+        <p class="mb-0" style="color: #94a3b8; font-size: 0.8rem;">{{ __('guest.forgot_password.subtitle') }}</p>
     </div>
     @if (!empty($status))
         <div class="alert alert-success small">{{ __($status) }}</div>
@@ -16,16 +16,16 @@
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
         <div class="mb-4">
-            <label for="email" class="form-label">{{ __('Email') }}</label>
-            <input type="email" name="email" value="{{ old('email') }}" required autofocus class="form-control @error('email') is-invalid @enderror" placeholder="nome@esempio.com">
+            <label for="email" class="form-label">{{ __('guest.forgot_password.email') }}</label>
+            <input type="email" name="email" value="{{ old('email') }}" required autofocus class="form-control @error('email') is-invalid @enderror" placeholder="{{ __('guest.forgot_password.email_placeholder') }}">
             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
-        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('Invia link di reset') }}</button>
+        <button type="submit" class="btn btn-primary w-100" style="padding: 0.5rem;">{{ __('guest.forgot_password.submit') }}</button>
     </form>
 @endsection
 
 @section('footer')
     <a href="{{ route('login') }}" style="color: #64748b; text-decoration: none; font-size: 0.8rem;">
-        <i class="fas fa-arrow-left me-1" style="font-size: 0.65rem;"></i>{{ __('Torna al login') }}
+        <i class="fas fa-arrow-left me-1" style="font-size: 0.65rem;"></i>{{ __('guest.forgot_password.back_to_login') }}
     </a>
 @endsection

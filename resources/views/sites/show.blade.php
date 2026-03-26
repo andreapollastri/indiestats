@@ -2,12 +2,12 @@
 
 @php
     $rangeLabels = [
-        'today' => 'Oggi',
-        '7d' => '7 giorni',
-        '30d' => '30 giorni',
-        '3m' => '3 mesi',
-        '6m' => '6 mesi',
-        '1y' => '1 anno',
+        'today' => __('Oggi'),
+        '7d' => __('7 giorni'),
+        '30d' => __('30 giorni'),
+        '3m' => __('3 mesi'),
+        '6m' => __('6 mesi'),
+        '1y' => __('1 anno'),
     ];
     $statBorders = ['primary', 'success', 'info', 'warning'];
     $siteTab = $site_tab ?? 'summary';
@@ -174,17 +174,17 @@
             tabindex="0"
         >
             @include('sites.partials.stats-table', [
-                'title' => 'Pagine',
-                'description' => 'Top percorsi',
+                'title' => __('Pagine'),
+                'description' => __('Top percorsi'),
                 'dtType' => 'paths',
-                'dimLabel' => 'Percorso',
+                'dimLabel' => __('Percorso'),
                 'site' => $site,
                 'range' => $range,
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'UTM source',
-                'description' => 'Parametro utm_source dalla pagina di atterraggio',
+                'title' => __('UTM source'),
+                'description' => __('Parametro utm_source dalla pagina di atterraggio'),
                 'dtType' => 'utm_source',
                 'dimLabel' => 'utm_source',
                 'site' => $site,
@@ -192,8 +192,8 @@
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'UTM medium',
-                'description' => 'Parametro utm_medium (es. cpc, email, social)',
+                'title' => __('UTM medium'),
+                'description' => __('Parametro utm_medium (es. cpc, email, social)'),
                 'dtType' => 'utm_medium',
                 'dimLabel' => 'utm_medium',
                 'site' => $site,
@@ -201,8 +201,8 @@
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'UTM campaign',
-                'description' => 'Parametro utm_campaign',
+                'title' => __('UTM campaign'),
+                'description' => __('Parametro utm_campaign'),
                 'dtType' => 'utm_campaign',
                 'dimLabel' => 'utm_campaign',
                 'site' => $site,
@@ -210,8 +210,8 @@
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'UTM term',
-                'description' => 'Parametro utm_term (parole chiave a pagamento)',
+                'title' => __('UTM term'),
+                'description' => __('Parametro utm_term (parole chiave a pagamento)'),
                 'dtType' => 'utm_term',
                 'dimLabel' => 'utm_term',
                 'site' => $site,
@@ -219,8 +219,8 @@
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'UTM content',
-                'description' => 'Parametro utm_content (varianti A/B o link)',
+                'title' => __('UTM content'),
+                'description' => __('Parametro utm_content (varianti A/B o link)'),
                 'dtType' => 'utm_content',
                 'dimLabel' => 'utm_content',
                 'site' => $site,
@@ -228,36 +228,36 @@
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'Query di ricerca',
-                'description' => 'Termini da motori di ricerca o parametri ?q= sulla pagina',
+                'title' => __('Query di ricerca'),
+                'description' => __('Termini da motori di ricerca o parametri ?q= sulla pagina'),
                 'dtType' => 'search',
-                'dimLabel' => 'Query',
+                'dimLabel' => __('Query'),
                 'site' => $site,
                 'range' => $range,
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'Sorgenti',
-                'description' => 'Referrer / motore',
+                'title' => __('Sorgenti'),
+                'description' => __('Referrer / motore'),
                 'dtType' => 'source',
-                'dimLabel' => 'Sorgente',
+                'dimLabel' => __('Sorgente'),
                 'site' => $site,
                 'range' => $range,
             ])
 
             @include('sites.partials.stats-table-outbound', [
-                'title' => 'Link in uscita',
-                'description' => 'URL di destinazione; provenienza = primo referrer della sessione (come per gli eventi)',
-                'dimLabel' => 'URL destinazione',
+                'title' => __('Link in uscita'),
+                'description' => __('URL di destinazione; provenienza = primo referrer della sessione (come per gli eventi)'),
+                'dimLabel' => __('URL destinazione'),
                 'site' => $site,
                 'range' => $range,
             ])
 
             @include('sites.partials.stats-table', [
-                'title' => 'Dispositivo',
+                'title' => __('Dispositivo'),
                 'description' => null,
                 'dtType' => 'device',
-                'dimLabel' => 'Tipo',
+                'dimLabel' => __('Tipo'),
                 'site' => $site,
                 'range' => $range,
             ])

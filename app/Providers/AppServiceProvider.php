@@ -56,17 +56,17 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Email di benvenuto con link firmato per confermare l'indirizzo email.
+     * Personalizza l'email di verifica indirizzo email.
      */
     protected function configureWelcomeEmailVerificationMail(): void
     {
         VerifyEmail::toMailUsing(function (object $notifiable, string $url): MailMessage {
             return (new MailMessage)
-                ->subject(__('Benvenuto in :app — conferma la tua email', ['app' => config('app.name')]))
-                ->greeting(__('Ciao :name!', ['name' => $notifiable->name]))
-                ->line(__('Grazie per esserti registrato. Per attivare il tuo account conferma il tuo indirizzo email cliccando il pulsante qui sotto.'))
-                ->action(__('Conferma indirizzo email'), $url)
-                ->line(__('Se non hai creato un account su :app, ignora questa email.', ['app' => config('app.name')]));
+                ->subject(__('mail.verify_email.subject', ['app' => config('app.name')]))
+                ->greeting(__('mail.verify_email.greeting', ['name' => $notifiable->name]))
+                ->line(__('mail.verify_email.line'))
+                ->action(__('mail.verify_email.action'), $url)
+                ->line(__('mail.verify_email.outro', ['app' => config('app.name')]));
         });
     }
 }

@@ -10,12 +10,8 @@ use App\Http\Controllers\SiteStatsDataTablesController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Middleware\HandleTrackingCors;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::view('/', 'welcome', [
-    'title' => config('app.name'),
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', fn () => redirect()->route('login'))->name('home');
 
 Route::middleware([HandleTrackingCors::class, 'throttle:300,1'])->group(function (): void {
     Route::options('/collect/pageview', fn () => response('', 204));

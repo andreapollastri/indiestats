@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\LocaleResolver;
 use App\Support\UserPreferences;
 use Closure;
 use Illuminate\Http\Request;
@@ -22,10 +23,14 @@ class SetUserPreferences
             $locale = $user->locale;
             if (is_string($locale) && UserPreferences::isAllowedLocale($locale)) {
                 App::setLocale($locale);
+            } else {
+                App::setLocale('en');
             }
-
-            Carbon::setLocale(App::getLocale());
+        } else {
+            App::setLocale(LocaleResolver::resolveForGuest($request));
         }
+
+        Carbon::setLocale(App::getLocale());
 
         return $next($request);
     }

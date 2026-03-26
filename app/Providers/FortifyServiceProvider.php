@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -38,7 +37,6 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
-        Fortify::createUsersUsing(CreateNewUser::class);
     }
 
     /**
@@ -47,39 +45,33 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureViews(): void
     {
         Fortify::loginView(fn (Request $request) => view('auth.login', [
-            'title' => __('Accedi').' · '.config('app.name'),
+            'title' => __('guest.login.document_title', ['app' => config('app.name')]),
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
-            'canRegister' => Features::enabled(Features::registration()),
             'status' => $request->session()->get('status'),
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => view('auth.reset-password', [
-            'title' => __('Reimposta password').' · '.config('app.name'),
+            'title' => __('guest.reset_password.document_title', ['app' => config('app.name')]),
             'email' => $request->email,
             'token' => $request->route('token'),
         ]));
 
         Fortify::requestPasswordResetLinkView(fn (Request $request) => view('auth.forgot-password', [
-            'title' => __('Password dimenticata').' · '.config('app.name'),
+            'title' => __('guest.forgot_password.document_title', ['app' => config('app.name')]),
             'status' => $request->session()->get('status'),
         ]));
 
         Fortify::verifyEmailView(fn (Request $request) => view('auth.verify-email', [
-            'title' => __('Verifica email').' · '.config('app.name'),
-            'status' => $request->session()->get('status'),
-        ]));
-
-        Fortify::registerView(fn (Request $request) => view('auth.register', [
-            'title' => __('Registrati').' · '.config('app.name'),
+            'title' => __('guest.verify_email.document_title', ['app' => config('app.name')]),
             'status' => $request->session()->get('status'),
         ]));
 
         Fortify::twoFactorChallengeView(fn () => view('auth.two-factor-challenge', [
-            'title' => __('Autenticazione a due fattori').' · '.config('app.name'),
+            'title' => __('guest.two_factor.document_title', ['app' => config('app.name')]),
         ]));
 
         Fortify::confirmPasswordView(fn () => view('auth.confirm-password', [
-            'title' => __('Conferma password').' · '.config('app.name'),
+            'title' => __('guest.confirm_password.document_title', ['app' => config('app.name')]),
         ]));
     }
 

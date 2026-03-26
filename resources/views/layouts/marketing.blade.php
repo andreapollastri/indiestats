@@ -58,10 +58,7 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm">{{ __('Dashboard') }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-sm" style="color: #475569; font-weight: 500;">{{ __('Accedi') }}</a>
-                    @if ($canRegister ?? true)
-                        <a href="{{ route('register') }}" class="btn btn-primary btn-sm">{{ __('Registrati') }}</a>
-                    @endif
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm">{{ __('Accedi') }}</a>
                 @endauth
             </div>
         </div>

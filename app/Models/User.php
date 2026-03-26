@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\UserPreferences;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +16,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 #[Fillable(['name', 'email', 'password', 'locale', 'timezone'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmailContract
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
@@ -36,5 +38,18 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function sites(): HasMany
     {
         return $this->hasMany(Site::class);
+    }
+
+    /**
+     * Lingua per notifiche e mail (coda inclusa).
+     */
+    public function preferredLocale(): string
+    {
+        $locale = $this->locale;
+        if (is_string($locale) && UserPreferences::isAllowedLocale($locale)) {
+            return $locale;
+        }
+
+        return 'en';
     }
 }

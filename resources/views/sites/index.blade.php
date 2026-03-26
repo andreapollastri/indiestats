@@ -24,7 +24,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="allowed_domains" class="form-label">{{ __('Domini consentiti') }} <span style="color: #ef4444;">*</span></label>
-                        <input id="allowed_domains" name="allowed_domains" type="text" class="form-control @error('allowed_domains') is-invalid @enderror" value="{{ old('allowed_domains') }}" required autocomplete="off" placeholder="esempio.com, www.esempio.com">
+                        <input id="allowed_domains" name="allowed_domains" type="text" class="form-control @error('allowed_domains') is-invalid @enderror" value="{{ old('allowed_domains') }}" required autocomplete="off" placeholder="{{ __('esempio.com, www.esempio.com') }}">
                         @error('allowed_domains')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
