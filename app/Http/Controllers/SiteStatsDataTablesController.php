@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Services\SiteStatsDataTableService;
+use App\Support\UserAnalyticsRange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,16 +20,9 @@ class SiteStatsDataTablesController extends Controller
         ]);
 
         $range = $validated['range'];
-        $from = match ($range) {
-            'today' => now()->startOfDay(),
-            '7d' => now()->subDays(7)->startOfDay(),
-            '30d' => now()->subDays(30)->startOfDay(),
-            '3m' => now()->subMonths(3)->startOfDay(),
-            '6m' => now()->subMonths(6)->startOfDay(),
-            '1y' => now()->subYear()->startOfDay(),
-            default => now()->subDays(7)->startOfDay(),
-        };
-        $to = now()->endOfDay();
+        $bounds = UserAnalyticsRange::fromRequest($request, $range);
+        $from = $bounds['from'];
+        $to = $bounds['to'];
 
         $payload = $tables->handle($request, $site, $from, $to);
 

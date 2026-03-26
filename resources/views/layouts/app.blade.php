@@ -43,6 +43,12 @@
                     <span>{{ __('Siti') }}</span>
                 </a>
             </li>
+            <li class="nav-item {{ request()->routeIs('preferences.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('preferences.edit') }}">
+                    <i class="fas fa-fw fa-sliders"></i>
+                    <span>{{ __('Impostazioni') }}</span>
+                </a>
+            </li>
             <li class="nav-item {{ request()->routeIs('account.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('account.edit') }}">
                     <i class="fas fa-fw fa-user-circle"></i>

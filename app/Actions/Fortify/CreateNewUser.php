@@ -28,6 +28,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
+            'locale' => config('app.locale', 'it'),
+            'timezone' => 'UTC',
         ]);
     }
 }

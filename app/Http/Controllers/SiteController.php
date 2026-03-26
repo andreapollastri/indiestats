@@ -6,6 +6,7 @@ use App\Models\Site;
 use App\Services\AnalyticsQueryService;
 use App\Services\SiteFilterOptionsService;
 use App\Support\AnalyticsFilters;
+use App\Support\UserAnalyticsRange;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -60,7 +61,7 @@ class SiteController extends Controller
             'allowed_domains' => $allowedDomains,
         ]);
 
-        return redirect()->route('sites.index')->with('success', 'Sito aggiunto.');
+        return redirect()->route('sites.index')->with('success', __('Sito aggiunto.'));
     }
 
     public function show(Request $request, Site $site, AnalyticsQueryService $analytics, SiteFilterOptionsService $filterOptions): View
@@ -68,21 +69,10 @@ class SiteController extends Controller
         $this->authorize('view', $site);
 
         $range = $request->query('range', '7d');
-        $allowed = ['today', '7d', '30d', '3m', '6m', '1y'];
-        if (! in_array($range, $allowed, true)) {
-            $range = '7d';
-        }
-
-        $from = match ($range) {
-            'today' => now()->startOfDay(),
-            '7d' => now()->subDays(7)->startOfDay(),
-            '30d' => now()->subDays(30)->startOfDay(),
-            '3m' => now()->subMonths(3)->startOfDay(),
-            '6m' => now()->subMonths(6)->startOfDay(),
-            '1y' => now()->subYear()->startOfDay(),
-            default => now()->subDays(7)->startOfDay(),
-        };
-        $to = now()->endOfDay();
+        $bounds = UserAnalyticsRange::fromRequest($request, $range);
+        $range = $bounds['range'];
+        $from = $bounds['from'];
+        $to = $bounds['to'];
 
         $filters = AnalyticsFilters::fromRequest($request);
         $stats = $analytics->build($site->id, $from, $to, $filters);

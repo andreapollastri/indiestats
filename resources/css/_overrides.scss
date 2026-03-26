@@ -182,12 +182,21 @@
     max-width: 100%;
 }
 
-// DataTables styling
-$pa-dt-font-size: 0.8125rem;
+// DataTables styling — unica scala per celle (.dt-column) e controlli
+$pa-dt-font-size: 0.75rem;
 
 .card-body .dt-container {
     font-size: $pa-dt-font-size;
     line-height: 1.5;
+
+    table {
+        th.dt-column,
+        td.dt-column {
+            font-size: $pa-dt-font-size;
+            line-height: 1.45;
+            font-variant-numeric: tabular-nums;
+        }
+    }
 
     .dt-length,
     .dt-search,
@@ -195,24 +204,41 @@ $pa-dt-font-size: 0.8125rem;
     .dt-processing,
     .dt-paging {
         font-size: inherit;
+
+        ul.pagination {
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+
+        .page-item .page-link {
+            padding: 0.2rem 0.45rem;
+            font-size: 0.75rem;
+            line-height: 1.25;
+            min-width: 1.65rem;
+            text-align: center;
+            border-radius: 0.25rem;
+        }
     }
 
     .form-control,
     .form-select {
         font-size: $pa-dt-font-size;
     }
-
-    .dt-paging .page-link {
-        font-size: $pa-dt-font-size;
-        border-radius: 0.25rem;
-    }
 }
 
 table.table.pa-site-dt {
+    th.dt-column,
+    td.dt-column {
+        font-size: $pa-dt-font-size;
+        line-height: 1.45;
+        font-variant-numeric: tabular-nums;
+    }
+
     thead > tr > th,
     tbody > tr > td {
         font-size: $pa-dt-font-size;
-        line-height: 1.5;
+        line-height: 1.45;
         vertical-align: middle;
         border-color: #f1f5f9;
     }
@@ -220,7 +246,7 @@ table.table.pa-site-dt {
     thead > tr > th {
         font-family: "JetBrains Mono", monospace;
         font-weight: 500;
-        font-size: 0.7rem;
+        font-size: $pa-dt-font-size;
         color: #94a3b8;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -241,6 +267,7 @@ table.table.pa-site-dt {
     tbody td.font-monospace,
     thead th.font-monospace {
         font-size: $pa-dt-font-size;
+        line-height: 1.45;
     }
 }
 
@@ -472,23 +499,15 @@ pre {
     color: #0f172a;
 }
 
-// Dettaglio eventi: tipografia compatta e uniforme; data/ora stretta, visitatore più largo
+// Dettaglio eventi: padding compatto; tipografia eredita da .dt-column uniforme
 table.table.pa-site-dt.pa-site-dt-events {
     thead > tr > th {
-        font-size: 0.65rem;
         padding: 0.4rem 0.5rem;
     }
 
     tbody > tr > td {
-        font-size: 0.75rem;
-        line-height: 1.4;
         padding: 0.4rem 0.5rem;
         vertical-align: top;
-    }
-
-    tbody td.font-monospace,
-    thead th.font-monospace {
-        font-size: 0.75rem;
     }
 
     // HTML da server (referrer .small, payload ul): stessa scala del resto

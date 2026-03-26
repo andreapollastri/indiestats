@@ -14,6 +14,7 @@ class AnalyticsQueryService
     public function __construct(
         private AnalyticsFilterScope $filterScope
     ) {}
+
     /**
      * Riempie i giorni senza dati con zero (stesso formato della dashboard).
      *
@@ -48,8 +49,8 @@ class AnalyticsQueryService
      */
     public function build(int $siteId, CarbonInterface $from, CarbonInterface $to, ?AnalyticsFilters $filters = null): array
     {
-        $from = $from->copy()->startOfDay();
-        $to = $to->copy()->endOfDay();
+        $from = $from->copy();
+        $to = $to->copy();
         $filters = $filters ?? new AnalyticsFilters;
 
         $driver = DB::connection()->getDriverName();

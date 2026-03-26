@@ -50,8 +50,8 @@ class SiteStatsDataTableService
     {
         $siteId = $site->id;
 
-        $from = $from->copy()->startOfDay();
-        $to = $to->copy()->endOfDay();
+        $from = $from->copy();
+        $to = $to->copy();
 
         $type = (string) $request->input('type', '');
         $draw = (int) $request->input('draw', 1);
@@ -63,6 +63,7 @@ class SiteStatsDataTableService
         $orderDir = strtolower((string) data_get($request->input('order'), '0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         $filters = AnalyticsFilters::fromRequest($request);
+        $displayTimezone = $request->user()?->timezone ?? 'UTC';
 
         return match ($type) {
             'paths', 'utm', 'search', 'source', 'browser', 'device', 'country' => $this->pageAggregated(
@@ -100,7 +101,8 @@ class SiteStatsDataTableService
                 $start,
                 $length,
                 $draw,
-                $filters
+                $filters,
+                $displayTimezone
             ),
             'outbound' => $this->outboundLinks(
                 $siteId,
@@ -382,7 +384,8 @@ class SiteStatsDataTableService
         int $start,
         int $length,
         int $draw,
-        AnalyticsFilters $filters
+        AnalyticsFilters $filters,
+        string $displayTimezone
     ): array {
         $like = $search !== '' ? '%'.addcslashes($search, '%_\\').'%' : null;
 
@@ -430,13 +433,13 @@ class SiteStatsDataTableService
             $dataQuery->orderBy('created_at', $orderDir);
         }
 
-        $rows = $dataQuery->offset($start)->limit($length)->get()->map(function ($row) use ($hasAttributingPath) {
+        $rows = $dataQuery->offset($start)->limit($length)->get()->map(function ($row) use ($hasAttributingPath, $displayTimezone) {
             /** @var array<string, string>|null $props */
             $props = $row->properties;
             $pathVal = $hasAttributingPath ? ($row->path_for_display ?? $row->path) : $row->path;
 
             return [
-                'created_at' => $row->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i'),
+                'created_at' => $row->created_at->timezone($displayTimezone)->format('d/m/Y H:i'),
                 'name' => $row->name,
                 'visitor_id' => $row->visitor_id,
                 'path' => ($pathVal === null || $pathVal === '') ? '—' : (string) $pathVal,

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleTrackingCors;
+use App\Http\Middleware\SetUserPreferences;
 use App\Http\Middleware\ShareViewData;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             ShareViewData::class,
+            SetUserPreferences::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

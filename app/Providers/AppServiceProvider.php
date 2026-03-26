@@ -17,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->afterResolving('translator', function ($translator): void {
+            $translator->getLoader()->addJsonPath(lang_path('extensions'));
+        });
     }
 
     /**

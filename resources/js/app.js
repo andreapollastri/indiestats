@@ -3,6 +3,7 @@ import * as bootstrap from 'bootstrap';
 import { Chart, registerables } from 'chart.js';
 import './site-stats-datatables.js';
 import './site-filters.js';
+import './preferences-settings.js';
 
 window.$ = window.jQuery = jQuery;
 window.bootstrap = bootstrap;
