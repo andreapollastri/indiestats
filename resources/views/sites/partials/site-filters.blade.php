@@ -50,7 +50,7 @@
                         <a href="{{ $filterResetUrl }}" class="btn btn-sm btn-outline-secondary">{{ __('Azzera filtri') }}</a>
                     </div>
                     <div class="row g-2">
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-source">{{ __('Provenienza') }}</label>
                             <select name="filter_source" id="pa-f-source" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="source" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutte') }}</option>
@@ -59,7 +59,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-path">{{ __('Pagina') }}</label>
                             <select name="filter_path" id="pa-f-path" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="path" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutte') }}</option>
@@ -68,16 +68,52 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-lg-4 col-md-6">
-                            <label class="form-label small mb-1" for="pa-f-utm">{{ __('UTM source') }}</label>
-                            <select name="filter_utm" id="pa-f-utm" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm" placeholder="{{ __('Cerca…') }}">
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-utm-source">{{ __('UTM source') }}</label>
+                            <select name="filter_utm_source" id="pa-f-utm-source" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_source" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutte') }}</option>
-                                @if ($analytics_filters->utm)
-                                    <option value="{{ $analytics_filters->utm }}" selected>{{ $analytics_filters->utm }}</option>
+                                @if ($analytics_filters->utmSource)
+                                    <option value="{{ $analytics_filters->utmSource }}" selected>{{ $analytics_filters->utmSource }}</option>
                                 @endif
                             </select>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-utm-medium">{{ __('UTM medium') }}</label>
+                            <select name="filter_utm_medium" id="pa-f-utm-medium" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_medium" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutte') }}</option>
+                                @if ($analytics_filters->utmMedium)
+                                    <option value="{{ $analytics_filters->utmMedium }}" selected>{{ $analytics_filters->utmMedium }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-utm-campaign">{{ __('UTM campaign') }}</label>
+                            <select name="filter_utm_campaign" id="pa-f-utm-campaign" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_campaign" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutte') }}</option>
+                                @if ($analytics_filters->utmCampaign)
+                                    <option value="{{ $analytics_filters->utmCampaign }}" selected>{{ $analytics_filters->utmCampaign }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-utm-term">{{ __('UTM term') }}</label>
+                            <select name="filter_utm_term" id="pa-f-utm-term" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_term" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutte') }}</option>
+                                @if ($analytics_filters->utmTerm)
+                                    <option value="{{ $analytics_filters->utmTerm }}" selected>{{ $analytics_filters->utmTerm }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-utm-content">{{ __('UTM content') }}</label>
+                            <select name="filter_utm_content" id="pa-f-utm-content" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_content" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutte') }}</option>
+                                @if ($analytics_filters->utmContent)
+                                    <option value="{{ $analytics_filters->utmContent }}" selected>{{ $analytics_filters->utmContent }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-event">{{ __('Evento') }}</label>
                             <select name="filter_event" id="pa-f-event" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="event" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutti') }}</option>
@@ -86,7 +122,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-device">{{ __('Dispositivo') }}</label>
                             <select name="filter_device" id="pa-f-device" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="device" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutti') }}</option>
@@ -95,7 +131,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-country">{{ __('Paese') }}</label>
                             <select name="filter_country" id="pa-f-country" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="country" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutti') }}</option>

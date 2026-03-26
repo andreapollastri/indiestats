@@ -86,7 +86,7 @@
                     $features = [
                         ['icon' => 'fa-code', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.08)', 'title' => __('Snippet unico'), 'desc' => __('Copia e incolla una riga di JavaScript. Nessun SDK, nessuna config.')],
                         ['icon' => 'fa-chart-bar', 'color' => '#06b6d4', 'bg' => 'rgba(6,182,212,0.08)', 'title' => __('Dashboard chiara'), 'desc' => __('Visitatori, pagine, sorgenti, paesi e dispositivi in una vista sola.')],
-                        ['icon' => 'fa-bullseye', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.08)', 'title' => __('Eventi personalizzati'), 'desc' => __('Registra tag con indiestats.track() e monitora descrizione, volume e dettaglio.')],
+                        ['icon' => 'fa-bullseye', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.08)', 'title' => __('Eventi personalizzati'), 'desc' => __('Registra tag con downstage.track() e monitora descrizione, volume e dettaglio.')],
                         ['icon' => 'fa-filter', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.08)', 'title' => __('Filtri avanzati'), 'desc' => __('Filtra per sorgente, percorso, UTM, dispositivo o paese in tempo reale.')],
                         ['icon' => 'fa-shield-halved', 'color' => '#ec4899', 'bg' => 'rgba(236,72,153,0.08)', 'title' => __('Privacy-first'), 'desc' => __('Nessun cookie di terze parti. Nessun dato personale raccolto.')],
                         ['icon' => 'fa-bolt', 'color' => '#0f172a', 'bg' => 'rgba(15,23,42,0.06)', 'title' => __('Leggerissimo'), 'desc' => __('Lo script pesa meno di 1KB. Zero impatto sulle performance.')],
@@ -146,7 +146,7 @@
                             <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #38bdf8;">data-site</span>=<span style="color: #10b981;">"pk_abc123..."</span></div>
                             <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #38bdf8;">defer</span><span style="color: #e879f9;">&gt;&lt;/script&gt;</span></div>
                             <div style="margin-top: 0.75rem; color: #475569;">// {{ __('Opzionale: traccia eventi custom') }}</div>
-                            <div><span style="color: #38bdf8;">window</span>.<span style="color: #f1f5f9;">indiestats</span>.<span style="color: #fbbf24;">track</span>(<span style="color: #10b981;">'signup'</span>, {</div>
+                            <div><span style="color: #38bdf8;">window</span>.<span style="color: #f1f5f9;">downstage</span>.<span style="color: #fbbf24;">track</span>(<span style="color: #10b981;">'signup'</span>, {</div>
                             <div>&nbsp;&nbsp;<span style="color: #38bdf8;">plan</span>: <span style="color: #10b981;">'pro'</span></div>
                             <div>})</div>
                         </div>

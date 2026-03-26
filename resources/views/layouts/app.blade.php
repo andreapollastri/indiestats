@@ -73,7 +73,7 @@
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <div class="nd-mobile-topbar d-md-none border-bottom py-2 mb-4 position-relative">
+                <div class="nd-mobile-topbar d-md-none border-bottom py-2 mb-2 position-relative">
                     <button
                         id="sidebarToggleTop"
                         class="btn btn-link position-absolute top-50 start-0 translate-middle-y ms-2 p-2 border-0"
@@ -93,7 +93,7 @@
                     </div>
                 </div>
 
-                <div class="container-fluid">
+                <div class="container-fluid pa-page-main">
                     @yield('content')
                 </div>
             </div>

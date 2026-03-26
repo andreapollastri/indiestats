@@ -9,7 +9,11 @@ final class AnalyticsFilters
     public function __construct(
         public readonly ?string $source = null,
         public readonly ?string $path = null,
-        public readonly ?string $utm = null,
+        public readonly ?string $utmSource = null,
+        public readonly ?string $utmMedium = null,
+        public readonly ?string $utmCampaign = null,
+        public readonly ?string $utmTerm = null,
+        public readonly ?string $utmContent = null,
         public readonly ?string $event = null,
         public readonly ?string $device = null,
         public readonly ?string $country = null,
@@ -18,6 +22,18 @@ final class AnalyticsFilters
 
     public static function fromRequest(Request $request): self
     {
+        return self::fromQueryArray($request->query());
+    }
+
+    /**
+     * Ricostruisce i filtri da parametri query (es. salvati in site_exports.filters_payload).
+     *
+     * @param  array<string, mixed>  $query
+     */
+    public static function fromQueryArray(array $query): self
+    {
+        $request = Request::create('/', 'GET', $query);
+
         $s = function (string $key, int $maxLen) use ($request): ?string {
             $v = $request->input($key);
             if (! is_string($v)) {
@@ -31,10 +47,19 @@ final class AnalyticsFilters
             return mb_substr($v, 0, $maxLen);
         };
 
+        $utmSource = $s('filter_utm_source', 255);
+        if ($utmSource === null) {
+            $utmSource = $s('filter_utm', 255);
+        }
+
         return new self(
             source: $s('filter_source', 64),
             path: $s('filter_path', 2048),
-            utm: $s('filter_utm', 255),
+            utmSource: $utmSource,
+            utmMedium: $s('filter_utm_medium', 255),
+            utmCampaign: $s('filter_utm_campaign', 255),
+            utmTerm: $s('filter_utm_term', 255),
+            utmContent: $s('filter_utm_content', 255),
             event: $s('filter_event', 128),
             device: $s('filter_device', 32),
             country: $s('filter_country', 2),
@@ -54,8 +79,20 @@ final class AnalyticsFilters
         if ($this->path !== null) {
             $o['filter_path'] = $this->path;
         }
-        if ($this->utm !== null) {
-            $o['filter_utm'] = $this->utm;
+        if ($this->utmSource !== null) {
+            $o['filter_utm_source'] = $this->utmSource;
+        }
+        if ($this->utmMedium !== null) {
+            $o['filter_utm_medium'] = $this->utmMedium;
+        }
+        if ($this->utmCampaign !== null) {
+            $o['filter_utm_campaign'] = $this->utmCampaign;
+        }
+        if ($this->utmTerm !== null) {
+            $o['filter_utm_term'] = $this->utmTerm;
+        }
+        if ($this->utmContent !== null) {
+            $o['filter_utm_content'] = $this->utmContent;
         }
         if ($this->event !== null) {
             $o['filter_event'] = $this->event;
@@ -82,7 +119,11 @@ final class AnalyticsFilters
     {
         return $this->source !== null
             || $this->path !== null
-            || $this->utm !== null
+            || $this->utmSource !== null
+            || $this->utmMedium !== null
+            || $this->utmCampaign !== null
+            || $this->utmTerm !== null
+            || $this->utmContent !== null
             || $this->device !== null
             || $this->country !== null
             || $this->searchQuery !== null;
@@ -93,7 +134,11 @@ final class AnalyticsFilters
         return new self(
             source: $this->source,
             path: $this->path,
-            utm: $this->utm,
+            utmSource: $this->utmSource,
+            utmMedium: $this->utmMedium,
+            utmCampaign: $this->utmCampaign,
+            utmTerm: $this->utmTerm,
+            utmContent: $this->utmContent,
             event: null,
             device: $this->device,
             country: $this->country,
@@ -110,7 +155,11 @@ final class AnalyticsFilters
         return new self(
             source: null,
             path: null,
-            utm: $this->utm,
+            utmSource: $this->utmSource,
+            utmMedium: $this->utmMedium,
+            utmCampaign: $this->utmCampaign,
+            utmTerm: $this->utmTerm,
+            utmContent: $this->utmContent,
             event: $this->event,
             device: $this->device,
             country: $this->country,

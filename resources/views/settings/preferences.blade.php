@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mb-4 mt-3">
-        <p class="small fw-semibold mb-1 text-uppercase" style="letter-spacing: 0.06em; color: #94a3b8; font-size: 0.65rem;">{{ __('Navigazione') }}</p>
+    <div class="mb-4">
         <h1 class="h3 mb-0 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Impostazioni') }}</h1>
     </div>
 

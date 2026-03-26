@@ -15,7 +15,7 @@ class SiteStatsDataTablesController extends Controller
         $this->authorize('view', $site);
 
         $validated = $request->validate([
-            'type' => 'required|string|in:paths,utm,search,source,browser,device,country,outbound,goals,event_names,events',
+            'type' => 'required|string|in:paths,utm,utm_source,utm_medium,utm_campaign,utm_term,utm_content,search,source,browser,device,country,outbound,goals,event_names,events',
             'range' => 'required|string|in:today,7d,30d,3m,6m,1y',
         ]);
 

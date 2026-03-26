@@ -18,7 +18,7 @@ class TrackerController extends Controller
 (function(){
 var K={$key};
 var B={$base};
-if(location.protocol==='https:'&&B.indexOf('http:')===0){console.warn('[IndieStats] Page is HTTPS but APP_URL is HTTP: the browser blocks script and API calls (mixed content). Use HTTPS for the API (e.g. Herd/Valet) or test over HTTP.');}
+if(location.protocol==='https:'&&B.indexOf('http:')===0){console.warn('[downstage] Page is HTTPS but APP_URL is HTTP: the browser blocks script and API calls (mixed content). Use HTTPS for the API (e.g. Herd/Valet) or test over HTTP.');}
 var S='is_vid_'+K.replace(/-/g,'').slice(0,12);
 function vid(){
 try{
@@ -111,7 +111,7 @@ else{sendPageview();}
 window.addEventListener('beforeunload',sendDuration);
 if(document.readyState==='complete')sendPageview();
 else window.addEventListener('load',sendPageview);
-var NS='indiestats';
+var NS='downstage';
 window[NS]=window[NS]||{};
 window[NS].track=function(name,props){
 if(!name||typeof name!=='string')return;

@@ -4,15 +4,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Conservazione dati (giorni)
+    | Conservazione dati
     |--------------------------------------------------------------------------
     |
-    | Pageview e click in uscita più vecchi di questo numero di giorni vengono
-    | eliminati dal comando pianificato analytics:prune. Default: 365 (1 anno).
+    | Se imposti ANALYTICS_RETENTION_DAYS nel .env, viene usato quel numero di
+    | giorni (comportamento legacy). Altrimenti si usa retention_months: pageview,
+    | eventi di tracking e click in uscita più vecchi del periodo indicato vengono
+    | eliminati dal comando pianificato analytics:prune. Default: 12 mesi.
     |
     */
 
-    'retention_days' => (int) env('ANALYTICS_RETENTION_DAYS', 365),
+    'retention_days' => env('ANALYTICS_RETENTION_DAYS') !== null
+        ? (int) env('ANALYTICS_RETENTION_DAYS')
+        : null,
+
+    'retention_months' => (int) env('ANALYTICS_RETENTION_MONTHS', 12),
 
     /*
     |--------------------------------------------------------------------------

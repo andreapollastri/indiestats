@@ -16,7 +16,11 @@ $nd-content-bg: #f8fafc;
 }
 
 body {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -39,6 +43,11 @@ body {
 
 #content {
     flex: 1 0 auto;
+}
+
+// Spazio uniforme sopra il titolo in tutte le pagine app (stesso offset desktop e mobile)
+.pa-page-main {
+    padding-top: 2rem;
 }
 
 // Sidebar
@@ -177,7 +186,9 @@ body {
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
 
-    i { opacity: 1; }
+    i {
+        opacity: 1;
+    }
 }
 
 .sidebar .nav-item.active .nav-link {
@@ -371,7 +382,9 @@ body {
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
+        transition:
+            opacity 0.2s ease,
+            visibility 0.2s ease;
         backdrop-filter: blur(2px);
     }
 

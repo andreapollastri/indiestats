@@ -1,15 +1,15 @@
-# IndieStats
+# downstage
 
 Analytics web **privacy-oriented** e minimale, costruita con [Laravel 13](https://laravel.com/docs/13.x) e [Vue 3 + Inertia](https://laravel.com/docs/13.x/starter-kits). Ogni utente gestisce **più siti**, ognuno con uno snippet di tracciamento dedicato.
 
 ## Requisiti
 
 | Software | Versione indicativa |
-|----------|---------------------|
-| PHP | ^8.3 |
-| Composer | 2.x |
-| Node.js | 20+ (consigliato) |
-| npm | 9+ |
+| -------- | ------------------- |
+| PHP      | ^8.3                |
+| Composer | 2.x                 |
+| Node.js  | 20+ (consigliato)   |
+| npm      | 9+                  |
 
 Estensioni PHP usuali per Laravel: `openssl`, `pdo`, `mbstring`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`.
 
@@ -37,45 +37,45 @@ Apri il browser su **http://127.0.0.1:8000** (o la porta mostrata da `php artisa
 
 2. **Dipendenze PHP e asset:**
 
-   ```bash
-   composer install
-   npm install
-   ```
+    ```bash
+    composer install
+    npm install
+    ```
 
 3. **Ambiente:**
 
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
 4. **Database** (di default è SQLite):
 
-   ```bash
-   touch database/database.sqlite   # solo se il file non esiste già
-   php artisan migrate
-   ```
+    ```bash
+    touch database/database.sqlite   # solo se il file non esiste già
+    php artisan migrate
+    ```
 
-   Per **MySQL** o **PostgreSQL**, imposta `DB_*` in `.env` e crea il database vuoto prima di `migrate`.
+    Per **MySQL** o **PostgreSQL**, imposta `DB_*` in `.env` e crea il database vuoto prima di `migrate`.
 
 5. **Build frontend:**
 
-   ```bash
-   npm run build
-   ```
+    ```bash
+    npm run build
+    ```
 
-   In sviluppo puoi usare `npm run dev` insieme a `php artisan serve`.
+    In sviluppo puoi usare `npm run dev` insieme a `php artisan serve`.
 
 ## Configurazione
 
 ### Variabili essenziali (`.env`)
 
-| Variabile | Ruolo |
-|-----------|--------|
-| `APP_NAME` | Nome mostrato nell’interfaccia |
-| `APP_URL` | **Obbligatorio in produzione**: URL pubblico dell’installazione (es. `https://stats.tuodominio.it`). Lo snippet del tracker usa questo dominio per caricare `/i/{uuid}.js` e chiamare `/collect/...`. |
-| `APP_ENV` / `APP_DEBUG` | In produzione: `production` e `false` |
-| `DB_*` | Connessione database |
+| Variabile               | Ruolo                                                                                                                                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `APP_NAME`              | Nome mostrato nell’interfaccia                                                                                                                                                                        |
+| `APP_URL`               | **Obbligatorio in produzione**: URL pubblico dell’installazione (es. `https://stats.tuodominio.it`). Lo snippet del tracker usa questo dominio per caricare `/i/{uuid}.js` e chiamare `/collect/...`. |
+| `APP_ENV` / `APP_DEBUG` | In produzione: `production` e `false`                                                                                                                                                                 |
+| `DB_*`                  | Connessione database                                                                                                                                                                                  |
 
 ### Sessione e code
 
@@ -88,9 +88,9 @@ Per le statistiche per **paese** senza servizi esterni:
 1. Registrati su [MaxMind](https://www.maxmind.com/) e scarica **GeoLite2 Country** (formato `.mmdb`).
 2. Imposta in `.env` il percorso assoluto al file:
 
-   ```env
-   GEOIP_DATABASE=/percorso/completo/GeoLite2-Country.mmdb
-   ```
+    ```env
+    GEOIP_DATABASE=/percorso/completo/GeoLite2-Country.mmdb
+    ```
 
 Se non imposti `GEOIP_DATABASE`, il paese resterà vuoto nelle statistiche; il resto funziona comunque.
 
@@ -111,9 +111,8 @@ Vai su **Siti** (`/sites` o `/dashboard`):
 
 1. Inserisci un **nome** (solo per te).
 2. Opzionale: **domini consentiti**, separati da virgola (es. `miosito.com, www.miosito.com`).
-
-   - Se **vuoto**, il tracker accetta richieste da qualsiasi `Origin` (comodo in sviluppo, **sconsigliato in produzione** senza altre protezioni).
-   - Se **compilato**, solo le pagine servite da quei host possono inviare eventi (controllo su header `Origin` / `Referer`).
+    - Se **vuoto**, il tracker accetta richieste da qualsiasi `Origin` (comodo in sviluppo, **sconsigliato in produzione** senza altre protezioni).
+    - Se **compilato**, solo le pagine servite da quei host possono inviare eventi (controllo su header `Origin` / `Referer`).
 
 3. Clicca **Aggiungi sito**.
 
@@ -122,8 +121,16 @@ Vai su **Siti** (`/sites` o `/dashboard`):
 Per ogni sito viene mostrato un **embed code** del tipo:
 
 ```html
-<script async src="https://TUO-APP-URL/i/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"></script>
-<noscript><img src="https://TUO-APP-URL/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&p=/" width="1" height="1" /></noscript>
+<script
+    async
+    src="https://TUO-APP-URL/i/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"
+></script>
+<noscript
+    ><img
+        src="https://TUO-APP-URL/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&p=/"
+        width="1"
+        height="1"
+/></noscript>
 ```
 
 - Sostituisci `TUO-APP-URL` con l’origine reale della tua installazione (deve coincidere con `APP_URL`).
@@ -140,8 +147,8 @@ Apri il sito dalla lista: puoi filtrare il **periodo** con i pulsanti (oggi, 7 /
 Dopo lo snippet dello script, sul sito tracciato puoi inviare eventi da JavaScript:
 
 ```js
-window.indiestats.track('nome_evento');
-window.indiestats.track('nome_evento', { chiave: 'valore' });
+window.downstage.track("nome_evento");
+window.downstage.track("nome_evento", { chiave: "valore" });
 ```
 
 - Gli **eventi** sono elencati nel periodo selezionato (nome, conteggi, visitatori unici).
@@ -149,16 +156,25 @@ window.indiestats.track('nome_evento', { chiave: 'valore' });
 
 Proprietà opzionali: oggetto **piatto**, fino a 20 chiavi, valori stringa/numero/booleano (normalizzati lato server).
 
-### Conservazione dati (1 anno)
+### Conservazione dati (12 mesi)
 
-Le tabelle di analytics conservano al massimo **365 giorni** di dati di **pageview**, **click in uscita** ed **eventi custom** (i record dei goal sono solo le definizioni; non scadono). Il comando `php artisan analytics:prune` elimina i record più vecchi; è **pianificato ogni giorno alle 03:15** quando usi lo scheduler Laravel.
+Le tabelle di analytics conservano al massimo **12 mesi** di dati grezzi: **pageview**, **click in uscita** ed **eventi custom** (`tracking_events`). Le definizioni dei **goal** restano nel database e non vengono eliminate dal prune.
 
-- Variabile opzionale: `ANALYTICS_RETENTION_DAYS` (default `365`) in `.env`.
-- In produzione aggiungi al **cron** del server:
+Il comando `php artisan analytics:prune` rimuove i record con `created_at` precedente al periodo di conservazione; è **pianificato ogni giorno alle 03:15** quando lo scheduler Laravel è attivo (richiede il cron che esegue `schedule:run`).
 
-  ```cron
-  * * * * * cd /percorso/al/progetto && php artisan schedule:run >> /dev/null 2>&1
-  ```
+**Configurazione (`.env`):**
+
+| Variabile | Comportamento |
+| --------- | ------------- |
+| *(nessuna)* | Si usa **`ANALYTICS_RETENTION_MONTHS`** con default **12**. |
+| `ANALYTICS_RETENTION_MONTHS` | Numero di mesi di conservazione (es. `12`). Ignorato se è impostato `ANALYTICS_RETENTION_DAYS`. |
+| `ANALYTICS_RETENTION_DAYS` | Se impostato, ha **priorità**: conservazione espressa in **giorni** (es. `90`), utile per policy legacy o test. |
+
+In produzione aggiungi al **cron** del server (una riga al minuto):
+
+```cron
+* * * * * cd /percorso/al/progetto && php artisan schedule:run >> /dev/null 2>&1
+```
 
 In locale puoi eseguire manualmente: `php artisan analytics:prune`.
 
@@ -168,18 +184,18 @@ In locale puoi eseguire manualmente: `php artisan analytics:prune`.
 - Identificativo visitatore in **localStorage** (prima parte, senza cookie di terze parti lato analytics).
 - Durata approssimativa sulla pagina all’uscita (tab nascosta / chiusura).
 - Click su link che portano **fuori** dal dominio corrente.
-- **Eventi custom** con nome e proprietà opzionali (`indiestats.track`).
+- **Eventi custom** con nome e proprietà opzionali (`downstage.track`).
 
 ## Endpoint pubblici (riferimento)
 
-| Metodo | Percorso | Descrizione |
-|--------|----------|-------------|
-| `GET` | `/i/{uuid}.js` | Script tracker |
-| `POST` | `/collect/pageview` | Registrazione visualizzazione |
-| `POST` | `/collect/duration` | Aggiornamento durata |
-| `POST` | `/collect/outbound` | Click in uscita |
-| `POST` | `/collect/event` | Evento custom (`name`, opz. `properties`) |
-| `GET` | `/collect/pixel.gif` | Fallback noscript (tracking limitato) |
+| Metodo | Percorso             | Descrizione                               |
+| ------ | -------------------- | ----------------------------------------- |
+| `GET`  | `/i/{uuid}.js`       | Script tracker                            |
+| `POST` | `/collect/pageview`  | Registrazione visualizzazione             |
+| `POST` | `/collect/duration`  | Aggiornamento durata                      |
+| `POST` | `/collect/outbound`  | Click in uscita                           |
+| `POST` | `/collect/event`     | Evento custom (`name`, opz. `properties`) |
+| `GET`  | `/collect/pixel.gif` | Fallback noscript (tracking limitato)     |
 
 Le richieste `POST` su `/collect/*` sono escluse dal token CSRF e hanno CORS aperto per consentire il caricamento da siti esterni. Sono applicati **rate limit** sulle route di raccolta.
 
@@ -246,11 +262,11 @@ Da SSH come utente app: `cd ~/current` equivale ad entrare nella release puntata
 
 ### Frontend (Vite): npm sul server **oppure** build in locale
 
-IndieStats compila JS/CSS con Vite (`npm run build` → `public/build/`). La pipeline predefinita di Cipi **non** include Node: installa solo dipendenze PHP con Composer. Node va aggiunto tu sul VPS (es. [NodeSource](https://github.com/nodesource/distributions), [nvm](https://github.com/nvm-sh/nvm), ecc.) e verificato con `node -v` / `npm -v` come utente dell’app.
+downstage compila JS/CSS con Vite (`npm run build` → `public/build/`). La pipeline predefinita di Cipi **non** include Node: installa solo dipendenze PHP con Composer. Node va aggiunto tu sul VPS (es. [NodeSource](https://github.com/nodesource/distributions), [nvm](https://github.com/nvm-sh/nvm), ecc.) e verificato con `node -v` / `npm -v` come utente dell’app.
 
-| Situazione | Cosa fare |
-|------------|-----------|
-| **Hai Node sul server** | Automatizza la build **nel recipe Deployer** (consigliato) oppure esegui a mano dopo ogni deploy — vedi sotto. |
+| Situazione                  | Cosa fare                                                                                                                                                                                                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hai Node sul server**     | Automatizza la build **nel recipe Deployer** (consigliato) oppure esegui a mano dopo ogni deploy — vedi sotto.                                                                                                                                                                |
 | **Non hai Node sul server** | Build **in locale o in CI**: `npm ci && npm run build`, poi copia **`public/build/`** sulla release attiva (`~/current` o path equivalente). Il repo ignora `public/build` (`.gitignore`), quindi in genere si usa `rsync`/`scp` o artifact CI, non il commit della cartella. |
 
 Senza `public/build/` aggiornato, l’interfaccia Inertia non caricherà CSS/JS.
@@ -288,7 +304,7 @@ Se usi code Laravel in background, configura i worker Supervisor per l’app (Ci
 ### Risorse
 
 - [Sito Cipi](https://cipi.sh/) — panoramica, quick start, stack
-- Documentazione completa e comandi CLI: dalla sezione *Docs* sul sito
+- Documentazione completa e comandi CLI: dalla sezione _Docs_ sul sito
 
 ## Sviluppo
 

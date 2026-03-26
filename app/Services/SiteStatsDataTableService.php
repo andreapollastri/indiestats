@@ -26,9 +26,11 @@ class SiteStatsDataTableService
     {
         return [
             'paths' => ['group' => 'path', 'json_key' => 'path', 'where' => null],
-            'utm' => ['group' => 'utm_source', 'json_key' => 'utm_source', 'where' => function (Builder $q): void {
-                $q->whereNotNull('utm_source')->where('utm_source', '!=', '');
-            }],
+            'utm_source' => self::utmPageAgg('utm_source'),
+            'utm_medium' => self::utmPageAgg('utm_medium'),
+            'utm_campaign' => self::utmPageAgg('utm_campaign'),
+            'utm_term' => self::utmPageAgg('utm_term'),
+            'utm_content' => self::utmPageAgg('utm_content'),
             'search' => ['group' => 'search_query', 'json_key' => 'query', 'where' => function (Builder $q): void {
                 $q->whereNotNull('search_query')->where('search_query', '!=', '');
             }],
@@ -44,6 +46,20 @@ class SiteStatsDataTableService
     }
 
     /**
+     * @return array{group: string, json_key: string, where: callable(Builder): void}
+     */
+    private static function utmPageAgg(string $column): array
+    {
+        return [
+            'group' => $column,
+            'json_key' => $column,
+            'where' => function (Builder $q) use ($column): void {
+                $q->whereNotNull($column)->where($column, '!=', '');
+            },
+        ];
+    }
+
+    /**
      * @return array{draw: int, recordsTotal: int, recordsFiltered: int, data: list<array<string, mixed>>}
      */
     public function handle(Request $request, Site $site, CarbonInterface $from, CarbonInterface $to): array
@@ -54,6 +70,9 @@ class SiteStatsDataTableService
         $to = $to->copy();
 
         $type = (string) $request->input('type', '');
+        if ($type === 'utm') {
+            $type = 'utm_source';
+        }
         $draw = (int) $request->input('draw', 1);
         $start = max(0, (int) $request->input('start', 0));
         $length = min(100, max(1, (int) $request->input('length', 10)));
@@ -66,7 +85,7 @@ class SiteStatsDataTableService
         $displayTimezone = $request->user()?->timezone ?? 'UTC';
 
         return match ($type) {
-            'paths', 'utm', 'search', 'source', 'browser', 'device', 'country' => $this->pageAggregated(
+            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'country' => $this->pageAggregated(
                 $siteId,
                 $from,
                 $to,

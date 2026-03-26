@@ -30,13 +30,11 @@ class SiteFilterOptionsService
                 $like,
                 $limit
             ),
-            'utm' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
-                    ->whereNotNull('utm_source')->where('utm_source', '!=', ''),
-                'utm_source',
-                $like,
-                $limit
-            ),
+            'utm', 'utm_source' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_source', $like, $limit),
+            'utm_medium' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_medium', $like, $limit),
+            'utm_campaign' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_campaign', $like, $limit),
+            'utm_term' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_term', $like, $limit),
+            'utm_content' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_content', $like, $limit),
             'event' => $this->distinctColumn(
                 TrackingEvent::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
                 'name',
@@ -67,13 +65,39 @@ class SiteFilterOptionsService
      */
     public function presetsForAll(int $siteId, CarbonInterface $from, CarbonInterface $to): array
     {
-        $types = ['source', 'path', 'utm', 'event', 'device', 'country', 'search'];
+        $types = [
+            'source',
+            'path',
+            'utm_source',
+            'utm_medium',
+            'utm_campaign',
+            'utm_term',
+            'utm_content',
+            'event',
+            'device',
+            'country',
+            'search',
+        ];
         $out = [];
         foreach ($types as $type) {
             $out[$type] = $this->options($siteId, $type, $from, $to, null, 15);
         }
 
         return $out;
+    }
+
+    /**
+     * @return list<array{value: string, text: string}>
+     */
+    private function utmDistinctColumn(int $siteId, CarbonInterface $from, CarbonInterface $to, string $column, ?string $like, int $limit): array
+    {
+        $q = PageView::query()
+            ->where('site_id', $siteId)
+            ->whereBetween('created_at', [$from, $to])
+            ->whereNotNull($column)
+            ->where($column, '!=', '');
+
+        return $this->distinctColumn($q, $column, $like, $limit);
     }
 
     /**

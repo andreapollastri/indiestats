@@ -67,9 +67,30 @@ function tableConfig(type, csrf, tableEl) {
                 columns: num('path', false),
             };
         case 'utm':
+        case 'utm_source':
             return {
                 ...base,
                 columns: num('utm_source', true),
+            };
+        case 'utm_medium':
+            return {
+                ...base,
+                columns: num('utm_medium', true),
+            };
+        case 'utm_campaign':
+            return {
+                ...base,
+                columns: num('utm_campaign', true),
+            };
+        case 'utm_term':
+            return {
+                ...base,
+                columns: num('utm_term', true),
+            };
+        case 'utm_content':
+            return {
+                ...base,
+                columns: num('utm_content', true),
             };
         case 'search':
             return {

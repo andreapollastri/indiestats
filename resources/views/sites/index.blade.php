@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mb-4 mt-3">
+    <div class="mb-4">
         <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('I tuoi siti') }}</h1>
         <p class="small mb-0" style="color: #94a3b8;">{{ __('Aggiungi un sito e incolla lo snippet sulle pagine che vuoi misurare.') }}</p>
     </div>
@@ -28,7 +28,9 @@
                         @error('allowed_domains')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">{{ __('Aggiungi sito') }}</button>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">{{ __('Aggiungi sito') }}</button>
+                </div>
             </form>
         </div>
     </div>
@@ -39,14 +41,14 @@
         @foreach ($sites as $site)
             <div class="card mb-3">
                 <div class="card-body">
-                    <div class="d-flex flex-wrap justify-content-between align-items-start mb-2">
-                        <div>
+                    <div class="row g-2 align-items-start align-items-md-center mb-2">
+                        <div class="col-12 col-md order-2 order-md-1">
                             <h2 class="h6 mb-1 fw-bold">
                                 <a href="{{ route('sites.show', $site['public_key']) }}" class="text-decoration-none" style="color: #0f172a;">{{ $site['name'] }}</a>
                             </h2>
                             <p class="small font-monospace mb-0" style="color: #94a3b8; font-size: 0.7rem;">{{ $site['public_key'] }}</p>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-1">
+                        <div class="col-12 col-md-auto d-flex flex-wrap align-items-center justify-content-end gap-1 ms-md-auto order-1 order-md-2">
                             <a href="{{ route('sites.show', $site['public_key']) }}" class="btn btn-outline-primary btn-sm">{{ __('Statistiche') }}</a>
                             <button type="button" class="btn btn-outline-secondary btn-sm" data-copy="{{ $site['embed_code'] }}" data-copy-done="{{ __('Copiato') }}" title="{{ __('Copia snippet') }}"><i class="fas fa-copy"></i></button>
                             <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSiteModal" data-delete-url="{{ route('sites.destroy', $site['public_key']) }}" data-site-name="{{ e($site['name']) }}" title="{{ __('Elimina') }}" aria-label="{{ __('Elimina') }}">

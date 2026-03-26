@@ -14,7 +14,7 @@ class SiteFilterOptionsController extends Controller
         $this->authorize('view', $site);
 
         $validated = $request->validate([
-            'type' => 'required|string|in:source,path,utm,event,device,country,search',
+            'type' => 'required|string|in:source,path,utm,utm_source,utm_medium,utm_campaign,utm_term,utm_content,event,device,country,search',
             'range' => 'required|string|in:today,7d,30d,3m,6m,1y',
             'q' => 'nullable|string|max:256',
         ]);

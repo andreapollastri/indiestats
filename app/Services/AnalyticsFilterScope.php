@@ -38,8 +38,20 @@ class AnalyticsFilterScope
         if ($filters->path !== null) {
             $q->where('path', $filters->path);
         }
-        if ($filters->utm !== null) {
-            $q->where('utm_source', $filters->utm);
+        if ($filters->utmSource !== null) {
+            $q->where('utm_source', $filters->utmSource);
+        }
+        if ($filters->utmMedium !== null) {
+            $q->where('utm_medium', $filters->utmMedium);
+        }
+        if ($filters->utmCampaign !== null) {
+            $q->where('utm_campaign', $filters->utmCampaign);
+        }
+        if ($filters->utmTerm !== null) {
+            $q->where('utm_term', $filters->utmTerm);
+        }
+        if ($filters->utmContent !== null) {
+            $q->where('utm_content', $filters->utmContent);
         }
         if ($filters->device !== null) {
             $q->where('device_type', $filters->device);

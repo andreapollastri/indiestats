@@ -20,23 +20,53 @@
 @endphp
 
 @section('content')
-    <div class="d-flex flex-column flex-lg-row align-items-start justify-content-between mb-4 mt-3 gap-3">
-        <div>
+    <div class="row g-3 align-items-start align-items-lg-center mb-4">
+        <div class="col-12 col-lg order-2 order-lg-1">
             <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ $site['name'] }}</h1>
             <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
         </div>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach ($rangeLabels as $key => $label)
-                @php
-                    $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
-                    if ($siteTab === 'detail') {
-                        $rangeQuery['tab'] = 'detail';
-                    } elseif ($siteTab === 'events') {
-                        $rangeQuery['tab'] = 'events';
-                    }
-                @endphp
-                <a href="{{ route('sites.show', $rangeQuery) }}" class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
-            @endforeach
+        <div class="col-12 col-lg-auto d-flex flex-wrap gap-1 align-items-center justify-content-end order-1 order-lg-2">
+            <div class="dropdown">
+                <button
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    id="pa-site-range-dropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                >
+                    <i class="fas fa-calendar-days me-1" aria-hidden="true"></i>{{ $rangeLabels[$range] ?? $range }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pa-site-range-dropdown">
+                    @foreach ($rangeLabels as $key => $label)
+                        @php
+                            $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
+                            if ($siteTab === 'detail') {
+                                $rangeQuery['tab'] = 'detail';
+                            } elseif ($siteTab === 'events') {
+                                $rangeQuery['tab'] = 'events';
+                            }
+                        @endphp
+                        <li>
+                            <a
+                                href="{{ route('sites.show', $rangeQuery) }}"
+                                class="dropdown-item {{ $range === $key ? 'active' : '' }}"
+                            >{{ $label }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                id="pa-site-export-btn"
+                data-pa-export-url="{{ route('sites.exports.store', $site['public_key']) }}"
+                data-pa-csrf="{{ csrf_token() }}"
+                data-pa-range="{{ $range }}"
+                data-pa-export-pending="{{ __('Esportazione in corso…') }}"
+                data-pa-export-ready="{{ __('Export pronto. Scarica il file Excel.') }}"
+                data-pa-export-failed="{{ __('Esportazione non riuscita.') }}"
+            ><i class="fas fa-download me-1" aria-hidden="true"></i>{{ __('Esporta') }}</button>
         </div>
     </div>
 
@@ -154,9 +184,45 @@
 
             @include('sites.partials.stats-table', [
                 'title' => 'UTM source',
-                'description' => 'Campagne etichettate',
-                'dtType' => 'utm',
+                'description' => 'Parametro utm_source dalla pagina di atterraggio',
+                'dtType' => 'utm_source',
                 'dimLabel' => 'utm_source',
+                'site' => $site,
+                'range' => $range,
+            ])
+
+            @include('sites.partials.stats-table', [
+                'title' => 'UTM medium',
+                'description' => 'Parametro utm_medium (es. cpc, email, social)',
+                'dtType' => 'utm_medium',
+                'dimLabel' => 'utm_medium',
+                'site' => $site,
+                'range' => $range,
+            ])
+
+            @include('sites.partials.stats-table', [
+                'title' => 'UTM campaign',
+                'description' => 'Parametro utm_campaign',
+                'dtType' => 'utm_campaign',
+                'dimLabel' => 'utm_campaign',
+                'site' => $site,
+                'range' => $range,
+            ])
+
+            @include('sites.partials.stats-table', [
+                'title' => 'UTM term',
+                'description' => 'Parametro utm_term (parole chiave a pagamento)',
+                'dtType' => 'utm_term',
+                'dimLabel' => 'utm_term',
+                'site' => $site,
+                'range' => $range,
+            ])
+
+            @include('sites.partials.stats-table', [
+                'title' => 'UTM content',
+                'description' => 'Parametro utm_content (varianti A/B o link)',
+                'dtType' => 'utm_content',
+                'dimLabel' => 'utm_content',
                 'site' => $site,
                 'range' => $range,
             ])
@@ -233,11 +299,11 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Eventi configurati') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).') }}</small>
+            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con downstage.track (stesso valore della stringa nel codice).') }}</small>
             <small class="d-block mt-1" style="color: #94a3b8;">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
         </div>
         <div class="card-body">
-            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
+            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.downstage.track('nome_tag', { opzionale: 'valore' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
@@ -290,7 +356,7 @@
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con indiestats.track nel periodo') }}</small>
+            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con downstage.track nel periodo') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">

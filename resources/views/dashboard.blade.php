@@ -13,14 +13,35 @@
 @endphp
 
 @section('content')
-    <div class="mb-4 mt-3">
-        <div class="d-flex flex-wrap justify-content-start justify-content-lg-end mb-3 gap-1">
-            @foreach ($rangeLabels as $key => $label)
-                <a href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}" class="btn btn-sm {{ $range === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
-            @endforeach
+    <div class="row g-3 align-items-start align-items-lg-center mb-4">
+        <div class="col-12 col-lg order-2 order-lg-1">
+            <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Dashboard') }}</h1>
+            <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
         </div>
-        <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Dashboard') }}</h1>
-        <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
+        <div class="col-12 col-lg-auto d-flex flex-wrap gap-1 align-items-center justify-content-end order-1 order-lg-2">
+            <div class="dropdown">
+                <button
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    id="pa-dashboard-range-dropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                >
+                    <i class="fas fa-calendar-days me-1" aria-hidden="true"></i>{{ $rangeLabels[$range] ?? $range }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pa-dashboard-range-dropdown">
+                    @foreach ($rangeLabels as $key => $label)
+                        <li>
+                            <a
+                                href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}"
+                                class="dropdown-item {{ $range === $key ? 'active' : '' }}"
+                            >{{ $label }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
     </div>
 
     @include('partials.flash')

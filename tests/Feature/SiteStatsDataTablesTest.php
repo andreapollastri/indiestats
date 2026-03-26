@@ -40,4 +40,35 @@ class SiteStatsDataTablesTest extends TestCase
             'data',
         ]);
     }
+
+    public function test_utm_campaign_datatable_returns_valid_json_for_authenticated_owner(): void
+    {
+        $user = User::factory()->create([
+            'timezone' => 'Europe/Rome',
+        ]);
+
+        $site = $user->sites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(
+            route('sites.stats.datatables', $site->public_key),
+            [
+                'type' => 'utm_campaign',
+                'range' => '7d',
+                'draw' => 1,
+                'start' => 0,
+                'length' => 10,
+            ]
+        );
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'draw',
+            'recordsTotal',
+            'recordsFiltered',
+            'data',
+        ]);
+    }
 }

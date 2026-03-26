@@ -4,6 +4,7 @@ use App\Http\Controllers\CollectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteExportController;
 use App\Http\Controllers\SiteFilterOptionsController;
 use App\Http\Controllers\SiteStatsDataTablesController;
 use App\Http\Controllers\TrackerController;
@@ -44,6 +45,17 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy')->whereUuid('site');
     Route::post('sites/{site}/goals', [GoalController::class, 'store'])->name('sites.goals.store')->whereUuid('site');
     Route::delete('sites/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('sites.goals.destroy')->whereUuid('site');
+
+    Route::post('sites/{site}/exports', [SiteExportController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('sites.exports.store')
+        ->whereUuid('site');
+    Route::get('sites/{site}/exports/{export}/status', [SiteExportController::class, 'status'])
+        ->name('sites.exports.status')
+        ->whereUuid('site');
+    Route::get('sites/{site}/exports/{export}/download', [SiteExportController::class, 'download'])
+        ->name('sites.exports.download')
+        ->whereUuid('site');
 });
 
 require __DIR__.'/settings.php';
