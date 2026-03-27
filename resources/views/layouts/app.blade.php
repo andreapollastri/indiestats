@@ -109,7 +109,13 @@
             <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>&copy; {{ config('app.name') }} {{ date('Y') }}</span>
+                        <a
+                            href="https://github.com/andreapollastri/indiestats"
+                            class="text-muted text-decoration-none"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="{{ config('app.name') }} — GitHub"
+                        >&copy; {{ config('app.name') }} {{ date('Y') }}</a>
                     </div>
                 </div>
             </footer>
