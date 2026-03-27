@@ -9,6 +9,6 @@ class GoalPolicy
 {
     public function delete(User $user, Goal $goal): bool
     {
-        return $user->id === $goal->site->user_id;
+        return $user->canAccessSite($goal->site);
     }
 }

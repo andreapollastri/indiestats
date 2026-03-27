@@ -25,9 +25,9 @@ class HandleTrackingCors
     }
 
     /**
-     * Riflette l'header Origin quando presente (browser cross-origin), così non serve
-     * Access-Control-Allow-Origin: * — compatibile anche con richieste con credenziali.
-     * L’autorizzazione resta in CollectController (site_key + domini consentiti).
+     * Reflect the Origin header when present (browser cross-origin), so we avoid
+     * Access-Control-Allow-Origin: * — compatible with credentialed requests.
+     * Authorization remains in CollectController (site_key + allowed domains).
      *
      * @return array<string, string>
      */
@@ -59,7 +59,7 @@ class HandleTrackingCors
     }
 
     /**
-     * Valida e restituisce l'Origin così com’è (solo http/https con host), altrimenti null.
+     * Validate and return the Origin as-is (http/https with host only), otherwise null.
      */
     private function normalizeOriginHeader(mixed $origin): ?string
     {

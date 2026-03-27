@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Dataset per export Excel: stesse regole delle DataTable (filtri + periodo), senza paginazione.
+ * Excel export dataset: same rules as DataTables (filters + period), without pagination.
  */
 class SiteAnalyticsExportDataset
 {

@@ -9,6 +9,6 @@ class SiteExportPolicy
 {
     public function view(User $user, SiteExport $export): bool
     {
-        return $user->id === $export->user_id;
+        return $user->canAccessSite($export->site);
     }
 }

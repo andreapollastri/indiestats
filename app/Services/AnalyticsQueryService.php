@@ -16,7 +16,7 @@ class AnalyticsQueryService
     ) {}
 
     /**
-     * Riempie i giorni senza dati con zero (stesso formato della dashboard).
+     * Fill days with no data using zeros (same shape as the dashboard chart).
      *
      * @param  list<array{date: string, pageviews: int, visitors: int}>  $byDay
      * @return list<array{date: string, pageviews: int}>

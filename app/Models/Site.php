@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -32,11 +33,29 @@ class Site extends Model
                 $site->public_key = (string) Str::uuid();
             }
         });
+
+        static::created(function (Site $site): void {
+            if ($site->user_id === null) {
+                return;
+            }
+
+            $site->assignedUsers()->syncWithoutDetaching([(int) $site->user_id]);
+        });
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Users granted access to this site (base role UI).
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function assignedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
     public function pageViews(): HasMany
@@ -102,7 +121,7 @@ class Site extends Model
     }
 
     /**
-     * Accetta host "puliti" o URL completi (es. https://web.ap.it.test/path) salvati per errore in allowed_domains.
+     * Accept plain hosts or full URLs (e.g. https://example.test/path) mistakenly stored in allowed_domains.
      */
     protected static function normalizeAllowedHostEntry(string $raw): ?string
     {

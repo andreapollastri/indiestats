@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CollectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalController;
@@ -31,7 +32,11 @@ Route::get('/i/{publicKey}.js', [TrackerController::class, 'script'])
     ->middleware('throttle:600,1')
     ->whereUuid('publicKey');
 
-Route::middleware(['auth', 'verified'])->group(function (): void {
+Route::middleware(['auth', 'admin'])->group(function (): void {
+    Route::resource('users', UserController::class)->except(['show']);
+});
+
+Route::middleware(['auth'])->group(function (): void {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
@@ -57,8 +62,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 require __DIR__.'/settings.php';
 
 /*
-| Fortify registra POST /forgot-password senza throttle nominato: lo aggiungiamo qui.
-| refreshNameLookups() è necessario perché la lookup per nome può non essere ancora popolata.
+| Fortify registers POST /forgot-password without a named throttle middleware; we attach it here.
+| refreshNameLookups() is required because the route name lookup may not be populated yet.
 */
 Route::getRoutes()->refreshNameLookups();
 Route::getRoutes()->getByName('password.email')?->middleware(['throttle:password-reset-email']);

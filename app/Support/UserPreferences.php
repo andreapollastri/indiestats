@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * Lingue supportate e metadati per le preferenze utente.
+ * Supported locales and metadata for user preferences.
  */
 final class UserPreferences
 {

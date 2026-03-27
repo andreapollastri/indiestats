@@ -12,8 +12,8 @@ class GoalDeletionTest extends TestCase
 
     public function test_deleting_goal_removes_tracking_events_with_same_tag(): void
     {
-        $user = User::factory()->create();
-        $site = $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
             'name' => 'Test site',
             'allowed_domains' => 'example.com',
         ]);

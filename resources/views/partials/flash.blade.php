@@ -1,8 +1,14 @@
-@if (!empty($flashSuccess) || $errors->any())
+@if (!empty($flashSuccess) || !empty($flashError) || $errors->any())
     <div class="mb-4">
         @if (!empty($flashSuccess))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ $flashSuccess }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Chiudi') }}"></button>
+            </div>
+        @endif
+        @if (!empty($flashError))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ $flashError }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Chiudi') }}"></button>
             </div>
         @endif

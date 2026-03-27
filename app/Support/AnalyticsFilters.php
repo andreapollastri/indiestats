@@ -26,7 +26,7 @@ final class AnalyticsFilters
     }
 
     /**
-     * Ricostruisce i filtri da parametri query (es. salvati in site_exports.filters_payload).
+     * Rebuild filters from query parameters (e.g. stored in site_exports.filters_payload).
      *
      * @param  array<string, mixed>  $query
      */
@@ -147,8 +147,8 @@ final class AnalyticsFilters
     }
 
     /**
-     * Per query su outbound_clicks: path e provenienza si applicano alle colonne from_path / referrer_source;
-     * non vanno ripetuti nel sottoinsieme visitor_id da page_views.
+     * For outbound_clicks queries: path and source map to from_path / referrer_source;
+     * they must not be repeated in the page_views visitor_id subquery.
      */
     public function withoutPathAndSource(): self
     {

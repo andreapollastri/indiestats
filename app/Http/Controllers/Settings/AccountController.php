@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\View\View;
 use Laravel\Fortify\Features;
 
@@ -16,13 +15,12 @@ class AccountController extends Controller
     public function edit(TwoFactorAuthenticationRequest $request): View
     {
         $user = $request->user();
-        $hasVerifiedEmail = $user->hasVerifiedEmail();
 
         $canManageTwoFactor = Features::canManageTwoFactorAuthentication();
         $twoFactorEnabled = false;
         $pendingTwoFactorConfirm = false;
 
-        if ($hasVerifiedEmail && $canManageTwoFactor) {
+        if ($canManageTwoFactor) {
             $request->ensureStateIsValid();
 
             $twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
@@ -35,9 +33,7 @@ class AccountController extends Controller
             'breadcrumbs' => [
                 ['title' => __('Account'), 'href' => route('account.edit')],
             ],
-            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
-            'hasVerifiedEmail' => $hasVerifiedEmail,
             'canManageTwoFactor' => $canManageTwoFactor,
             'twoFactorEnabled' => $twoFactorEnabled,
             'pendingTwoFactorConfirm' => $pendingTwoFactorConfirm,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\HandleTrackingCors;
 use App\Http\Middleware\SetUserPreferences;
 use App\Http\Middleware\ShareViewData;
@@ -24,9 +25,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'collect/*',
         ]);
 
+        $middleware->alias([
+            'admin' => EnsureUserIsAdmin::class,
+        ]);
+
         $middleware->web(append: [
-            ShareViewData::class,
             SetUserPreferences::class,
+            ShareViewData::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

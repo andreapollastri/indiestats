@@ -30,9 +30,9 @@ class FakeDataSeederTest extends TestCase
         $this->assertDatabaseCount('sites', 5);
         $this->assertDatabaseCount('goals', 25);
 
-        $user = User::where('email', 'base@users.test')->first();
+        $user = User::where('email', 'admin@users.test')->first();
         $this->assertNotNull($user);
-        $this->assertCount(5, $user->sites);
+        $this->assertCount(5, $user->ownedSites);
 
         $site = Site::first();
         $this->assertEquals(3000, $site->pageViews()->count());

@@ -1,33 +1,49 @@
 import DataTable from 'datatables.net-responsive-bs5';
 import { getPaAnalyticsFilterParams } from './site-filters.js';
 
-/** Traduzioni inline (evita errori TN/21 da caricamento i18n via CDN/CORS). */
-const DT_IT = {
-    emptyTable: 'Nessun dato disponibile nella tabella',
-    info: 'Visualizzazione da _START_ a _END_ di _TOTAL_ elementi',
-    infoEmpty: 'Visualizzazione da 0 a 0 di 0 elementi',
-    infoFiltered: '(filtrati da _MAX_ elementi totali)',
-    infoThousands: '.',
-    decimal: ',',
-    lengthMenu: 'Visualizza _MENU_ elementi',
-    loadingRecords: 'Caricamento...',
-    processing: 'Elaborazione...',
-    search: 'Cerca:',
-    zeroRecords: 'Nessun elemento corrispondente trovato',
+/** Fallback if the layout script tag is missing (e.g. tests). */
+const DEFAULT_DATATABLES_LANGUAGE = {
+    emptyTable: 'No data available in table',
+    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+    infoEmpty: 'Showing 0 to 0 of 0 entries',
+    infoFiltered: '(filtered from _MAX_ total entries)',
+    infoThousands: ',',
+    decimal: '.',
+    lengthMenu: 'Show _MENU_ entries',
+    loadingRecords: 'Loading...',
+    processing: 'Processing...',
+    search: 'Search:',
+    zeroRecords: 'No matching records found',
     paginate: {
-        first: 'Inizio',
-        last: 'Fine',
-        next: 'Succ.',
-        previous: 'Prec.',
+        first: 'First',
+        last: 'Last',
+        next: 'Next',
+        previous: 'Previous',
     },
     aria: {
-        orderable: 'Ordinabile',
-        orderableReverse: 'Ordinabile (ordine inverso)',
-        orderableRemove: 'Ordinabile (rimuovi ordinamento)',
-        sortAscending: ': attiva per ordinare la colonna in ordine crescente',
-        sortDescending: ': attiva per ordinare la colonna in ordine decrescente',
+        orderable: 'Orderable',
+        orderableReverse: 'Orderable (reverse order)',
+        orderableRemove: 'Orderable (remove ordering)',
+        sortAscending: ': activate to sort column ascending',
+        sortDescending: ': activate to sort column descending',
     },
 };
+
+function readDatatablesLanguage() {
+    const el = document.getElementById('pa-datatables-language');
+    if (!el) {
+        return null;
+    }
+    try {
+        const parsed = JSON.parse(el.textContent.trim());
+        if (parsed && typeof parsed === 'object') {
+            return parsed;
+        }
+    } catch {
+        // ignore
+    }
+    return null;
+}
 
 function escapeHtml(s) {
     if (s === null || s === undefined) {
@@ -41,6 +57,8 @@ function escapeHtml(s) {
 }
 
 function tableConfig(type, csrf, tableEl) {
+    const dtLang = readDatatablesLanguage() || DEFAULT_DATATABLES_LANGUAGE;
+
     const num = (a, b) => [
         { data: a, className: !b ? 'font-monospace' : '' },
         { data: 'pageviews', className: 'text-end font-monospace' },
@@ -57,7 +75,7 @@ function tableConfig(type, csrf, tableEl) {
             [10, 25, 50, 100],
         ],
         order: [[1, 'desc']],
-        language: DT_IT,
+        language: dtLang,
     };
 
     switch (type) {
@@ -230,8 +248,8 @@ function tableConfig(type, csrf, tableEl) {
             };
         case 'goals': {
             const confirmMsg =
-                (tableEl && tableEl.dataset.paDtConfirmDelete) || 'Eliminare questo evento?';
-            const removeLabel = (tableEl && tableEl.dataset.paDtRemoveLabel) || 'Rimuovi';
+                (tableEl && tableEl.dataset.paDtConfirmDelete) || 'Delete this event?';
+            const removeLabel = (tableEl && tableEl.dataset.paDtRemoveLabel) || 'Remove';
             return {
                 ...base,
                 order: [[0, 'asc']],

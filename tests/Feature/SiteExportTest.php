@@ -17,8 +17,8 @@ class SiteExportTest extends TestCase
     {
         Queue::fake();
 
-        $user = User::factory()->create();
-        $site = $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
             'name' => 'My site',
             'allowed_domains' => 'example.com',
         ]);
@@ -42,8 +42,8 @@ class SiteExportTest extends TestCase
 
     public function test_status_endpoint_returns_json_for_pending_export(): void
     {
-        $user = User::factory()->create();
-        $site = $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
             'name' => 'My site',
             'allowed_domains' => 'example.com',
         ]);

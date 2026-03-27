@@ -182,7 +182,7 @@
     max-width: 100%;
 }
 
-// DataTables styling — corpo celle vs testate colonne (testate più piccole, sans uniforme)
+// DataTables styling — cell body vs column headers (smaller headers, uniform sans)
 $pa-dt-font-size: 0.75rem;
 $pa-dt-header-font-size: 0.6875rem;
 
@@ -532,7 +532,7 @@ table.table.pa-site-dt.pa-site-dt-events {
         vertical-align: top;
     }
 
-    // HTML da server (referrer .small, payload ul): stessa scala del resto
+    // Server-rendered HTML (referrer .small, payload ul): same scale as surrounding text
     tbody .small,
     tbody small {
         font-size: inherit;

@@ -30,7 +30,7 @@ final class EventPayloadSanitizer
     }
 
     /**
-     * Percorso da persistere: solo pathname, senza query string nì fragment (UTM e ?q= restano in colonne dedicate).
+     * Path to persist: pathname only, no query string or fragment (UTM and ?q= live in dedicated columns).
      */
     public static function normalizeStoredPath(string $path): string
     {

@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class PreferencesController extends Controller
 {
     /**
-     * Preferenze globali: lingua e fuso orario.
+     * Global preferences: locale and timezone.
      */
     public function edit(Request $request): View
     {

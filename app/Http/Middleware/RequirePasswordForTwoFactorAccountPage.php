@@ -17,7 +17,7 @@ class RequirePasswordForTwoFactorAccountPage
     {
         $user = $request->user();
 
-        if ($user === null || ! $user->hasVerifiedEmail()) {
+        if ($user === null) {
             return $next($request);
         }
 

@@ -22,8 +22,7 @@ class DashboardController extends Controller
 
         $filters = AnalyticsFilters::fromRequest($request);
 
-        $sites = Site::query()
-            ->where('user_id', $request->user()->id)
+        $sites = $request->user()->accessibleSitesQuery()
             ->orderBy('name')
             ->get()
             ->map(function (Site $site) use ($analytics, $from, $to, $filters) {

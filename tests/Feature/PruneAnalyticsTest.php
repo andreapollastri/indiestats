@@ -19,8 +19,8 @@ class PruneAnalyticsTest extends TestCase
     {
         $this->travelTo('2026-03-26 12:00:00');
 
-        $user = User::factory()->create();
-        $site = $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
             'name' => 'S',
             'allowed_domains' => 'example.com',
         ]);
@@ -85,8 +85,8 @@ class PruneAnalyticsTest extends TestCase
     {
         $this->travelTo('2026-03-26 12:00:00');
 
-        $user = User::factory()->create();
-        $site = $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
             'name' => 'S',
             'allowed_domains' => 'example.com',
         ]);

@@ -61,11 +61,6 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::verifyEmailView(fn (Request $request) => view('auth.verify-email', [
-            'title' => __('guest.verify_email.document_title', ['app' => config('app.name')]),
-            'status' => $request->session()->get('status'),
-        ]));
-
         Fortify::twoFactorChallengeView(fn () => view('auth.two-factor-challenge', [
             'title' => __('guest.two_factor.document_title', ['app' => config('app.name')]),
         ]));
@@ -97,18 +92,5 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinutes($minutes, 1)->by('password-reset-email:'.$email.'|'.$request->ip());
         });
 
-        RateLimiter::for('verification-email', function (Request $request) {
-            $minutes = max(1, (int) config('auth_email.resend_minutes', 15));
-
-            if ($request->routeIs('verification.send')) {
-                $user = $request->user();
-
-                return Limit::perMinutes($minutes, 1)->by(
-                    'verification-send:'.($user?->getAuthIdentifier() ?? 'guest')
-                );
-            }
-
-            return Limit::perMinute(30)->by('verification-verify:'.$request->ip());
-        });
     }
 }

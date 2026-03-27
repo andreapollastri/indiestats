@@ -37,11 +37,6 @@
                     </p>
 
                     <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
-                        <button type="button" class="btn btn-primary px-4"
-                            style="padding: 0.55rem 1.25rem; font-size: 0.9rem;"
-                            onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = @json(route('home')); }">
-                            <i class="fas fa-arrow-left me-2" style="font-size: 0.75rem;"></i>{{ __('Error 429: back') }}
-                        </button>
                         <a href="{{ route('home') }}" class="btn px-4"
                             style="color: #475569; font-weight: 500; padding: 0.55rem 1.25rem; font-size: 0.9rem;">
                             {{ __('Error 429: home') }}

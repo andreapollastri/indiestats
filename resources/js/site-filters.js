@@ -42,9 +42,9 @@ export function readFilterConfig() {
 }
 
 /**
- * Parametri `filter_*` per AJAX DataTables: solo dalla query string visibile (location).
- * Non usare il JSON `cfg.current`: dopo navigazione o modifica URL senza reload poteva restare
- * un merge obsoleto e i totali delle tabelle non coincidevano con i filtri effettivi.
+ * `filter_*` parameters for AJAX DataTables: read only from the visible query string (location).
+ * Do not use JSON `cfg.current`: after navigation or URL changes without reload it could hold
+ * a stale merge and table totals would not match the active filters.
  */
 export function getPaAnalyticsFilterParams() {
     const out = {};
@@ -142,19 +142,19 @@ function init() {
             placeholder: placeholder,
             openOnFocus: true,
             /**
-             * dropdown_input: campo di ricerca nel pannello (altrimenti con un valore selezionato
-             * Tom Select nasconde l’input e non si può digitare → load() non parte).
-             * clear_button: pulsante per tornare a «Tutte» e cercare di nuovo.
+             * dropdown_input: search field in the panel (otherwise with a selected value Tom Select
+             * hides the input so typing is impossible and load() never runs).
+             * clear_button: button to go back to “All” and search again.
              */
             plugins: [
                 'caret_position',
                 'dropdown_input',
-                { name: 'clear_button', options: { title: 'Azzera filtro' } },
+                { name: 'clear_button', options: { title: 'Clear filter' } },
             ],
             loadThrottle: 300,
-            // Non usare document.body: Tom Select applica top/left solo se dropdownParent === 'body' (stringa);
-            // con HTMLElement positionDropdown() non viene eseguito e il menu finisce fuori posto.
-            // Default: parent = wrapper .ts-wrapper (position: relative) → dropdown sotto il campo.
+            // Do not use document.body: Tom Select only applies top/left when dropdownParent === 'body' (string);
+            // with an HTMLElement, positionDropdown() does not run and the menu is misplaced.
+            // Default: parent = .ts-wrapper wrapper (position: relative) → dropdown below the field.
             load: function (query, callback) {
                 const url = new URL(cfg.optionsUrl, window.location.origin);
                 url.searchParams.set('type', type);

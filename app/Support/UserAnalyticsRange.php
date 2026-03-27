@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /**
- * Calcolo intervalli analitici nel fuso orario dell'utente (date in DB restano UTC).
+ * Computes analytics date ranges in the user's timezone (dates in the DB remain UTC).
  */
 final class UserAnalyticsRange
 {

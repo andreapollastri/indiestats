@@ -23,9 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
+Route::middleware(['auth'])->group(function () {
     Route::post('settings/security/two-factor/cancel-setup', [SecurityController::class, 'cancelTwoFactorSetup'])
         ->middleware('throttle:12,1')
         ->name('security.two-factor.cancel-setup');

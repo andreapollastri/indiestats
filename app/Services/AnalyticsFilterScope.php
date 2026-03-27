@@ -65,8 +65,8 @@ class AnalyticsFilterScope
     }
 
     /**
-     * Outbound: path e provenienza si applicano alle righe (from_path, referrer_source);
-     * utm/dispositivo/paese/query ed evento restringono i visitor come per le altre metriche.
+     * Outbound: path and source apply to row columns (from_path, referrer_source);
+     * UTM/device/country/search query and event narrow visitors like other metrics.
      */
     public function constrainVisitorForOutbound(
         Builder $q,
@@ -113,11 +113,11 @@ class AnalyticsFilterScope
     }
 
     /**
-     * Filtri su dimensioni page view (source, path, utm, device, …): non basta
-     * restringere i visitor_id — ogni riga tracking_events deve essere attribuibile
-     * a una page_view nel periodo che soddisfa i filtri e precede (o coincide con) l'evento.
+     * Filters on page view dimensions (source, path, utm, device, …): it is not enough
+     * to narrow visitor_id — each tracking_events row must be attributable to a page_view
+     * in range that satisfies the filters and is on or before the event time.
      *
-     * Se c'è già where('name', …) sul main query, non duplicare il sottoinsieme evento su visitor_id.
+     * If the main query already has where('name', …), do not duplicate the event subset on visitor_id.
      */
     public function constrainVisitorForTrackingEvents(
         Builder $q,
@@ -169,7 +169,7 @@ class AnalyticsFilterScope
         $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, $eventNamed);
     }
 
-    /** Aggregazione per tag: filter_event restringe i visitatori come nelle metriche di riepilogo, non solo le righe con quel name. */
+    /** Tag aggregation: filter_event narrows visitors like summary metrics, not only rows with that name. */
     public function applyToEventNamesAggregation(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
@@ -210,9 +210,9 @@ class AnalyticsFilterScope
     }
 
     /**
-     * Path della page view più recente nel periodo che soddisfa i filtri e precede l'evento
-     * (stessa logica dell'EXISTS su page_views). Usato per mostrare in dettaglio il percorso
-     * allineato al filtro (es. pathname+query) invece del solo path inviato con track().
+     * Most recent page view path in range that matches filters and is on or before the event
+     * (same logic as the EXISTS on page_views). Used to show detail path aligned with the filter
+     * (e.g. pathname+query) instead of only the path sent with track().
      */
     public function attributingPageViewPathSubquery(
         int $siteId,

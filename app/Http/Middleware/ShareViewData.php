@@ -15,6 +15,7 @@ class ShareViewData
     public function handle(Request $request, Closure $next): Response
     {
         View::share('flashSuccess', $request->session()->get('success'));
+        View::share('flashError', $request->session()->get('error'));
 
         return $next($request);
     }

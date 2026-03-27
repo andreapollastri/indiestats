@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use App\Models\SiteExport;
+use App\Models\User;
 use App\Policies\SiteExportPolicy;
+use App\Policies\UserPolicy;
 use Carbon\CarbonImmutable;
-use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -31,9 +31,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(SiteExport::class, SiteExportPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
 
         $this->configureDefaults();
-        $this->configureWelcomeEmailVerificationMail();
     }
 
     /**
@@ -53,20 +53,5 @@ class AppServiceProvider extends ServiceProvider
             ->symbols()
             ->uncompromised(),
         );
-    }
-
-    /**
-     * Personalizza l'email di verifica indirizzo email.
-     */
-    protected function configureWelcomeEmailVerificationMail(): void
-    {
-        VerifyEmail::toMailUsing(function (object $notifiable, string $url): MailMessage {
-            return (new MailMessage)
-                ->subject(__('mail.verify_email.subject', ['app' => config('app.name')]))
-                ->greeting(__('mail.verify_email.greeting', ['name' => $notifiable->name]))
-                ->line(__('mail.verify_email.line'))
-                ->action(__('mail.verify_email.action'), $url)
-                ->line(__('mail.verify_email.outro', ['app' => config('app.name')]));
-        });
     }
 }

@@ -18,16 +18,5 @@
             </div>
             <button type="submit" class="btn btn-primary" data-test="update-profile-button">{{ __('Salva') }}</button>
         </form>
-        @if ($mustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
-            <hr style="border-color: #f1f5f9;">
-            <p class="small text-warning mb-2">{{ __('Il tuo indirizzo email non è verificato.') }}</p>
-            <form method="POST" action="{{ route('verification.send') }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-outline-secondary btn-sm">{{ __('Invia di nuovo la mail di verifica') }}</button>
-            </form>
-            @if ($status === 'verification-link-sent')
-                <p class="small mt-2 mb-0" style="color: #10b981;">{{ __('verification-link-sent') }}</p>
-            @endif
-        @endif
     </div>
 </div>

@@ -18,8 +18,9 @@ class SiteController extends Controller
 {
     public function index(Request $request): View
     {
-        $sites = Site::query()
-            ->where('user_id', $request->user()->id)
+        $canManageSites = $request->user()->isAdmin();
+
+        $sites = $request->user()->accessibleSitesQuery()
             ->orderBy('name')
             ->get()
             ->map(fn (Site $s) => [
@@ -37,11 +38,14 @@ class SiteController extends Controller
                 ['title' => __('Siti'), 'href' => route('sites.index')],
             ],
             'sites' => $sites,
+            'canManageSites' => $canManageSites,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Site::class);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'allowed_domains' => 'required|string|max:2000',
@@ -56,7 +60,7 @@ class SiteController extends Controller
             ]);
         }
 
-        $request->user()->sites()->create([
+        $request->user()->ownedSites()->create([
             'name' => $data['name'],
             'allowed_domains' => $allowedDomains,
         ]);

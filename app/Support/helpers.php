@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 if (! function_exists('user_timezone')) {
     /**
-     * Fuso orario dell'utente autenticato (IANA), default UTC.
+     * Authenticated user's timezone (IANA), default UTC.
      */
     function user_timezone(): string
     {
@@ -26,7 +26,7 @@ if (! function_exists('user_locale')) {
 
 if (! function_exists('user_now')) {
     /**
-     * "Ora" nel fuso dell'utente autenticato.
+     * Current time in the authenticated user's timezone.
      */
     function user_now(): Carbon
     {
@@ -36,7 +36,7 @@ if (! function_exists('user_now')) {
 
 if (! function_exists('format_user_datetime')) {
     /**
-     * Converte un istante UTC (o Carbon) nel fuso dell'utente e lo formatta.
+     * Convert a UTC instant (or Carbon) to the user's timezone and format it.
      */
     function format_user_datetime(DateTimeInterface|string|null $value, string $format = 'd/m/Y H:i'): string
     {

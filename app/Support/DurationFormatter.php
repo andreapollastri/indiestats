@@ -10,14 +10,14 @@ final class DurationFormatter
 
     private const SEC_DAY = 86400;
 
-    /** Mese = 30 giorni. */
+    /** Month = 30 days. */
     private const SEC_MONTH = 2592000;
 
-    /** Anno = 365 giorni. */
+    /** Year = 365 days. */
     private const SEC_YEAR = 31536000;
 
     /**
-     * Formatta secondi in testo leggibile (it): sotto 1 min secondi (eventuale decimale); poi minuti, ore, giorni, mesi (30g), anni (365g), con resti espliciti.
+     * Format seconds as human-readable Italian text: under 1 min as seconds (optional decimal); then minutes, hours, days, months (30d), years (365d), with explicit remainders.
      */
     public static function formatSeconds(?float $seconds): string
     {

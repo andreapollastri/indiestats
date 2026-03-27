@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Seed dati fake
+    | Fake data seeding
     |--------------------------------------------------------------------------
     |
-    | Se true, il seeder FakeDataSeeder popola il database con dati di esempio
-    | (5 siti, ~3000 pageview per sito, click in uscita, eventi, goal).
-    | Imposta SEED_FAKE_DATA=true nel .env per abilitare.
+    | When true, FakeDataSeeder fills the database with sample data
+    | (5 sites, ~3000 page views per site, outbound clicks, events, goals).
+    | Set SEED_FAKE_DATA=true in .env to enable.
     |
     */
 
@@ -17,13 +17,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Conservazione dati (giorni)
+    | Data retention (days)
     |--------------------------------------------------------------------------
     |
-    | Pageview, eventi di tracking e click in uscita con created_at precedente a
-    | oggi meno questo numero di giorni vengono eliminati dal comando
-    | analytics:prune (pianificato ogni notte). Default: 375 (circa un anno + 10
-    | giorni di margine). Imposta ANALYTICS_RETENTION_DAYS nel .env per sovrascrivere.
+    | Page views, tracking events, and outbound clicks with created_at older than
+    | today minus this many days are removed by the analytics:prune command
+    | (scheduled nightly). Default: 375 (about one year + 10 days buffer).
+    | Set ANALYTICS_RETENTION_DAYS in .env to override.
     |
     */
 
@@ -31,16 +31,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Host aggiuntivi per validazione origine (collect API)
+    | Extra hosts for origin validation (collect API)
     |--------------------------------------------------------------------------
     |
-    | Le richieste di raccolta devono provenire da un host nell’elenco
-    | allowed_domains del sito. Qui puoi aggiungere host per sviluppo locale
-    | senza modificarli nel DB.
+    | Collection requests must come from a host in the site's allowed_domains list.
+    | Here you can add hosts for local development without changing the database.
     |
-    | Se TRACKING_EXTRA_ALLOWED_HOSTS non è impostato in .env e APP_ENV=local,
-    | si usano localhost e 127.0.0.1. Imposta la variabile (anche vuota) per
-    | disattivare il default locale.
+    | If TRACKING_EXTRA_ALLOWED_HOSTS is not set in .env and APP_ENV=local,
+    | localhost and 127.0.0.1 are used. Set the variable (even empty) to disable
+    | the local default.
     |
     */
 

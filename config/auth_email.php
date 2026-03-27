@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Intervallo minimo tra email di autenticazione
+    | Minimum interval between authentication emails
     |--------------------------------------------------------------------------
     |
-    | Limite applicato alle richieste HTTP che inviano link di reset password
-    | o reinviano la mail di verifica (per utente o combinazione email+IP).
-    | Il broker dei token di reset password usa lo stesso intervallo in secondi.
+    | Applied to HTTP requests that send password reset links or resend
+    | verification email (per user or email+IP combination).
+    | The password reset token broker uses the same interval in seconds.
     |
     */
 

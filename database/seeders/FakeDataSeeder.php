@@ -24,11 +24,11 @@ class FakeDataSeeder extends Seeder
     private const BATCH_SIZE = 500;
 
     private const GOALS_PER_SITE = [
-        ['label' => 'Registrazioni', 'event_name' => 'signup'],
-        ['label' => 'Acquisti', 'event_name' => 'purchase'],
-        ['label' => 'Iscrizioni newsletter', 'event_name' => 'newsletter_subscribe'],
-        ['label' => 'Download', 'event_name' => 'download'],
-        ['label' => 'Modulo contatto', 'event_name' => 'contact_form'],
+        ['label' => 'Signups', 'event_name' => 'signup'],
+        ['label' => 'Purchases', 'event_name' => 'purchase'],
+        ['label' => 'Newsletter subscriptions', 'event_name' => 'newsletter_subscribe'],
+        ['label' => 'Downloads', 'event_name' => 'download'],
+        ['label' => 'Contact form', 'event_name' => 'contact_form'],
     ];
 
     /**
@@ -42,10 +42,11 @@ class FakeDataSeeder extends Seeder
             return;
         }
 
-        $user = User::firstOrCreate(
-            ['email' => 'base@users.test'],
-            ['name' => 'Base User', 'password' => bcrypt('password')],
-        );
+        $user = User::query()->where('email', 'admin@users.test')->first()
+            ?? User::factory()->admin()->create([
+                'name' => 'Admin User',
+                'email' => 'admin@users.test',
+            ]);
 
         $sites = Site::factory()
             ->count(self::SITES_COUNT)

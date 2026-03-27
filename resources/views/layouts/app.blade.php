@@ -43,6 +43,14 @@
                     <span>{{ __('Siti') }}</span>
                 </a>
             </li>
+            @if (Auth::user()->isAdmin())
+                <li class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('users.index') }}">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>{{ __('users.page_title') }}</span>
+                    </a>
+                </li>
+            @endif
             <li class="nav-item {{ request()->routeIs('preferences.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('preferences.edit') }}">
                     <i class="fas fa-fw fa-sliders"></i>
@@ -111,6 +119,8 @@
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
+
+    @include('partials.datatables-language')
 
     @stack('scripts')
 </body>

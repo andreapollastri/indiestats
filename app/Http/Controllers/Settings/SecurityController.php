@@ -24,7 +24,7 @@ class SecurityController extends Controller
     }
 
     /**
-     * Annulla la configurazione 2FA in corso (QR mostrato ma codice non ancora confermato).
+     * Cancel in-progress 2FA setup (QR shown but code not confirmed yet).
      */
     public function cancelTwoFactorSetup(Request $request, DisableTwoFactorAuthentication $disable): RedirectResponse
     {

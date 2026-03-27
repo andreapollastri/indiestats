@@ -17,6 +17,52 @@ Privacy-friendly, self-hosted web analytics built with [Laravel 13](https://lara
 - **Data export** to Excel (XLSX) via background jobs
 - **Automatic data pruning** with configurable retention period (default: 375 days)
 - **Multi-site support** with domain allowlisting per site
+- **Localized UI**: analytics tables (DataTables) use your account language for labels, pagination, and number formatting
+- **Branded error pages** for HTTP 403, 404, and 429, consistent with the app design
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/is-dashboard.png" alt="IndieStats — dashboard with site overview and sparklines" width="920">
+</p>
+<p align="center"><em>Dashboard — traffic overview per site and date range</em></p>
+
+<p align="center">
+  <img src="screenshots/is-site.png" alt="IndieStats — site analytics summary" width="920">
+</p>
+<p align="center"><em>Site analytics — summary metrics and charts</em></p>
+
+<p align="center">
+  <img src="screenshots/is-site2.png" alt="IndieStats — site analytics detail" width="920">
+</p>
+<p align="center"><em>Site analytics — additional breakdowns</em></p>
+
+<p align="center">
+  <img src="screenshots/is-filters.png" alt="IndieStats — analytics filters" width="920">
+</p>
+<p align="center"><em>Filters — path, source, UTM, device, country, and more</em></p>
+
+<p align="center">
+  <img src="screenshots/is-tables.png" alt="IndieStats — DataTables analytics" width="920">
+</p>
+<p align="center"><em>Detail tables — server-side paginated records with sorting</em></p>
+
+<p align="center">
+  <img src="screenshots/is-users.png" alt="IndieStats — user management" width="920">
+</p>
+<p align="center"><em>Users (admin) — manage accounts and roles</em></p>
+
+<p align="center">
+  <img src="screenshots/is-2fa.png" alt="IndieStats — two-factor authentication" width="920">
+</p>
+<p align="center"><em>Account — password and two-factor authentication</em></p>
+
+## Recent updates
+
+- **Authentication**: email verification is not required to use the app (Fortify’s email-verification flow is disabled). You can still change email in account settings; `MAIL_*` is used for password reset and other mail.
+- **Analytics tables**: DataTables strings are injected from Laravel translations and follow the signed-in user’s locale (same as the rest of the UI).
+- **Error pages**: Custom 403 / 404 / 429 pages use the marketing layout and translated copy.
+- **Demo seeding**: `DatabaseSeeder` creates an **admin** demo user (`admin@users.test` / `password`). Optional fake analytics data is still controlled with `SEED_FAKE_DATA=true` (see below).
 
 ## Requirements
 
@@ -63,7 +109,7 @@ Add `SEED_FAKE_DATA=true` to your `.env`, then:
 php artisan db:seed
 ```
 
-This creates a demo user (`base@users.test`) and populates the database with sample sites, pageviews, outbound clicks, events and goals.
+This creates a demo **admin** user (`admin@users.test`, password `password`) and, when `SEED_FAKE_DATA=true`, populates the database with sample sites, pageviews, outbound clicks, events and goals. If you run `FakeDataSeeder` alone (e.g. in tests), an admin user with that email is created when missing.
 
 ## Configuration
 
@@ -78,7 +124,7 @@ This creates a demo user (`base@users.test`) and populates the database with sam
 | `GEOIP_DATABASE` | Absolute path to MaxMind GeoLite2-Country.mmdb for country stats | _(disabled)_ |
 | `ANALYTICS_RETENTION_DAYS` | Days to keep raw analytics data before pruning | `375` |
 | `TRACKING_EXTRA_ALLOWED_HOSTS` | Comma-separated extra hosts allowed for tracking (useful for local dev) | `localhost,127.0.0.1` (local env) |
-| `MAIL_*` | Mail configuration for email verification and password reset | `log` (local) |
+| `MAIL_*` | Mail configuration (password reset, etc.) | `log` (local) |
 
 ### GeoIP (Country Detection)
 
@@ -221,7 +267,7 @@ Click on any site to access detailed analytics. The detail view has three tabs:
 - UTM source breakdown and search queries
 
 #### Detail Tab
-- Server-side paginated DataTables with full pageview records
+- Server-side paginated DataTables with full pageview records (UI language follows your account locale)
 - Advanced filtering and search
 - Sortable columns
 
@@ -265,7 +311,7 @@ All `/collect/*` POST routes are CSRF-exempt with open CORS to allow cross-origi
 6. Run `php artisan config:cache` and `php artisan route:cache` after deploy
 7. Run `npm run build` on every deploy that changes frontend assets
 8. If behind a proxy/load balancer, configure Laravel's **trusted proxies** so `request()->ip()` returns the real visitor IP (needed for GeoIP)
-9. Configure `MAIL_*` for email verification and password reset
+9. Configure `MAIL_*` for password reset and other mail
 
 ## Deploying with Cipi
 
@@ -330,7 +376,7 @@ npm run build
 
 - **Backend**: Laravel 13, PHP 8.3+
 - **Frontend**: Bootstrap 5, Chart.js, DataTables, Tom Select, Font Awesome
-- **Authentication**: Laravel Fortify (login, registration, email verification, password reset)
+- **Authentication**: Laravel Fortify (login, registration, password reset, optional two-factor authentication; email verification not enforced)
 - **Database**: SQLite (default), MySQL/PostgreSQL supported
 - **Queue**: Database driver (default), Redis supported
 - **GeoIP**: MaxMind GeoLite2 (optional)
@@ -338,4 +384,4 @@ npm run build
 
 ## License
 
-MIT
+IndieStats is released under the [MIT License](LICENSE).

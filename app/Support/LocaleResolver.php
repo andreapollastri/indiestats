@@ -7,12 +7,12 @@ namespace App\Support;
 use Illuminate\Http\Request;
 
 /**
- * Risolve la lingua per utenti non autenticati (header Accept-Language, sessione).
+ * Resolves locale for unauthenticated users (Accept-Language header and session).
  */
 final class LocaleResolver
 {
     /**
-     * Lingua per visitatori: preferisce Accept-Language, altrimenti sessione, fallback en.
+     * Visitor locale: prefers Accept-Language, then session, fallback en.
      */
     public static function resolveForGuest(Request $request): string
     {
@@ -33,7 +33,7 @@ final class LocaleResolver
     }
 
     /**
-     * Analizza Accept-Language e restituisce il primo codice supportato (en, it, es, fr, de), altrimenti en.
+     * Parse Accept-Language and return the first supported code (en, it, es, fr, de), otherwise en.
      */
     public static function fromAcceptLanguage(string $header): string
     {

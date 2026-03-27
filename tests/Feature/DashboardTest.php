@@ -27,8 +27,8 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_ok_with_one_site(): void
     {
-        $user = User::factory()->create();
-        $user->sites()->create([
+        $user = User::factory()->admin()->create();
+        $user->ownedSites()->create([
             'name' => 'Test site',
             'allowed_domains' => 'example.com',
         ]);

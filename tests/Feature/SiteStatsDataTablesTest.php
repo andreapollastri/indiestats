@@ -12,11 +12,11 @@ class SiteStatsDataTablesTest extends TestCase
 
     public function test_events_datatable_returns_valid_json_for_authenticated_owner(): void
     {
-        $user = User::factory()->create([
+        $user = User::factory()->admin()->create([
             'timezone' => 'Europe/Rome',
         ]);
 
-        $site = $user->sites()->create([
+        $site = $user->ownedSites()->create([
             'name' => 'Test site',
             'allowed_domains' => 'example.com',
         ]);
@@ -43,11 +43,11 @@ class SiteStatsDataTablesTest extends TestCase
 
     public function test_utm_campaign_datatable_returns_valid_json_for_authenticated_owner(): void
     {
-        $user = User::factory()->create([
+        $user = User::factory()->admin()->create([
             'timezone' => 'Europe/Rome',
         ]);
 
-        $site = $user->sites()->create([
+        $site = $user->ownedSites()->create([
             'name' => 'Test site',
             'allowed_domains' => 'example.com',
         ]);
@@ -70,5 +70,26 @@ class SiteStatsDataTablesTest extends TestCase
             'recordsFiltered',
             'data',
         ]);
+    }
+
+    public function test_site_page_embeds_datatables_strings_for_user_locale(): void
+    {
+        $user = User::factory()->admin()->create([
+            'locale' => 'it',
+        ]);
+
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="pa-datatables-language"', false);
+        $response->assertSee(__('datatables.empty_table', [], 'it'), false);
     }
 }
