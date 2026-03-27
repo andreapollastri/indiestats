@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class UserManagementTest extends TestCase
@@ -32,5 +33,42 @@ class UserManagementTest extends TestCase
             ->from(route('users.index'))
             ->delete(route('users.destroy', $admin))
             ->assertForbidden();
+    }
+
+    public function test_edit_user_page_hides_site_assignment_when_role_is_admin(): void
+    {
+        Config::set('app.locale', 'en');
+
+        $actingAdmin = User::factory()->admin()->create();
+        $targetAdmin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($actingAdmin)->get(route('users.edit', $targetAdmin));
+
+        $response->assertOk();
+        $response->assertSee(__('users.sites_admin_note'), false);
+        $html = $response->getContent();
+        $this->assertStringContainsString('id="pa-user-sites-assign"', $html);
+        $this->assertMatchesRegularExpression(
+            '/id="pa-user-sites-assign"[^>]*class="[^"]*\bd-none\b/',
+            $html
+        );
+    }
+
+    public function test_edit_user_page_shows_site_assignment_when_role_is_base(): void
+    {
+        Config::set('app.locale', 'en');
+
+        $actingAdmin = User::factory()->admin()->create();
+        $baseUser = User::factory()->base()->create();
+
+        $response = $this->actingAs($actingAdmin)->get(route('users.edit', $baseUser));
+
+        $response->assertOk();
+        $response->assertSee(__('users.sites_assigned'), false);
+        $html = $response->getContent();
+        $this->assertMatchesRegularExpression(
+            '/id="pa-user-sites-admin-note"[^>]*class="[^"]*\bd-none\b/',
+            $html
+        );
     }
 }

@@ -44,27 +44,35 @@
                     </div>
                 </div>
 
-                <h6 class="fw-bold mb-2" style="color: #0f172a;">{{ __('users.sites_assigned') }}</h6>
-                <p class="small text-muted mb-3">{{ __('users.sites_hint') }}</p>
-                <div class="row g-2 mb-4">
-                    @foreach ($sites as $site)
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="site_ids[]"
-                                    value="{{ $site->id }}"
-                                    id="site-{{ $site->id }}"
-                                    @checked(in_array($site->id, old('site_ids', $selectedSiteIds), true))
-                                >
-                                <label class="form-check-label" for="site-{{ $site->id }}">{{ $site->name }}</label>
+                @php
+                    $selectedRole = old('role', $user->role->value);
+                    $isAdminRole = $selectedRole === 'admin';
+                @endphp
+
+                <div id="pa-user-sites-assign" class="{{ $isAdminRole ? 'd-none' : '' }}">
+                    <h6 class="fw-bold mb-2" style="color: #0f172a;">{{ __('users.sites_assigned') }}</h6>
+                    <p class="small text-muted mb-3">{{ __('users.sites_hint') }}</p>
+                    <div class="row g-2 mb-4">
+                        @foreach ($sites as $site)
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="site_ids[]"
+                                        value="{{ $site->id }}"
+                                        id="site-{{ $site->id }}"
+                                        @checked(in_array($site->id, old('site_ids', $selectedSiteIds), true))
+                                    >
+                                    <label class="form-check-label" for="site-{{ $site->id }}">{{ $site->name }}</label>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+                    @error('site_ids')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+                    @error('site_ids.*')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
                 </div>
-                @error('site_ids')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
-                @error('site_ids.*')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+                <p id="pa-user-sites-admin-note" class="small text-muted mb-4 {{ $isAdminRole ? '' : 'd-none' }}">{{ __('users.sites_admin_note') }}</p>
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">{{ __('actions.save') }}</button>
@@ -74,3 +82,5 @@
         </div>
     </div>
 @endsection
+
+@include('partials.user-role-sites-toggle-script')

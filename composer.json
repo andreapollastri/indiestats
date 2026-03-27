@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "cipi/agent": "^1.5",
         "geoip2/geoip2": "^3.3",
         "jenssegers/agent": "^2.6",
         "laravel/fortify": "^1.34",
