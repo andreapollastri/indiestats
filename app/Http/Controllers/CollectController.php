@@ -29,6 +29,7 @@ class CollectController extends Controller
             'utm_term' => 'nullable|string|max:255',
             'utm_content' => 'nullable|string|max:255',
             'search_query' => 'nullable|string|max:512',
+            'user_agent' => 'nullable|string|max:512',
         ]);
 
         $site = Site::query()->where('public_key', $data['site_key'])->first();
@@ -45,7 +46,7 @@ class CollectController extends Controller
         $searchQuery = $data['search_query'] ?? $analysis['search_query'];
 
         $agent = new Agent;
-        $agent->setUserAgent($request->userAgent() ?? '');
+        $agent->setUserAgent($this->userAgentStringForParsing($request, $data));
 
         $browser = $agent->browser() ?: 'unknown';
         $os = $agent->platform() ?: 'unknown';
@@ -194,6 +195,25 @@ class CollectController extends Controller
         ]);
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Prefer an explicit UA from the JSON body (sent by the tracker) so parsing matches the client
+     * even when intermediate proxies alter the User-Agent header.
+     *
+     * @param  array<string, mixed>  $validatedPageview
+     */
+    private function userAgentStringForParsing(Request $request, array $validatedPageview): string
+    {
+        $fromBody = $validatedPageview['user_agent'] ?? null;
+        if (is_string($fromBody)) {
+            $t = trim($fromBody);
+            if ($t !== '') {
+                return $t;
+            }
+        }
+
+        return $request->userAgent() ?? '';
     }
 
     /**

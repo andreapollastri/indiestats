@@ -66,6 +66,12 @@ class SiteAnalyticsExportDataset
         if ($type === 'device') {
             $header[0] = 'Dispositivo';
         }
+        if ($type === 'browser') {
+            $header[0] = 'Browser';
+        }
+        if ($type === 'os') {
+            $header[0] = 'Sistema operativo';
+        }
         if (str_starts_with($type, 'utm_')) {
             $header[0] = $type;
         }
@@ -257,8 +263,14 @@ class SiteAnalyticsExportDataset
                 $q->whereNotNull('search_query')->where('search_query', '!=', '');
             }],
             'source' => ['group' => 'referrer_source', 'json_key' => 'source', 'where' => null],
+            'browser' => ['group' => 'browser', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('browser');
+            }],
             'device' => ['group' => 'device_type', 'json_key' => 'name', 'where' => function (Builder $q): void {
                 $q->whereNotNull('device_type');
+            }],
+            'os' => ['group' => 'os', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('os');
             }],
             'country' => ['group' => 'country_code', 'json_key' => 'code', 'where' => null],
         ];

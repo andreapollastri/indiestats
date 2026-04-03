@@ -18,6 +18,8 @@ final class AnalyticsFilters
         public readonly ?string $device = null,
         public readonly ?string $country = null,
         public readonly ?string $searchQuery = null,
+        public readonly ?string $browser = null,
+        public readonly ?string $os = null,
     ) {}
 
     public static function fromRequest(Request $request): self
@@ -64,6 +66,8 @@ final class AnalyticsFilters
             device: $s('filter_device', 32),
             country: $s('filter_country', 2),
             searchQuery: $s('filter_q', 512),
+            browser: $s('filter_browser', 64),
+            os: $s('filter_os', 64),
         );
     }
 
@@ -106,6 +110,12 @@ final class AnalyticsFilters
         if ($this->searchQuery !== null) {
             $o['filter_q'] = $this->searchQuery;
         }
+        if ($this->browser !== null) {
+            $o['filter_browser'] = $this->browser;
+        }
+        if ($this->os !== null) {
+            $o['filter_os'] = $this->os;
+        }
 
         return $o;
     }
@@ -126,7 +136,9 @@ final class AnalyticsFilters
             || $this->utmContent !== null
             || $this->device !== null
             || $this->country !== null
-            || $this->searchQuery !== null;
+            || $this->searchQuery !== null
+            || $this->browser !== null
+            || $this->os !== null;
     }
 
     public function withoutEvent(): self
@@ -143,6 +155,8 @@ final class AnalyticsFilters
             device: $this->device,
             country: $this->country,
             searchQuery: $this->searchQuery,
+            browser: $this->browser,
+            os: $this->os,
         );
     }
 
@@ -164,6 +178,8 @@ final class AnalyticsFilters
             device: $this->device,
             country: $this->country,
             searchQuery: $this->searchQuery,
+            browser: $this->browser,
+            os: $this->os,
         );
     }
 

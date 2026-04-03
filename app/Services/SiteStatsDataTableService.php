@@ -41,6 +41,9 @@ class SiteStatsDataTableService
             'device' => ['group' => 'device_type', 'json_key' => 'name', 'where' => function (Builder $q): void {
                 $q->whereNotNull('device_type');
             }],
+            'os' => ['group' => 'os', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('os');
+            }],
             'country' => ['group' => 'country_code', 'json_key' => 'code', 'where' => null],
         ];
     }
@@ -85,7 +88,7 @@ class SiteStatsDataTableService
         $displayTimezone = $request->user()?->timezone ?? 'UTC';
 
         return match ($type) {
-            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'country' => $this->pageAggregated(
+            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'os', 'country' => $this->pageAggregated(
                 $siteId,
                 $from,
                 $to,

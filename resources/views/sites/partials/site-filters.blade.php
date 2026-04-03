@@ -132,6 +132,24 @@
                             </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-browser">{{ __('Browser') }}</label>
+                            <select name="filter_browser" id="pa-f-browser" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="browser" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutti') }}</option>
+                                @if ($analytics_filters->browser)
+                                    <option value="{{ $analytics_filters->browser }}" selected>{{ $analytics_filters->browser }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1" for="pa-f-os">{{ __('Sistema operativo') }}</label>
+                            <select name="filter_os" id="pa-f-os" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="os" placeholder="{{ __('Cerca…') }}">
+                                <option value="">{{ __('Tutti') }}</option>
+                                @if ($analytics_filters->os)
+                                    <option value="{{ $analytics_filters->os }}" selected>{{ $analytics_filters->os }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-country">{{ __('Paese') }}</label>
                             <select name="filter_country" id="pa-f-country" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="country" placeholder="{{ __('Cerca…') }}">
                                 <option value="">{{ __('Tutti') }}</option>

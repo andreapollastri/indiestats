@@ -157,6 +157,7 @@ function tableConfig(type, csrf, tableEl) {
                 ],
             };
         case 'browser':
+        case 'os':
         case 'device':
             return {
                 ...base,

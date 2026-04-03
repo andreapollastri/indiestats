@@ -62,6 +62,12 @@ class AnalyticsFilterScope
         if ($filters->searchQuery !== null) {
             $q->where('search_query', $filters->searchQuery);
         }
+        if ($filters->browser !== null) {
+            $q->where('browser', $filters->browser);
+        }
+        if ($filters->os !== null) {
+            $q->where('os', $filters->os);
+        }
     }
 
     /**

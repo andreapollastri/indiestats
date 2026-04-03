@@ -41,6 +41,37 @@ class SiteStatsDataTablesTest extends TestCase
         ]);
     }
 
+    public function test_os_datatable_returns_valid_json_for_authenticated_owner(): void
+    {
+        $user = User::factory()->admin()->create([
+            'timezone' => 'Europe/Rome',
+        ]);
+
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(
+            route('sites.stats.datatables', $site->public_key),
+            [
+                'type' => 'os',
+                'range' => '7d',
+                'draw' => 1,
+                'start' => 0,
+                'length' => 10,
+            ]
+        );
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'draw',
+            'recordsTotal',
+            'recordsFiltered',
+            'data',
+        ]);
+    }
+
     public function test_utm_campaign_datatable_returns_valid_json_for_authenticated_owner(): void
     {
         $user = User::factory()->admin()->create([

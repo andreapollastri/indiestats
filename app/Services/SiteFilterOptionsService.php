@@ -48,6 +48,20 @@ class SiteFilterOptionsService
                 $like,
                 $limit
             ),
+            'browser' => $this->distinctColumn(
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                    ->whereNotNull('browser'),
+                'browser',
+                $like,
+                $limit
+            ),
+            'os' => $this->distinctColumn(
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                    ->whereNotNull('os'),
+                'os',
+                $like,
+                $limit
+            ),
             'country' => $this->countryOptions($siteId, $from, $to, $like, $limit),
             'search' => $this->distinctColumn(
                 PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
@@ -75,6 +89,8 @@ class SiteFilterOptionsService
             'utm_content',
             'event',
             'device',
+            'browser',
+            'os',
             'country',
             'search',
         ];

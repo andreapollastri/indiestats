@@ -59,4 +59,28 @@ class AnalyticsFiltersTest extends TestCase
             'filter_utm_content' => 'e',
         ], $filters->toQueryArray());
     }
+
+    public function test_to_query_array_includes_browser_and_os_filters(): void
+    {
+        $filters = new AnalyticsFilters(
+            browser: 'Chrome',
+            os: 'macOS',
+        );
+
+        $this->assertSame([
+            'filter_browser' => 'Chrome',
+            'filter_os' => 'macOS',
+        ], $filters->toQueryArray());
+    }
+
+    public function test_from_query_array_round_trips_browser_and_os(): void
+    {
+        $filters = AnalyticsFilters::fromQueryArray([
+            'filter_browser' => 'Firefox',
+            'filter_os' => 'Linux',
+        ]);
+
+        $this->assertSame('Firefox', $filters->browser);
+        $this->assertSame('Linux', $filters->os);
+    }
 }

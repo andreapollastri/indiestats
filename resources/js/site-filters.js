@@ -11,6 +11,8 @@ const TYPE_TO_PARAM = {
     utm_content: 'filter_utm_content',
     event: 'filter_event',
     device: 'filter_device',
+    browser: 'filter_browser',
+    os: 'filter_os',
     country: 'filter_country',
 };
 
@@ -25,6 +27,8 @@ const FILTER_PARAM_KEYS = [
     'filter_utm_content',
     'filter_event',
     'filter_device',
+    'filter_browser',
+    'filter_os',
     'filter_country',
     'filter_q',
 ];

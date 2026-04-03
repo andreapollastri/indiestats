@@ -51,7 +51,9 @@ class SiteAnalyticsExcelExportService
             'utm_content',
             'search',
             'source',
+            'browser',
             'device',
+            'os',
             'country',
         ];
 
@@ -64,7 +66,9 @@ class SiteAnalyticsExcelExportService
             'utm_content' => 'UTM content',
             'search' => 'Query ricerca',
             'source' => 'Sorgenti',
+            'browser' => 'Browser',
             'device' => 'Dispositivo',
+            'os' => 'Sistema operativo',
             'country' => 'Paese',
         ];
 

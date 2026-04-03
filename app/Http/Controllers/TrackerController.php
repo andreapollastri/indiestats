@@ -78,6 +78,7 @@ var sq=u.searchParams.get('q')||u.searchParams.get('query')||u.searchParams.get(
 var body={site_key:K,visitor_id:vid(),path:pagePath(),referrer:document.referrer||null};
 Object.assign(body,m);
 if(sq)body.search_query=sq;
+if(typeof navigator!=='undefined'&&navigator.userAgent){body.user_agent=navigator.userAgent;}
 jsonPost('/collect/pageview',body).then(function(r){return r.json();}).then(function(d){
 pvId=d.id;
 if(pendingDuration){
