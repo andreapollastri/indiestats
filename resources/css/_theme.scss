@@ -312,6 +312,12 @@ body {
 @media (min-width: 768px) {
     .sidebar {
         width: 15rem !important;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        max-height: 100vh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
     }
 
     .sidebar .nav-item .nav-link {
