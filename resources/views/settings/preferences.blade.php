@@ -7,6 +7,10 @@
 
     @include('partials.flash')
 
+    @if ($geoipSettings !== null)
+        @include('settings.partials.geoip-settings-section', ['geoipSettings' => $geoipSettings])
+    @endif
+
     <div class="card mb-4">
         <div class="card-header py-3">
             <h6 class="m-0" style="color: #10b981;">{{ __('Impostazioni generali') }}</h6>

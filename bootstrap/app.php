@@ -39,5 +39,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('analytics:prune')->dailyAt('02:00');
+        $schedule->command('geoip:update')->weekly()->mondays()->at('04:15');
     })
     ->create();

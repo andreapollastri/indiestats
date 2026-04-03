@@ -153,5 +153,29 @@
     "Elimina account": "Delete account",
     "Questa azione è irreversibile.": "This action is irreversible.",
     "Inserisci la password per eliminare definitivamente l'account.": "Enter your password to permanently delete your account.",
-    "Password": "Password"
+    "Password": "Password",
+
+    "GeoIP (country)": "GeoIP (country)",
+    "GeoLite2 Country resolves visitor countries from IP addresses. MaxMind offers a free GeoLite2 database; you need a free account and a license key.": "GeoLite2 Country resolves visitor countries from IP addresses. MaxMind offers a free GeoLite2 database; you need a free account and a license key.",
+    "Create a free MaxMind account": "Create a free MaxMind account",
+    "and confirm your email if required.": "and confirm your email if required.",
+    "In the MaxMind portal, open “My License Key” and generate a key for GeoLite2 downloads (you can answer “No” to GeoIP Update if you only use this app).": "In the MaxMind portal, open “My License Key” and generate a key for GeoLite2 downloads (you can answer “No” to GeoIP Update if you only use this app).",
+    "Paste the key below and save, then click “Download or update database”.": "Paste the key below and save, then click “Download or update database”.",
+    "The file is stored on the server; the scheduler also runs :command weekly (with cron configured).": "The file is stored on the server; the scheduler also runs :command weekly (with cron configured).",
+    "GeoIP database file is present.": "GeoIP database file is present.",
+    "Last updated: :datetime": "Last updated: :datetime",
+    "GeoIP database file is not installed yet. Save a license key and download, or set GEOIP_DATABASE to an existing .mmdb path.": "GeoIP database file is not installed yet. Save a license key and download, or set GEOIP_DATABASE to an existing .mmdb path.",
+    "A license key is saved (hidden). Leave the field empty to keep it.": "A license key is saved (hidden). Leave the field empty to keep it.",
+    "MaxMind license key": "MaxMind license key",
+    "Paste your license key": "Paste your license key",
+    "Save key": "Save key",
+    "Remove saved key": "Remove saved key",
+    "Download or update database": "Download or update database",
+    "Optional: set GEOIP_MAXMIND_LICENSE_KEY or GEOIP_DATABASE in .env for deployments without using this form.": "Optional: set GEOIP_MAXMIND_LICENSE_KEY or GEOIP_DATABASE in .env for deployments without using this form.",
+
+    "GeoIP license key removed.": "GeoIP license key removed.",
+    "GeoIP license key saved.": "GeoIP license key saved.",
+    "No GeoIP license key is configured. Save a key above or set GEOIP_MAXMIND_LICENSE_KEY in .env.": "No GeoIP license key is configured. Save a key above or set GEOIP_MAXMIND_LICENSE_KEY in .env.",
+    "GeoIP download failed: :message": "GeoIP download failed: :message",
+    "GeoIP database updated successfully.": "GeoIP database updated successfully."
 }

@@ -121,23 +121,28 @@ This creates a demo **admin** user (`admin@users.test`, password `password`) and
 | `APP_ENV` / `APP_DEBUG` | Set to `production` / `false` in production | `local` / `true` |
 | `DB_CONNECTION` | Database driver (`sqlite`, `mysql`, `pgsql`) | `sqlite` |
 | `QUEUE_CONNECTION` | Queue driver for background jobs (exports) | `database` |
-| `GEOIP_DATABASE` | Absolute path to MaxMind GeoLite2-Country.mmdb for country stats | _(disabled)_ |
+| `GEOIP_DATABASE` | Optional override: absolute path to GeoLite2-Country.mmdb (skips the default storage path) | _(auto)_ |
+| `GEOIP_MAXMIND_LICENSE_KEY` | Optional MaxMind license key for `php artisan geoip:update` / scheduler (overrides the key stored in **Settings** when set) | _(empty)_ |
 | `ANALYTICS_RETENTION_DAYS` | Days to keep raw analytics data before pruning | `375` |
 | `TRACKING_EXTRA_ALLOWED_HOSTS` | Comma-separated extra hosts allowed for tracking (useful for local dev) | `localhost,127.0.0.1` (local env) |
 | `MAIL_*` | Mail configuration (password reset, etc.) | `log` (local) |
 
 ### GeoIP (Country Detection)
 
-To enable country-level statistics:
+Country resolution uses the **GeoLite2-Country** database (`.mmdb`). IndieStats can download and install it automatically.
 
-1. Register at [MaxMind](https://www.maxmind.com/) and download **GeoLite2 Country** (`.mmdb` format)
-2. Set the path in `.env`:
+**Recommended (admin UI):**
 
-```env
-GEOIP_DATABASE=/absolute/path/to/GeoLite2-Country.mmdb
-```
+1. Sign in as an **admin** user and open **Impostazioni** (Settings).
+2. In the **GeoIP (country)** card, follow the short instructions: create a free [MaxMind](https://www.maxmind.com/en/geolite2/signup) account, generate a **license key**, paste it, save, then click **Download or update database**.
+3. The file is stored at `storage/app/geoip/GeoLite2-Country.mmdb`. The scheduler runs `php artisan geoip:update` weekly (Mondays 04:15) if cron is configured.
 
-If not configured, country will be empty in stats — everything else works normally.
+**Optional environment overrides:**
+
+- `GEOIP_MAXMIND_LICENSE_KEY` — use this key for downloads instead of the key saved in Settings (useful in production).
+- `GEOIP_DATABASE` — point to a specific `.mmdb` file on disk (e.g. a manual install). When set and the file is readable, that path is used instead of the auto-download location.
+
+If no database is available, country stats show as unknown — everything else works normally. The download step requires the `tar` command (standard on Linux and macOS).
 
 ## Cron & Scheduled Commands
 
@@ -152,12 +157,16 @@ IndieStats uses Laravel's task scheduler for automated maintenance. Add this sin
 | Command | Schedule | Description |
 |---------|----------|-------------|
 | `analytics:prune` | Daily at 02:00 | Removes pageviews, tracking events, and outbound clicks older than the configured retention period (default: 375 days, ~1 year + 10 days margin) |
+| `geoip:update` | Weekly (Mondays 04:15) | Downloads GeoLite2-Country from MaxMind when a license key is configured (Settings or `GEOIP_MAXMIND_LICENSE_KEY`) |
 
-You can also run it manually at any time:
+You can also run these manually:
 
 ```bash
 php artisan analytics:prune
+php artisan geoip:update
 ```
+
+Optional: `php artisan geoip:update --key=your_license_key` for a one-off download with a specific key.
 
 **Note:** Goal definitions are never pruned — only raw pageview, event and outbound click records are removed.
 
