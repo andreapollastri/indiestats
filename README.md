@@ -314,13 +314,17 @@ All `/collect/*` POST routes are CSRF-exempt with open CORS to allow cross-origi
 
 1. Set `APP_URL` to your final HTTPS URL
 2. Set `APP_ENV=production` and `APP_DEBUG=false`
-3. Set `allowed_domains` for every site to prevent key misuse
-4. Configure the **cron** for `schedule:run` (see Cron section above)
-5. Start a **queue worker** with Supervisor (see Queue Workers section above)
-6. Run `php artisan config:cache` and `php artisan route:cache` after deploy
-7. Run `npm run build` on every deploy that changes frontend assets
+3. **Build frontend assets** so `public/build/manifest.json` exists: from the project root run `npm ci && npm run build` (or copy a pre-built `public/build/` from CI). This is **required on every deploy** for any release that uses `@vite` in Blade — not only when JS/CSS sources change. Deploy scripts that only run `composer install` will **not** create this file and the app will error with `Vite manifest not found`.
+4. Set `allowed_domains` for every site to prevent key misuse
+5. Configure the **cron** for `schedule:run` (see Cron section above)
+6. Start a **queue worker** with Supervisor (see Queue Workers section above)
+7. Run `php artisan config:cache` and `php artisan route:cache` after deploy
 8. If behind a proxy/load balancer, configure Laravel's **trusted proxies** so `request()->ip()` returns the real visitor IP (needed for GeoIP)
 9. Configure `MAIL_*` for password reset and other mail
+
+### Troubleshooting: `Vite manifest not found`
+
+If logs show `ViteManifestNotFoundException` / `Vite manifest not found at .../public/build/manifest.json`, the current release directory has no Vite build output. Fix by running `npm ci && npm run build` **inside that release** (after `composer install`), or by uploading `public/build/` from a machine or CI job that ran the build. Until this file exists, any page that calls `@vite(...)` will return 500 for logged-in users.
 
 ## Deploying with Cipi
 
