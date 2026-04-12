@@ -155,7 +155,7 @@
                 <div class="card mb-4">
                     <div class="card-header py-3">
                         <h6 class="m-0" style="color: #10b981;">{{ __('Andamento') }}</h6>
-                        <small style="color: #94a3b8;">{{ __('Visualizzazioni per giorno') }}</small>
+                        <small style="color: #94a3b8;">{{ $range === 'today' ? __('Visualizzazioni per ora') : __('Visualizzazioni per giorno') }}</small>
                     </div>
                     <div class="card-body">
                         <div class="pa-site-trend-chart-wrap">

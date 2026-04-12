@@ -25,9 +25,11 @@ class DashboardController extends Controller
         $sites = $request->user()->accessibleSitesQuery()
             ->orderBy('name')
             ->get()
-            ->map(function (Site $site) use ($analytics, $from, $to, $filters) {
-                $stats = $analytics->build($site->id, $from, $to, $filters);
-                $byDay = $analytics->fillDaySeries($stats['by_day'], $from, $to);
+            ->map(function (Site $site) use ($analytics, $from, $to, $filters, $range) {
+                $stats = $analytics->build($site->id, $from, $to, $filters, $range);
+                $byDay = $range === 'today'
+                    ? $analytics->fillHourSeries($stats['by_day'], $from, $to)
+                    : $analytics->fillDaySeries($stats['by_day'], $from, $to);
 
                 return [
                     'id' => $site->id,
@@ -41,9 +43,11 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        $chartPayload = collect($sites)->map(function (array $site) {
-            $labels = collect($site['by_day'])->map(function (array $row) {
-                return Carbon::parse($row['date'])->translatedFormat('j M');
+        $chartPayload = collect($sites)->map(function (array $site) use ($range) {
+            $labels = collect($site['by_day'])->map(function (array $row) use ($range) {
+                return $range === 'today'
+                    ? Carbon::parse($row['date'])->translatedFormat('H:i')
+                    : Carbon::parse($row['date'])->translatedFormat('j M');
             })->all();
 
             return [

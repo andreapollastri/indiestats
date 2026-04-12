@@ -79,7 +79,7 @@ class SiteController extends Controller
         $to = $bounds['to'];
 
         $filters = AnalyticsFilters::fromRequest($request);
-        $stats = $analytics->build($site->id, $from, $to, $filters);
+        $stats = $analytics->build($site->id, $from, $to, $filters, $range);
 
         $siteTab = $request->query('tab', 'summary');
         if ($request->query('analytics') === 'detail') {
@@ -95,13 +95,23 @@ class SiteController extends Controller
 
         $filterPresets = $filterOptions->presetsForAll($site->id, $from, $to);
 
-        $byDayFilled = $analytics->fillDaySeries($stats['by_day'], $from, $to);
-        $siteChartPayload = [
-            'labels' => collect($byDayFilled)->map(function (array $row) {
-                return Carbon::parse($row['date'])->translatedFormat('j M');
-            })->all(),
-            'data' => array_column($byDayFilled, 'pageviews'),
-        ];
+        if ($range === 'today') {
+            $seriesFilled = $analytics->fillHourSeries($stats['by_day'], $from, $to);
+            $siteChartPayload = [
+                'labels' => collect($seriesFilled)->map(function (array $row) {
+                    return Carbon::parse($row['date'])->translatedFormat('H:i');
+                })->all(),
+                'data' => array_column($seriesFilled, 'pageviews'),
+            ];
+        } else {
+            $byDayFilled = $analytics->fillDaySeries($stats['by_day'], $from, $to);
+            $siteChartPayload = [
+                'labels' => collect($byDayFilled)->map(function (array $row) {
+                    return Carbon::parse($row['date'])->translatedFormat('j M');
+                })->all(),
+                'data' => array_column($byDayFilled, 'pageviews'),
+            ];
+        }
 
         return view('sites.show', [
             'title' => $site->name.' · '.config('app.name'),
