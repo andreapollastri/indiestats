@@ -18,4 +18,7 @@ return [
     'no_users' => 'Nessun utente.',
     'confirm_delete_user' => 'Eliminare questo utente?',
     'leave_password_blank' => 'Lascia vuoto per non modificare la password.',
+    'last_login' => 'Ultimo accesso',
+    'last_login_never' => 'Mai',
+    'last_login_datetime_pattern' => 'd/m/Y H:i',
 ];

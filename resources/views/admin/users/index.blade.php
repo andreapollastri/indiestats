@@ -19,6 +19,7 @@
                         <th>{{ __('Nome') }}</th>
                         <th>{{ __('Email') }}</th>
                         <th>{{ __('Account') }}</th>
+                        <th>{{ __('users.last_login') }}</th>
                         <th class="text-end">{{ __('Impostazioni') }}</th>
                     </tr>
                 </thead>
@@ -31,6 +32,13 @@
                                 <span class="badge bg-{{ $u->role->value === 'admin' ? 'primary' : 'secondary' }}">
                                     {{ $u->role->value === 'admin' ? __('users.role_admin') : __('users.role_base') }}
                                 </span>
+                            </td>
+                            <td class="align-middle small text-nowrap">
+                                @if ($u->last_login_at)
+                                    {{ $u->last_login_at->timezone($u->timezone ?? config('app.timezone'))->locale(app()->getLocale())->translatedFormat(__('users.last_login_datetime_pattern')) }}
+                                @else
+                                    <span class="text-muted">{{ __('users.last_login_never') }}</span>
+                                @endif
                             </td>
                             <td class="align-middle text-end">
                                 <a href="{{ route('users.edit', $u) }}" class="btn btn-outline-primary btn-sm">{{ __('Impostazioni') }}</a>
@@ -45,7 +53,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-muted small">{{ __('users.no_users') }}</td>
+                            <td colspan="5" class="text-muted small">{{ __('users.no_users') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

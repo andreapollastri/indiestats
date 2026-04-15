@@ -18,4 +18,7 @@ return [
     'no_users' => 'No users yet.',
     'confirm_delete_user' => 'Delete this user?',
     'leave_password_blank' => 'Leave blank to keep the current password.',
+    'last_login' => 'Last login',
+    'last_login_never' => 'Never',
+    'last_login_datetime_pattern' => 'M j, Y g:i A',
 ];

@@ -20,9 +20,13 @@ class UserManagementTest extends TestCase
 
     public function test_admin_can_view_users_index(): void
     {
+        Config::set('app.locale', 'it');
+
         $admin = User::factory()->admin()->create();
 
-        $this->actingAs($admin)->get(route('users.index'))->assertOk();
+        $this->actingAs($admin)->get(route('users.index'))
+            ->assertOk()
+            ->assertSee(__('users.last_login'), false);
     }
 
     public function test_admin_cannot_delete_own_account_via_users_section(): void
