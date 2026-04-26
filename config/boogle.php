@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +58,7 @@ return [
     | These exception classes will never be reported to Boogle.
     */
     'except' => [
-        \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
+        NotFoundHttpException::class,
     ],
 
     /*
@@ -81,10 +83,10 @@ return [
     | Merge extra keys: Boogle::handle($e, "php", ["http" => ["extra" => "value"]]).
     */
     'http' => [
-        'include_query'   => true,
+        'include_query' => true,
         'include_payload' => true,
         'include_cookies' => true,
-        'cookie_values'   => true,
+        'cookie_values' => true,
         'include_session' => false,
         'include_headers' => false,
     ],
