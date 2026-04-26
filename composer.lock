@@ -4,8 +4,65 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b532aeff397b3d7d750c246038d831c",
+    "content-hash": "f5914700d58a8dd7408f79c7f90bcb1e",
     "packages": [
+        {
+            "name": "andreapollastri/boogle-client",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreapollastri/boogle-client.git",
+                "reference": "9c67951185a685219553b106d7c0ef7231f66fb6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreapollastri/boogle-client/zipball/9c67951185a685219553b106d7c0ef7231f66fb6",
+                "reference": "9c67951185a685219553b106d7c0ef7231f66fb6",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Boogle": "Boogle\\Facade"
+                    },
+                    "providers": [
+                        "Boogle\\BoogleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Boogle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Exception reporting for Laravel applications — send errors to your Boogle instance.",
+            "keywords": [
+                "boogle",
+                "error-tracking",
+                "exception",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/andreapollastri/boogle-client/issues",
+                "source": "https://github.com/andreapollastri/boogle-client/tree/1.0.0"
+            },
+            "time": "2026-04-26T17:56:12+00:00"
+        },
         {
             "name": "aws/aws-crt-php",
             "version": "v1.2.7",
