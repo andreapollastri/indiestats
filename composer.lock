@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f5914700d58a8dd7408f79c7f90bcb1e",
+    "content-hash": "25039d5b321d638bf5789d2b5535360f",
     "packages": [
         {
             "name": "andreapollastri/boogle-client",
@@ -62,6 +62,53 @@
                 "source": "https://github.com/andreapollastri/boogle-client/tree/1.0.0"
             },
             "time": "2026-04-26T17:56:12+00:00"
+        },
+        {
+            "name": "andreapollastri/checkpoint",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreapollastri/checkpoint.git",
+                "reference": "ba731b56d0c762a8b2440684324a84efdeb15776"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreapollastri/checkpoint/zipball/ba731b56d0c762a8b2440684324a84efdeb15776",
+                "reference": "ba731b56d0c762a8b2440684324a84efdeb15776",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/support": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
+                "phpunit/phpunit": "^9.5.10 || ^10.0 || ^11.0 || ^12.0 || ^13.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Checkpoint\\CheckpointServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Checkpoint\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Laravel security scanner — checks CVEs, hardcoded secrets, SQL injection, XSS and more via a single Artisan command.",
+            "support": {
+                "issues": "https://github.com/andreapollastri/checkpoint/issues",
+                "source": "https://github.com/andreapollastri/checkpoint/tree/1.0.3"
+            },
+            "time": "2026-04-27T06:11:39+00:00"
         },
         {
             "name": "aws/aws-crt-php",

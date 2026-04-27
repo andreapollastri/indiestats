@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.3",
         "andreapollastri/boogle-client": "^1.0",
+        "andreapollastri/checkpoint": "^1.0",
         "cipi/agent": "^1.5",
         "geoip2/geoip2": "^3.3",
         "jenssegers/agent": "^2.6",
