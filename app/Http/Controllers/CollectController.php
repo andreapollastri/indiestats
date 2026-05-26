@@ -311,7 +311,7 @@ class CollectController extends Controller
 
     private function gifResponse(): Response
     {
-        $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        $gif = file_get_contents(resource_path('tracking/pixel.gif'));
 
         return response($gif, 200, [
             'Content-Type' => 'image/gif',

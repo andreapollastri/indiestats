@@ -127,7 +127,7 @@ class AnalyticsQueryService
     private function pageViewsByDayBuckets(Builder $pvBase, string $dateExpr): array
     {
         return (clone $pvBase)
-            ->selectRaw("{$dateExpr} as d")
+            ->selectRaw($dateExpr.' as d')
             ->selectRaw('COUNT(*) as pageviews')
             ->selectRaw('COUNT(DISTINCT visitor_id) as visitors')
             ->groupBy(DB::raw($dateExpr))
