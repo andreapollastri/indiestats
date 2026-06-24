@@ -8,7 +8,7 @@
     </div>
     <div class="card-body">
         <p class="small mb-3" style="color: #64748b;">
-            {{ __('DB-IP ASN Lite resolves the visitor Autonomous System (ISP / hosting provider) from IP addresses. The database is free under Creative Commons Attribution; a link to DB-IP is shown in the footer when ASN data is used.') }}
+            {{ __('DB-IP ASN Lite resolves the visitor Autonomous System (ISP / hosting provider) from IP addresses. The database is free under Creative Commons Attribution.') }}
         </p>
         <ol class="small mb-4 ps-3" style="color: #64748b;">
             <li class="mb-1">
