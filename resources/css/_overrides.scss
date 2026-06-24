@@ -524,6 +524,34 @@ pre {
     color: #94a3b8 !important;
 }
 
+.pa-password-confirm-modal {
+    .modal-content {
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        justify-content: center;
+        padding-top: 1.5rem;
+    }
+
+    &__icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+
+    &__title {
+        color: #0f172a;
+    }
+}
+
 // KPI stat cards (summary tab)
 .pa-stat-card {
     border: 1px solid #e2e8f0;

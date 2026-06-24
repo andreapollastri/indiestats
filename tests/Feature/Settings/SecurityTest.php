@@ -46,7 +46,11 @@ class SecurityTest extends TestCase
         $response = $this->actingAs($user)
             ->get(route('account.edit'));
 
-        $response->assertRedirect(route('password.confirm'));
+        $response->assertOk();
+        $response->assertViewIs('settings.account');
+        $response->assertViewHas('requiresPasswordConfirmation', true);
+        $response->assertSee('id="pa-two-factor-password-confirm-form"', false);
+        $response->assertSee(__('Conferma password'), false);
     }
 
     public function test_security_page_does_not_require_password_confirmation_when_disabled()

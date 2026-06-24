@@ -65,9 +65,15 @@ class FortifyServiceProvider extends ServiceProvider
             'title' => __('guest.two_factor.document_title', ['app' => config('app.name')]),
         ]));
 
-        Fortify::confirmPasswordView(fn () => view('auth.confirm-password', [
-            'title' => __('guest.confirm_password.document_title', ['app' => config('app.name')]),
-        ]));
+        Fortify::confirmPasswordView(function (Request $request) {
+            if ($request->user()) {
+                return redirect()->route('account.edit', ['confirm_password' => 1]);
+            }
+
+            return view('auth.confirm-password', [
+                'title' => __('guest.confirm_password.document_title', ['app' => config('app.name')]),
+            ]);
+        });
     }
 
     /**

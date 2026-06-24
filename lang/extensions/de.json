@@ -84,6 +84,10 @@
     "Più visite": "Mehr Besuche",
     "Nessun dato geografico nel periodo": "Keine geografischen Daten im Zeitraum",
 
+    "Conferma la password per attivare o gestire il 2FA.": "Bestätige dein Passwort, um 2FA zu aktivieren oder zu verwalten.",
+    "Per gestire il 2FA, inserisci la password del tuo account.": "Gib dein Kontopasswort ein, um 2FA zu verwalten.",
+    "Conferma password": "Passwort bestätigen",
+
     "Sommario": "Zusammenfassung",
     "Dettaglio": "Detail",
     "Eventi": "Events",

@@ -14,8 +14,10 @@
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">{{ __('Nuova password') }}</label>
-                    <input id="password" type="password" name="password" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">
-                    @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <input id="password" type="password" name="password" class="form-control @if (! ($requiresPasswordConfirmation ?? false)) @error('password') is-invalid @enderror @endif" required autocomplete="new-password">
+                    @if (! ($requiresPasswordConfirmation ?? false))
+                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    @endif
                 </div>
                 <div class="mb-3">
                     <label for="password_confirmation" class="form-label">{{ __('Conferma nuova password') }}</label>
@@ -33,7 +35,26 @@
             <h6 class="m-0" style="color: #10b981;">{{ __('Autenticazione a due fattori') }}</h6>
         </div>
         <div class="card-body">
-            @if (! $twoFactorEnabled)
+            @if ($requiresPasswordConfirmation ?? false)
+                <p class="small mb-3 pa-text-muted-soft">{{ __('Per gestire il 2FA, inserisci la password del tuo account.') }}</p>
+                <form method="POST" action="{{ route('password.confirm.store') }}" id="pa-two-factor-password-confirm-form">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="pa_two_factor_confirm_password" class="form-label">{{ __('Password attuale') }}</label>
+                        <input
+                            id="pa_two_factor_confirm_password"
+                            type="password"
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                            class="form-control @error('password') is-invalid @enderror"
+                            placeholder="{{ __('guest.confirm_password.password_placeholder') }}"
+                        >
+                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ __('Conferma password') }}</button>
+                </form>
+            @elseif (! $twoFactorEnabled)
                 <p class="small" style="color: #94a3b8;">{{ __("Attiva 2FA per richiedere un codice dall'app di autenticazione al login.") }}</p>
                 @if ($pendingTwoFactorConfirm ?? false)
                     <div id="pa-two-factor-qr" class="mb-3 p-3 rounded text-center" style="background: #f8fafc; min-height: 200px;" data-qr-url="{{ route('two-factor.qr-code') }}"></div>

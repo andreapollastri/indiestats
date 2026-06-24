@@ -5,7 +5,6 @@ use App\Http\Controllers\Settings\GeoIpSettingsController;
 use App\Http\Controllers\Settings\PreferencesController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
-use App\Http\Middleware\RequirePasswordForTwoFactorAccountPage;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -22,7 +21,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('settings/account', [AccountController::class, 'edit'])
-        ->middleware(RequirePasswordForTwoFactorAccountPage::class)
         ->name('account.edit');
 
     Route::redirect('settings/profile', '/settings/account');
