@@ -309,6 +309,8 @@
             </x-stats-section>
 
             <x-stats-section id="geo" :title="__('Geografia')" :description="__('Distribuzione per paese')">
+                @include('sites.partials.country-map', ['site' => $site, 'range' => $range])
+
                 <div class="card mb-0 pa-stats-table-card">
                     <div class="card-header py-3">
                         <h6 class="m-0">{{ __('Paese') }}</h6>

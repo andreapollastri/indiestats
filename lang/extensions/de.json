@@ -78,6 +78,12 @@
     ":active attivi · :pageviews view (5 min)": ":active aktiv · :pageviews Aufrufe (5 Min.)",
     "Nessun visitatore attivo": "Keine aktiven Besucher",
 
+    "Geografia": "Geografie",
+    "Distribuzione per paese": "Verteilung nach Land",
+    "Meno visite": "Weniger Besuche",
+    "Più visite": "Mehr Besuche",
+    "Nessun dato geografico nel periodo": "Keine geografischen Daten im Zeitraum",
+
     "Sommario": "Zusammenfassung",
     "Dettaglio": "Detail",
     "Eventi": "Events",

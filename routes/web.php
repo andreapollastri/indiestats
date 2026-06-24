@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardRealtimeStatsController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteCountryMapController;
 use App\Http\Controllers\SiteExportController;
 use App\Http\Controllers\SiteFilterOptionsController;
 use App\Http\Controllers\SiteRealtimeStatsController;
@@ -47,6 +48,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show')->whereUuid('site');
     Route::match(['get', 'post'], 'sites/{site}/stats/datatables', SiteStatsDataTablesController::class)->name('sites.stats.datatables')->whereUuid('site');
+    Route::get('sites/{site}/stats/country-map', SiteCountryMapController::class)
+        ->name('sites.stats.country-map')
+        ->whereUuid('site');
     Route::get('sites/{site}/stats/realtime', SiteRealtimeStatsController::class)
         ->middleware('throttle:120,1')
         ->name('sites.stats.realtime')
