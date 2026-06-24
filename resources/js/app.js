@@ -1,6 +1,7 @@
 import jQuery from "jquery";
 import * as bootstrap from "bootstrap";
 import { Chart, registerables } from "chart.js";
+import "./site-realtime.js";
 import "./site-stats-datatables.js";
 import "./sites-index-datatable.js";
 import "./site-stats-ui.js";

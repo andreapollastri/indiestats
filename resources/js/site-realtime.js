@@ -1,0 +1,282 @@
+function readRealtimeConfig() {
+    const el = document.getElementById('pa-realtime-config');
+    if (!el) {
+        return null;
+    }
+    try {
+        const parsed = JSON.parse(el.textContent.trim());
+        if (parsed && typeof parsed === 'object') {
+            return parsed;
+        }
+    } catch {
+        // ignore
+    }
+    return null;
+}
+
+function escapeHtml(s) {
+    if (s === null || s === undefined) {
+        return '';
+    }
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function formatRelativeTime(seconds, labels) {
+    if (seconds < 15) {
+        return labels.justNow || 'Now';
+    }
+    if (seconds < 60) {
+        return (labels.secondsAgo || ':count s').replace(':count', String(seconds));
+    }
+    const minutes = Math.floor(seconds / 60);
+    return (labels.minutesAgo || ':count min').replace(':count', String(minutes));
+}
+
+function formatUpdatedAt(iso, labels) {
+    if (!iso) {
+        return labels.loading || '';
+    }
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+        return labels.loading || '';
+    }
+    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return (labels.updated || 'Updated :time').replace(':time', time);
+}
+
+function renderRecentList(items, labels) {
+    const list = document.getElementById('pa-realtime-recent');
+    if (!list) {
+        return;
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+        list.innerHTML =
+            '<li class="small pa-text-muted-soft">' + escapeHtml(labels.noActivity || 'No recent activity') + '</li>';
+        return;
+    }
+    list.innerHTML = items
+        .map(function (item) {
+            const country = item.country_code
+                ? '<span class="pa-realtime-recent__country font-monospace">' +
+                  escapeHtml(item.country_code) +
+                  '</span>'
+                : '';
+            return (
+                '<li class="pa-realtime-recent__item">' +
+                '<span class="pa-realtime-recent__path text-truncate font-monospace" title="' +
+                escapeHtml(item.path || '/') +
+                '">' +
+                escapeHtml(item.path || '/') +
+                '</span>' +
+                country +
+                '<span class="pa-realtime-recent__time font-monospace">' +
+                escapeHtml(formatRelativeTime(item.seconds_ago || 0, labels)) +
+                '</span>' +
+                '</li>'
+            );
+        })
+        .join('');
+}
+
+function initRealtimeChart(canvas, labels) {
+    const primary = 'rgb(16, 185, 129)';
+    const primaryFill = 'rgba(16, 185, 129, 0.08)';
+    const secondary = 'rgb(6, 182, 212)';
+
+    return new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: labels.pageviews || 'Pageviews',
+                    data: [],
+                    borderColor: primary,
+                    backgroundColor: primaryFill,
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 3,
+                    fill: true,
+                    tension: 0.35,
+                },
+                {
+                    label: labels.visitors || 'Visitors',
+                    data: [],
+                    borderColor: secondary,
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 3,
+                    fill: false,
+                    tension: 0.35,
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    intersect: false,
+                    mode: 'index',
+                    backgroundColor: '#0f172a',
+                    titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                    bodyFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                    padding: 8,
+                    cornerRadius: 6,
+                },
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        maxRotation: 0,
+                        maxTicksLimit: 8,
+                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                        color: '#94a3b8',
+                    },
+                    border: { display: false },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        font: { size: 9, family: "'JetBrains Mono', monospace" },
+                        color: '#94a3b8',
+                    },
+                    grid: { color: '#f1f5f9' },
+                    border: { display: false },
+                },
+            },
+        },
+    });
+}
+
+function updateRealtimeChart(chart, series) {
+    if (!chart || !Array.isArray(series)) {
+        return;
+    }
+    chart.data.labels = series.map(function (row) {
+        return row.label;
+    });
+    chart.data.datasets[0].data = series.map(function (row) {
+        return row.pageviews;
+    });
+    chart.data.datasets[1].data = series.map(function (row) {
+        return row.visitors;
+    });
+    chart.resize();
+    chart.update('none');
+}
+
+function applyRealtimePayload(payload, chart, labels) {
+    const activeEl = document.getElementById('pa-realtime-active');
+    const pageviewsEl = document.getElementById('pa-realtime-pageviews-5m');
+    const updatedEl = document.getElementById('pa-realtime-updated');
+
+    if (activeEl) {
+        activeEl.textContent = String(payload.active_visitors ?? 0);
+    }
+    if (pageviewsEl) {
+        pageviewsEl.textContent = String(payload.pageviews_last_5m ?? 0);
+    }
+    if (updatedEl) {
+        updatedEl.textContent = formatUpdatedAt(payload.generated_at, labels);
+    }
+
+    updateRealtimeChart(chart, payload.series);
+    renderRecentList(payload.recent, labels);
+}
+
+function init() {
+    const panel = document.getElementById('pa-realtime-panel');
+    const config = readRealtimeConfig();
+    const canvas = document.getElementById('pa-realtime-chart');
+    if (!panel || !config || !config.url || !canvas) {
+        return;
+    }
+
+    const labels = config.labels || {};
+    let chart = null;
+    let timer = null;
+    let inFlight = false;
+
+    function ensureChart() {
+        if (chart || typeof Chart === 'undefined') {
+            return chart;
+        }
+        chart = initRealtimeChart(canvas, labels);
+        return chart;
+    }
+
+    function fetchRealtime() {
+        if (inFlight || document.hidden) {
+            return;
+        }
+        inFlight = true;
+        fetch(config.url, {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('realtime fetch failed');
+                }
+                return response.json();
+            })
+            .then(function (payload) {
+                ensureChart();
+                applyRealtimePayload(payload, chart, labels);
+            })
+            .catch(function () {
+                const updatedEl = document.getElementById('pa-realtime-updated');
+                if (updatedEl) {
+                    updatedEl.textContent = labels.loading || 'Loading…';
+                }
+            })
+            .finally(function () {
+                inFlight = false;
+            });
+    }
+
+    function startPolling() {
+        if (timer) {
+            clearInterval(timer);
+        }
+        fetchRealtime();
+        timer = setInterval(fetchRealtime, config.pollMs || 15000);
+    }
+
+    if (typeof Chart === 'undefined') {
+        const waitForChart = function () {
+            if (typeof Chart === 'undefined') {
+                requestAnimationFrame(waitForChart);
+                return;
+            }
+            startPolling();
+        };
+        waitForChart();
+    } else {
+        startPolling();
+    }
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            fetchRealtime();
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

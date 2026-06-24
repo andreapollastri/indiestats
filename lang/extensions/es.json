@@ -63,6 +63,18 @@
     "Siti a cui hai accesso. Contatta un amministratore per nuove assegnazioni.": "Sitios a los que tienes acceso. Contacta con un administrador para nuevas asignaciones.",
     "Nessun sito assegnato al tuo account.": "No hay sitios asignados a tu cuenta.",
 
+    "In tempo reale": "En tiempo real",
+    "Visitatori attivi ora": "Visitantes activos ahora",
+    "Ultimi :minutes min": "Últimos :minutes min",
+    "Ultimi :minutes minuti": "Últimos :minutes minutos",
+    "Ultima attività": "Actividad reciente",
+    "Adesso": "Ahora mismo",
+    ":count s fa": "hace :count s",
+    ":count min fa": "hace :count min",
+    "Nessuna attività recente": "Sin actividad reciente",
+    "Aggiornato :time": "Actualizado :time",
+    "Caricamento…": "Cargando…",
+
     "Sommario": "Resumen",
     "Dettaglio": "Detalle",
     "Eventi": "Eventos",

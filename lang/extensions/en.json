@@ -63,6 +63,18 @@
     "Creato": "Created",
     "Azioni": "Actions",
 
+    "In tempo reale": "Real-time",
+    "Visitatori attivi ora": "Active visitors now",
+    "Ultimi :minutes min": "Last :minutes min",
+    "Ultimi :minutes minuti": "Last :minutes minutes",
+    "Ultima attività": "Latest activity",
+    "Adesso": "Just now",
+    ":count s fa": ":count s ago",
+    ":count min fa": ":count min ago",
+    "Nessuna attività recente": "No recent activity",
+    "Aggiornato :time": "Updated :time",
+    "Caricamento…": "Loading…",
+
     "Sommario": "Summary",
     "Dettaglio": "Detail",
     "Eventi": "Events",

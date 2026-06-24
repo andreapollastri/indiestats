@@ -7,6 +7,7 @@ use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteExportController;
 use App\Http\Controllers\SiteFilterOptionsController;
+use App\Http\Controllers\SiteRealtimeStatsController;
 use App\Http\Controllers\SiteStatsDataTablesController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Middleware\HandleTrackingCors;
@@ -42,6 +43,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show')->whereUuid('site');
     Route::match(['get', 'post'], 'sites/{site}/stats/datatables', SiteStatsDataTablesController::class)->name('sites.stats.datatables')->whereUuid('site');
+    Route::get('sites/{site}/stats/realtime', SiteRealtimeStatsController::class)
+        ->middleware('throttle:120,1')
+        ->name('sites.stats.realtime')
+        ->whereUuid('site');
     Route::get('sites/{site}/stats/filter-options', SiteFilterOptionsController::class)->name('sites.stats.filter-options')->whereUuid('site');
     Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy')->whereUuid('site');
     Route::post('sites/{site}/goals', [GoalController::class, 'store'])->name('sites.goals.store')->whereUuid('site');

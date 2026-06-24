@@ -63,6 +63,18 @@
     "Siti a cui hai accesso. Contatta un amministratore per nuove assegnazioni.": "Siti a cui hai accesso. Contatta un amministratore per nuove assegnazioni.",
     "Nessun sito assegnato al tuo account.": "Nessun sito assegnato al tuo account.",
 
+    "In tempo reale": "In tempo reale",
+    "Visitatori attivi ora": "Visitatori attivi ora",
+    "Ultimi :minutes min": "Ultimi :minutes min",
+    "Ultimi :minutes minuti": "Ultimi :minutes minuti",
+    "Ultima attività": "Ultima attività",
+    "Adesso": "Adesso",
+    ":count s fa": ":count s fa",
+    ":count min fa": ":count min fa",
+    "Nessuna attività recente": "Nessuna attività recente",
+    "Aggiornato :time": "Aggiornato :time",
+    "Caricamento…": "Caricamento…",
+
     "Sommario": "Sommario",
     "Dettaglio": "Dettaglio",
     "Eventi": "Eventi",

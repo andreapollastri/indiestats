@@ -135,6 +135,8 @@
             aria-labelledby="site-tab-summary"
             tabindex="0"
         >
+            @include('sites.partials.realtime-stats', ['site' => $site])
+
             <div class="row g-3 mb-3">
                 @foreach ([
                     ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors']), 'icon' => 'fa-users', 'accent' => 'emerald'],

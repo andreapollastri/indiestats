@@ -63,6 +63,18 @@
     "Siti a cui hai accesso. Contatta un amministratore per nuove assegnazioni.": "Websites, auf die du Zugriff hast. Wende dich an einen Administrator für neue Zuweisungen.",
     "Nessun sito assegnato al tuo account.": "Deinem Konto sind keine Websites zugewiesen.",
 
+    "In tempo reale": "Echtzeit",
+    "Visitatori attivi ora": "Aktive Besucher jetzt",
+    "Ultimi :minutes min": "Letzte :minutes Min.",
+    "Ultimi :minutes minuti": "Letzte :minutes Minuten",
+    "Ultima attività": "Letzte Aktivität",
+    "Adesso": "Gerade eben",
+    ":count s fa": "vor :count s",
+    ":count min fa": "vor :count Min.",
+    "Nessuna attività recente": "Keine recente Aktivität",
+    "Aggiornato :time": "Aktualisiert :time",
+    "Caricamento…": "Laden…",
+
     "Sommario": "Zusammenfassung",
     "Dettaglio": "Detail",
     "Eventi": "Events",
