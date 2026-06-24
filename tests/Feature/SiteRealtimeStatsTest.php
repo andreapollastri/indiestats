@@ -75,7 +75,7 @@ class SiteRealtimeStatsTest extends TestCase
                 ['minute', 'label', 'pageviews', 'visitors'],
             ],
             'recent' => [
-                ['path', 'country_code', 'seconds_ago'],
+                ['path', 'country_code', 'seconds_ago', 'time_ago'],
             ],
         ]);
     }
@@ -94,5 +94,27 @@ class SiteRealtimeStatsTest extends TestCase
         $response->assertSee('id="pa-realtime-panel"', false);
         $response->assertSee('id="pa-realtime-config"', false);
         $response->assertSee('Real-time', false);
+    }
+
+    public function test_recent_activity_uses_scaled_time_units(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it', 'timezone' => 'UTC']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Live site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-old',
+            'path' => '/archive',
+            'created_at' => now()->subHours(3),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.realtime', $site->public_key));
+
+        $response->assertOk();
+        $response->assertJsonPath('recent.0.time_ago', '3 h fa');
+        $response->assertJsonPath('recent.0.path', '/archive');
     }
 }

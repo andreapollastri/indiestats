@@ -456,12 +456,12 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.scss": {
-    "file": "assets/app-D9IItAxQ.css",
+    "file": "assets/app-Q-gs59aR.css",
     "src": "resources/css/app.scss",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CMBU21Ux.js",
+    "file": "assets/app-CQOUJYQS.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

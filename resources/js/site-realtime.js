@@ -33,7 +33,23 @@ function formatRelativeTime(seconds, labels) {
         return (labels.secondsAgo || ':count s').replace(':count', String(seconds));
     }
     const minutes = Math.floor(seconds / 60);
-    return (labels.minutesAgo || ':count min').replace(':count', String(minutes));
+    if (minutes < 60) {
+        return (labels.minutesAgo || ':count min').replace(':count', String(minutes));
+    }
+    const hours = Math.floor(seconds / 3600);
+    if (hours < 24) {
+        return (labels.hoursAgo || ':count h').replace(':count', String(hours));
+    }
+    const days = Math.floor(seconds / 86400);
+    if (days < 30) {
+        return (labels.daysAgo || ':count gg').replace(':count', String(days));
+    }
+    const months = Math.floor(seconds / (30 * 86400));
+    if (months < 12) {
+        return (labels.monthsAgo || ':count mesi').replace(':count', String(months));
+    }
+    const years = Math.floor(seconds / (12 * 30 * 86400));
+    return (labels.yearsAgo || ':count anni').replace(':count', String(years));
 }
 
 function formatUpdatedAt(iso, labels) {
@@ -78,7 +94,7 @@ function renderRecentList(items, labels) {
                 '</span>' +
                 country +
                 '<span class="pa-realtime-recent__time font-monospace">' +
-                escapeHtml(formatRelativeTime(item.seconds_ago || 0, labels)) +
+                escapeHtml(item.time_ago || formatRelativeTime(item.seconds_ago || 0, labels)) +
                 '</span>' +
                 '</li>'
             );

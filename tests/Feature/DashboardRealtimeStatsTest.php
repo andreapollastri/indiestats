@@ -54,7 +54,7 @@ class DashboardRealtimeStatsTest extends TestCase
             'pageviews_last_5m',
             'series',
             'recent' => [
-                ['site_name', 'path', 'country_code', 'seconds_ago'],
+                ['site_name', 'path', 'country_code', 'seconds_ago', 'time_ago'],
             ],
             'sites' => [
                 ['id', 'active_visitors', 'pageviews_last_5m'],

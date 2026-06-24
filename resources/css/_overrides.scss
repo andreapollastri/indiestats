@@ -390,8 +390,9 @@ table.table.pa-site-dt thead th.font-monospace {
 #accordionSidebar .nav-item form .nav-link {
     color: rgba(255, 255, 255, 0.7);
     padding: 0.6rem 1rem;
-    width: calc(100% - 1rem);
-    margin: 0.1rem 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0.1rem 0;
     line-height: inherit;
     font-size: 0.8rem;
     font-weight: 400;
@@ -414,9 +415,9 @@ table.table.pa-site-dt thead th.font-monospace {
     #accordionSidebar.sidebar.toggled .nav-item form .nav-link {
         text-align: center;
         padding: 0.6rem 0.5rem;
-        width: calc(4.5rem - 1rem);
-        margin-left: auto;
-        margin-right: auto;
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     #accordionSidebar.sidebar.toggled .nav-item form .nav-link span {

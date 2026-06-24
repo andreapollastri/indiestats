@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PageView;
+use App\Support\RelativeTimeAgoFormatter;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -20,7 +21,7 @@ class RealtimeAnalyticsService
      *   active_visitors: int,
      *   pageviews_last_5m: int,
      *   series: list<array{minute: string, label: string, pageviews: int, visitors: int}>,
-     *   recent: list<array{site_name: string, path: string, country_code: ?string, seconds_ago: int}>,
+     *   recent: list<array{site_name: string, path: string, country_code: ?string, seconds_ago: int, time_ago: string}>,
      *   sites: list<array{id: int, active_visitors: int, pageviews_last_5m: int}>,
      * }
      */
@@ -82,12 +83,14 @@ class RealtimeAnalyticsService
             ->get(['site_id', 'path', 'country_code', 'created_at'])
             ->map(function (PageView $pageView) use ($now): array {
                 $createdAt = Carbon::parse($pageView->created_at);
+                $secondsAgo = max(0, (int) $createdAt->diffInSeconds($now, absolute: true));
 
                 return [
                     'site_name' => $pageView->site?->name ?? '',
                     'path' => $pageView->path,
                     'country_code' => $pageView->country_code,
-                    'seconds_ago' => max(0, (int) $createdAt->diffInSeconds($now, absolute: true)),
+                    'seconds_ago' => $secondsAgo,
+                    'time_ago' => RelativeTimeAgoFormatter::format($secondsAgo),
                 ];
             })
             ->values()
@@ -122,7 +125,7 @@ class RealtimeAnalyticsService
      *   active_visitors: int,
      *   pageviews_last_5m: int,
      *   series: list<array{minute: string, label: string, pageviews: int, visitors: int}>,
-     *   recent: list<array{path: string, country_code: ?string, seconds_ago: int}>,
+     *   recent: list<array{path: string, country_code: ?string, seconds_ago: int, time_ago: string}>,
      * }
      */
     public function build(int $siteId, string $timezone): array
@@ -159,11 +162,13 @@ class RealtimeAnalyticsService
             ->get(['path', 'country_code', 'created_at'])
             ->map(function (PageView $pageView) use ($now): array {
                 $createdAt = Carbon::parse($pageView->created_at);
+                $secondsAgo = max(0, (int) $createdAt->diffInSeconds($now, absolute: true));
 
                 return [
                     'path' => $pageView->path,
                     'country_code' => $pageView->country_code,
-                    'seconds_ago' => max(0, (int) $createdAt->diffInSeconds($now, absolute: true)),
+                    'seconds_ago' => $secondsAgo,
+                    'time_ago' => RelativeTimeAgoFormatter::format($secondsAgo),
                 ];
             })
             ->values()

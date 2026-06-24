@@ -67,7 +67,7 @@
             <li class="nav-item">
                 <form method="POST" action="{{ route('logout') }}" class="mb-0 w-100">
                     @csrf
-                    <button type="submit" class="nav-link border-0 bg-transparent text-white w-100 shadow-none rounded-0">
+                    <button type="submit" class="nav-link border-0 bg-transparent text-white shadow-none rounded-0">
                         <i class="fas fa-fw fa-right-from-bracket"></i>
                         <span>{{ __('Esci') }}</span>
                     </button>

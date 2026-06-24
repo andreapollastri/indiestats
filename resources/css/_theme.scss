@@ -53,9 +53,11 @@ body {
 // Sidebar
 .sidebar {
     width: 15rem;
+    max-width: 15rem;
     min-height: 100vh;
     flex-shrink: 0;
     background: $nd-bg-dark;
+    overflow-x: hidden;
 }
 
 .bg-gradient-primary {
@@ -65,6 +67,10 @@ body {
 #accordionSidebar.navbar-nav {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
 }
 
 .sidebar-brand {
@@ -81,6 +87,8 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
 
     &:hover,
     &:focus-visible {
@@ -95,6 +103,10 @@ body {
 
 .sidebar-brand-text {
     display: inline;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sidebar-heading {
@@ -121,6 +133,9 @@ body {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: left;
+    min-width: 0;
+    max-width: calc(100% - 1.5rem);
+    overflow: hidden;
 }
 
 .sidebar-user-label {
@@ -161,24 +176,36 @@ body {
 
 .sidebar .nav-item {
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0 0.5rem;
 }
 
 .sidebar .nav-item .nav-link {
     padding: 0.6rem 1rem;
     width: 100%;
+    max-width: 100%;
     color: $nd-text-light;
     font-size: 0.8rem;
     font-weight: 400;
     border-radius: 0.375rem;
-    margin: 0.1rem 0.5rem;
-    width: calc(100% - 1rem);
+    margin: 0.1rem 0;
     transition: all 0.15s ease;
+    overflow: hidden;
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
     i {
         width: 1.25rem;
         text-align: center;
         font-size: 0.8rem;
         opacity: 0.7;
+        flex-shrink: 0;
     }
 }
 
@@ -205,6 +232,7 @@ body {
 .sidebar-divider {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     margin: 0.5rem 1rem;
+    max-width: calc(100% - 2rem);
 }
 
 .sidebar-dark .sidebar-divider {
@@ -312,10 +340,12 @@ body {
 @media (min-width: 768px) {
     .sidebar {
         width: 15rem !important;
+        max-width: 15rem !important;
         position: sticky;
         top: 0;
         align-self: flex-start;
         max-height: 100vh;
+        overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
     }
@@ -326,8 +356,10 @@ body {
     }
 
     .sidebar.toggled {
-        overflow: visible;
+        overflow-x: hidden;
+        overflow-y: auto;
         width: 4.5rem !important;
+        max-width: 4.5rem !important;
     }
 
     .sidebar.toggled .sidebar-brand .sidebar-brand-text {
@@ -345,8 +377,7 @@ body {
     .sidebar.toggled .nav-item .nav-link {
         text-align: center;
         padding: 0.6rem 0.5rem;
-        width: calc(4.5rem - 1rem);
-        margin: 0.1rem 0.5rem;
+        width: 100%;
     }
 
     .sidebar.toggled .nav-item .nav-link span {
@@ -368,9 +399,11 @@ body {
         left: 0;
         z-index: 1040;
         width: min(16rem, 85vw);
+        max-width: min(16rem, 85vw);
         min-height: 100vh;
         margin: 0;
         padding-bottom: 1rem;
+        overflow-x: hidden;
         overflow-y: auto;
         transform: translateX(-100%);
         transition: transform 0.2s ease;
@@ -438,6 +471,7 @@ body {
 @media (min-width: 768px) {
     body.sidebar-toggled .sidebar {
         width: 4.5rem !important;
+        max-width: 4.5rem !important;
     }
 
     body.sidebar-toggled .sidebar .sidebar-brand .sidebar-brand-text {
@@ -455,7 +489,7 @@ body {
     body.sidebar-toggled .sidebar .nav-item .nav-link {
         text-align: center;
         padding: 0.6rem 0.5rem;
-        width: calc(4.5rem - 1rem);
+        width: 100%;
     }
 
     body.sidebar-toggled .sidebar .nav-item .nav-link span {
