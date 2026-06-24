@@ -4,6 +4,7 @@ import { Chart, registerables } from "chart.js";
 import "./site-country-map.js";
 import "./site-realtime.js";
 import "./site-stats-datatables.js";
+import "./site-asn-profiles.js";
 import "./sites-index-datatable.js";
 import "./site-stats-ui.js";
 import "./site-filters.js";
