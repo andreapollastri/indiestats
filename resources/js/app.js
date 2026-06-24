@@ -2,6 +2,8 @@ import jQuery from "jquery";
 import * as bootstrap from "bootstrap";
 import { Chart, registerables } from "chart.js";
 import "./site-stats-datatables.js";
+import "./sites-index-datatable.js";
+import "./site-stats-ui.js";
 import "./site-filters.js";
 import "./site-export.js";
 import "./preferences-settings.js";
@@ -103,18 +105,23 @@ window.Chart = Chart;
         });
     });
 
-    document.querySelectorAll("[data-copy]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            const text = btn.getAttribute("data-copy");
-            if (!text || !navigator.clipboard) return;
-            navigator.clipboard.writeText(text).then(function () {
-                const orig = btn.innerHTML;
-                const done = btn.getAttribute("data-copy-done") || "Copiato";
-                btn.innerHTML = '<i class="fas fa-check me-1"></i>' + done;
-                setTimeout(function () {
-                    btn.innerHTML = orig;
-                }, 2000);
-            });
+    document.addEventListener('click', function (event) {
+        const btn = event.target.closest('[data-copy]');
+        if (!btn) {
+            return;
+        }
+        const text = btn.getAttribute('data-copy');
+        if (!text || !navigator.clipboard) {
+            return;
+        }
+        event.preventDefault();
+        navigator.clipboard.writeText(text).then(function () {
+            const orig = btn.innerHTML;
+            const done = btn.getAttribute('data-copy-done') || 'Copiato';
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>' + done;
+            setTimeout(function () {
+                btn.innerHTML = orig;
+            }, 2000);
         });
     });
 

@@ -56,13 +56,66 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;');
 }
 
+function formatNumber(n) {
+    const num = Number(n);
+    if (!Number.isFinite(num)) {
+        return '0';
+    }
+    return num.toLocaleString();
+}
+
+function renderMetricBar(value, maxOnPage) {
+    const num = Number(value);
+    const safe = Number.isFinite(num) ? num : 0;
+    const max = Number.isFinite(Number(maxOnPage)) && Number(maxOnPage) > 0 ? Number(maxOnPage) : safe;
+    const pct = max > 0 ? Math.max(4, Math.round((safe / max) * 100)) : 0;
+
+    return (
+        '<span class="pa-dt-metric">' +
+        '<span class="pa-dt-metric__bar">' +
+        '<span class="pa-bar-track pa-bar-track--sm">' +
+        '<span class="pa-bar-fill" style="width:' +
+        pct +
+        '%"></span>' +
+        '</span>' +
+        '</span>' +
+        '<span class="pa-dt-metric__value font-monospace">' +
+        escapeHtml(formatNumber(safe)) +
+        '</span>' +
+        '</span>'
+    );
+}
+
+function metricColumn(field) {
+    return {
+        data: field,
+        className: 'text-end font-monospace',
+        render: function (data, cellType, row, meta) {
+            if (cellType !== 'display') {
+                return data;
+            }
+            const api = new DataTable.Api(meta.settings);
+            const colIdx = meta.col;
+            let maxOnPage = 0;
+            api.rows({ page: 'current' }).every(function () {
+                const rowData = this.data();
+                const v = Number(rowData[field]);
+                if (Number.isFinite(v) && v > maxOnPage) {
+                    maxOnPage = v;
+                }
+            });
+            return renderMetricBar(data, maxOnPage);
+        },
+    };
+}
+
 function tableConfig(type, csrf, tableEl) {
     const dtLang = readDatatablesLanguage() || DEFAULT_DATATABLES_LANGUAGE;
 
     const num = (a, b) => [
         { data: a, className: !b ? 'font-monospace' : '' },
-        { data: 'pageviews', className: 'text-end font-monospace' },
-        { data: 'visitors', className: 'text-end font-monospace' },
+        metricColumn('pageviews'),
+        metricColumn('visitors'),
     ];
 
     const base = {
@@ -152,8 +205,8 @@ function tableConfig(type, csrf, tableEl) {
                             return escapeHtml(d || '—');
                         },
                     },
-                    { data: 'pageviews', className: 'text-end font-monospace' },
-                    { data: 'visitors', className: 'text-end font-monospace' },
+                    metricColumn('pageviews'),
+                    metricColumn('visitors'),
                 ],
             };
         case 'browser':
@@ -183,8 +236,8 @@ function tableConfig(type, csrf, tableEl) {
                             return escapeHtml(row.country_label || '') + (code ? ' ' + code : '');
                         },
                     },
-                    { data: 'pageviews', className: 'text-end font-monospace' },
-                    { data: 'visitors', className: 'text-end font-monospace' },
+                    metricColumn('pageviews'),
+                    metricColumn('visitors'),
                 ],
             };
         case 'event_names':
@@ -193,8 +246,8 @@ function tableConfig(type, csrf, tableEl) {
                 order: [[1, 'desc']],
                 columns: [
                     { data: 'name', className: 'font-monospace' },
-                    { data: 'count', className: 'text-end font-monospace' },
-                    { data: 'visitors', className: 'text-end font-monospace' },
+                    metricColumn('count'),
+                    metricColumn('visitors'),
                 ],
             };
         case 'events':
@@ -257,8 +310,8 @@ function tableConfig(type, csrf, tableEl) {
                 columns: [
                     { data: 'label' },
                     { data: 'event_name', className: 'font-monospace text-muted' },
-                    { data: 'count', className: 'text-end font-monospace' },
-                    { data: 'unique_visitors', className: 'text-end font-monospace' },
+                    metricColumn('count'),
+                    metricColumn('unique_visitors'),
                     {
                         data: null,
                         orderable: false,

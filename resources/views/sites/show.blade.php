@@ -9,7 +9,6 @@
         '6m' => __('6 mesi'),
         '1y' => __('1 anno'),
     ];
-    $statBorders = ['primary', 'success', 'info', 'warning'];
     $siteTab = $site_tab ?? 'summary';
     if ($errors->has('label') || $errors->has('event_name')) {
         $siteTab = 'events';
@@ -17,16 +16,35 @@
     $summaryTabActive = $siteTab === 'summary';
     $detailTabActive = $siteTab === 'detail';
     $eventsTabActive = $siteTab === 'events';
+
+    $rangeUrls = [];
+    foreach ($rangeLabels as $key => $label) {
+        $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
+        if ($siteTab === 'detail') {
+            $rangeQuery['tab'] = 'detail';
+        } elseif ($siteTab === 'events') {
+            $rangeQuery['tab'] = 'events';
+        }
+        $rangeUrls[$key] = route('sites.show', $rangeQuery);
+    }
+
+    $pagesPerVisitor = $stats['unique_visitors'] > 0
+        ? number_format($stats['total_pageviews'] / $stats['unique_visitors'], 1, ',', '.')
+        : '—';
+    $outboundRate = $stats['total_pageviews'] > 0
+        ? number_format(($stats['outbound_clicks'] / $stats['total_pageviews']) * 100, 1, ',', '.').'%'
+        : '—';
 @endphp
 
 @section('content')
     <div class="row g-3 align-items-start align-items-lg-center mb-4">
         <div class="col-12 col-lg order-2 order-lg-1">
-            <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ $site['name'] }}</h1>
-            <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
+            <h1 class="h3 mb-1 fw-bold pa-page-header__title">{{ $site['name'] }}</h1>
+            <p class="small mb-0 pa-page-header__period">{{ $period['from'] }} — {{ $period['to'] }}</p>
         </div>
-        <div class="col-12 col-lg-auto d-flex flex-wrap gap-1 align-items-center justify-content-end order-1 order-lg-2">
-            <div class="dropdown">
+        <div class="col-12 col-lg-auto d-flex flex-wrap gap-2 align-items-center justify-content-end order-1 order-lg-2">
+            <x-range-pills :ranges="$rangeLabels" :current="$range" :urls="$rangeUrls" class="d-none d-md-flex" />
+            <div class="dropdown d-md-none">
                 <button
                     class="btn btn-sm btn-outline-secondary dropdown-toggle"
                     type="button"
@@ -39,17 +57,9 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pa-site-range-dropdown">
                     @foreach ($rangeLabels as $key => $label)
-                        @php
-                            $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
-                            if ($siteTab === 'detail') {
-                                $rangeQuery['tab'] = 'detail';
-                            } elseif ($siteTab === 'events') {
-                                $rangeQuery['tab'] = 'events';
-                            }
-                        @endphp
                         <li>
                             <a
-                                href="{{ route('sites.show', $rangeQuery) }}"
+                                href="{{ $rangeUrls[$key] }}"
                                 class="dropdown-item {{ $range === $key ? 'active' : '' }}"
                             >{{ $label }}</a>
                         </li>
@@ -117,45 +127,49 @@
     </ul>
 
     <div class="tab-content pt-3" id="siteStatsTabContent">
+        @if ($summaryTabActive)
         <div
-            class="tab-pane fade {{ $summaryTabActive ? 'show active' : '' }}"
+            class="tab-pane fade show active"
             id="tab-site-summary"
             role="tabpanel"
             aria-labelledby="site-tab-summary"
             tabindex="0"
         >
-            <div class="row">
-                @php $icons = ['fa-users', 'fa-eye', 'fa-clock', 'fa-up-right-from-square']; @endphp
-                @php $iconColors = ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6']; @endphp
+            <div class="row g-3 mb-3">
                 @foreach ([
-                    ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors'])],
-                    ['label' => __('Visualizzazioni'), 'val' => number_format($stats['total_pageviews'])],
-                    ['label' => __('Tempo medio in pagina'), 'val' => \App\Support\DurationFormatter::formatSeconds($stats['avg_duration_seconds'])],
-                    ['label' => __('Click in uscita'), 'val' => number_format($stats['outbound_clicks'])],
-                ] as $idx => $box)
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-{{ $statBorders[$idx] }} h-100">
-                            <div class="card-body py-3">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <div class="text-xs fw-medium text-uppercase mb-1" style="color: #94a3b8; letter-spacing: 0.05em;">{{ $box['label'] }}</div>
-                                        <div class="h5 mb-0 fw-bold font-monospace" style="color: #0f172a;">{{ $box['val'] }}</div>
-                                    </div>
-                                    <div style="color: {{ $iconColors[$idx] }}; opacity: 0.3; font-size: 1.5rem;">
-                                        <i class="fas {{ $icons[$idx] }}"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors']), 'icon' => 'fa-users', 'accent' => 'emerald'],
+                    ['label' => __('Visualizzazioni'), 'val' => number_format($stats['total_pageviews']), 'icon' => 'fa-eye', 'accent' => 'cyan'],
+                    ['label' => __('Tempo medio in pagina'), 'val' => \App\Support\DurationFormatter::formatSeconds($stats['avg_duration_seconds']), 'icon' => 'fa-clock', 'accent' => 'amber'],
+                    ['label' => __('Click in uscita'), 'val' => number_format($stats['outbound_clicks']), 'icon' => 'fa-up-right-from-square', 'accent' => 'violet'],
+                ] as $box)
+                    @include('sites.partials.stat-card', $box)
                 @endforeach
             </div>
 
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="pa-insight-chip">
+                    <i class="fas fa-layer-group me-1" aria-hidden="true"></i>
+                    {{ __('Pagine / visitatore') }}: <strong class="font-monospace">{{ $pagesPerVisitor }}</strong>
+                </span>
+                <span class="pa-insight-chip">
+                    <i class="fas fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
+                    {{ __('Click out / vista') }}: <strong class="font-monospace">{{ $outboundRate }}</strong>
+                </span>
+            </div>
+
+            @include('sites.partials.summary-highlights', ['site' => $site, 'range' => $range])
+
             @if (!empty($site_chart_payload['labels']) && $summaryTabActive)
-                <div class="card mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0" style="color: #10b981;">{{ __('Andamento') }}</h6>
-                        <small style="color: #94a3b8;">{{ $range === 'today' ? __('Visualizzazioni per ora') : __('Visualizzazioni per giorno') }}</small>
+                <div class="card mb-4 pa-stats-table-card">
+                    <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div>
+                            <h6 class="m-0">{{ __('Andamento') }}</h6>
+                            <small>{{ $range === 'today' ? __('Visualizzazioni e visitatori per ora') : __('Visualizzazioni e visitatori per giorno') }}</small>
+                        </div>
+                        <div class="pa-chart-legend d-flex flex-wrap gap-3">
+                            <span class="pa-chart-legend__item"><span class="pa-chart-legend__dot pa-chart-legend__dot--pageviews"></span>{{ __('Visualizzazioni') }}</span>
+                            <span class="pa-chart-legend__item"><span class="pa-chart-legend__dot pa-chart-legend__dot--visitors"></span>{{ __('Visitatori') }}</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="pa-site-trend-chart-wrap">
@@ -165,163 +179,179 @@
                 </div>
             @endif
         </div>
+        @endif
 
+        @if ($detailTabActive)
         <div
-            class="tab-pane fade {{ $detailTabActive ? 'show active' : '' }}"
+            class="tab-pane fade show active"
             id="tab-site-detail"
             role="tabpanel"
             aria-labelledby="site-tab-detail"
             tabindex="0"
         >
-            @include('sites.partials.stats-table', [
-                'title' => __('Pagine'),
-                'description' => __('Top percorsi'),
-                'dtType' => 'paths',
-                'dimLabel' => __('Percorso'),
-                'site' => $site,
-                'range' => $range,
-            ])
+            @include('sites.partials.detail-jump-nav')
 
-            @include('sites.partials.stats-table', [
-                'title' => __('UTM source'),
-                'description' => __('Parametro utm_source dalla pagina di atterraggio'),
-                'dtType' => 'utm_source',
-                'dimLabel' => 'utm_source',
-                'site' => $site,
-                'range' => $range,
-            ])
+            <x-stats-section id="content" :title="__('Contenuto')" :description="__('Pagine e query di ricerca')" :expanded="true">
+                @include('sites.partials.stats-table', [
+                    'title' => __('Pagine'),
+                    'description' => __('Top percorsi'),
+                    'dtType' => 'paths',
+                    'dimLabel' => __('Percorso'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('UTM medium'),
-                'description' => __('Parametro utm_medium (es. cpc, email, social)'),
-                'dtType' => 'utm_medium',
-                'dimLabel' => 'utm_medium',
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('Query di ricerca'),
+                    'description' => __('Termini da motori di ricerca o parametri ?q= sulla pagina'),
+                    'dtType' => 'search',
+                    'dimLabel' => __('Query'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
+            </x-stats-section>
 
-            @include('sites.partials.stats-table', [
-                'title' => __('UTM campaign'),
-                'description' => __('Parametro utm_campaign'),
-                'dtType' => 'utm_campaign',
-                'dimLabel' => 'utm_campaign',
-                'site' => $site,
-                'range' => $range,
-            ])
+            <x-stats-section id="traffic" :title="__('Traffico')" :description="__('Provenienza e link in uscita')">
+                @include('sites.partials.stats-table', [
+                    'title' => __('Sorgenti'),
+                    'description' => __('Referrer / motore'),
+                    'dtType' => 'source',
+                    'dimLabel' => __('Sorgente'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('UTM term'),
-                'description' => __('Parametro utm_term (parole chiave a pagamento)'),
-                'dtType' => 'utm_term',
-                'dimLabel' => 'utm_term',
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table-outbound', [
+                    'title' => __('Link in uscita'),
+                    'description' => __('URL di destinazione; provenienza = primo referrer della sessione (come per gli eventi)'),
+                    'dimLabel' => __('URL destinazione'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
+            </x-stats-section>
 
-            @include('sites.partials.stats-table', [
-                'title' => __('UTM content'),
-                'description' => __('Parametro utm_content (varianti A/B o link)'),
-                'dtType' => 'utm_content',
-                'dimLabel' => 'utm_content',
-                'site' => $site,
-                'range' => $range,
-            ])
+            <x-stats-section id="utm" :title="__('Campagne UTM')" :description="__('Parametri di tracciamento campagne')">
+                @include('sites.partials.stats-table', [
+                    'title' => __('UTM source'),
+                    'description' => __('Parametro utm_source dalla pagina di atterraggio'),
+                    'dtType' => 'utm_source',
+                    'dimLabel' => 'utm_source',
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('Query di ricerca'),
-                'description' => __('Termini da motori di ricerca o parametri ?q= sulla pagina'),
-                'dtType' => 'search',
-                'dimLabel' => __('Query'),
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('UTM medium'),
+                    'description' => __('Parametro utm_medium (es. cpc, email, social)'),
+                    'dtType' => 'utm_medium',
+                    'dimLabel' => 'utm_medium',
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('Sorgenti'),
-                'description' => __('Referrer / motore'),
-                'dtType' => 'source',
-                'dimLabel' => __('Sorgente'),
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('UTM campaign'),
+                    'description' => __('Parametro utm_campaign'),
+                    'dtType' => 'utm_campaign',
+                    'dimLabel' => 'utm_campaign',
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table-outbound', [
-                'title' => __('Link in uscita'),
-                'description' => __('URL di destinazione; provenienza = primo referrer della sessione (come per gli eventi)'),
-                'dimLabel' => __('URL destinazione'),
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('UTM term'),
+                    'description' => __('Parametro utm_term (parole chiave a pagamento)'),
+                    'dtType' => 'utm_term',
+                    'dimLabel' => 'utm_term',
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('Browser'),
-                'description' => __('Rilevato dal tracciamento (User-Agent)'),
-                'dtType' => 'browser',
-                'dimLabel' => __('Browser'),
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('UTM content'),
+                    'description' => __('Parametro utm_content (varianti A/B o link)'),
+                    'dtType' => 'utm_content',
+                    'dimLabel' => 'utm_content',
+                    'site' => $site,
+                    'range' => $range,
+                ])
+            </x-stats-section>
 
-            @include('sites.partials.stats-table', [
-                'title' => __('Sistema operativo'),
-                'description' => __('Rilevato dal tracciamento (User-Agent)'),
-                'dtType' => 'os',
-                'dimLabel' => __('OS'),
-                'site' => $site,
-                'range' => $range,
-            ])
+            <x-stats-section id="tech" :title="__('Tecnologia')" :description="__('Browser, OS e dispositivo')">
+                @include('sites.partials.stats-table', [
+                    'title' => __('Browser'),
+                    'description' => __('Rilevato dal tracciamento (User-Agent)'),
+                    'dtType' => 'browser',
+                    'dimLabel' => __('Browser'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            @include('sites.partials.stats-table', [
-                'title' => __('Dispositivo'),
-                'description' => null,
-                'dtType' => 'device',
-                'dimLabel' => __('Tipo'),
-                'site' => $site,
-                'range' => $range,
-            ])
+                @include('sites.partials.stats-table', [
+                    'title' => __('Sistema operativo'),
+                    'description' => __('Rilevato dal tracciamento (User-Agent)'),
+                    'dtType' => 'os',
+                    'dimLabel' => __('OS'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
 
-            <div class="card mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0" style="color: #10b981;">{{ __('Paese') }}</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table
-                            class="table table-bordered table-sm mb-0 w-100 pa-site-dt"
-                            width="100%"
-                            data-pa-dt-url="{{ $dtUrl }}"
-                            data-pa-dt-type="country"
-                            data-pa-dt-range="{{ $range }}"
-                        >
-                            <thead>
-                                <tr>
-                                    <th>{{ __('Paese') }}</th>
-                                    <th class="text-end">{{ __('Viste') }}</th>
-                                    <th class="text-end">{{ __('Univoci') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                @include('sites.partials.stats-table', [
+                    'title' => __('Dispositivo'),
+                    'description' => null,
+                    'dtType' => 'device',
+                    'dimLabel' => __('Tipo'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
+            </x-stats-section>
+
+            <x-stats-section id="geo" :title="__('Geografia')" :description="__('Distribuzione per paese')">
+                <div class="card mb-0 pa-stats-table-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0">{{ __('Paese') }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-sm mb-0 w-100 pa-site-dt"
+                                width="100%"
+                                data-pa-dt-url="{{ $dtUrl }}"
+                                data-pa-dt-type="country"
+                                data-pa-dt-range="{{ $range }}"
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('Paese') }}</th>
+                                        <th class="text-end">{{ __('Viste') }}</th>
+                                        <th class="text-end">{{ __('Univoci') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </x-stats-section>
         </div>
+        @endif
 
+        @if ($eventsTabActive)
         <div
-            class="tab-pane fade {{ $eventsTabActive ? 'show active' : '' }}"
+            class="tab-pane fade show active"
             id="tab-site-events"
             role="tabpanel"
             aria-labelledby="site-tab-events"
             tabindex="0"
         >
-    <div class="card mb-4">
+    <div class="card mb-4 pa-stats-table-card">
         <div class="card-header py-3">
-            <h6 class="m-0" style="color: #10b981;">{{ __('Eventi configurati') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).') }}</small>
-            <small class="d-block mt-1" style="color: #94a3b8;">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
+            <h6 class="m-0">{{ __('Eventi configurati') }}</h6>
+            <small>{{ __('Descrizione in dashboard e tag inviato con indiestats.track (stesso valore della stringa nel codice).') }}</small>
+            <small class="d-block mt-1 pa-text-muted-soft">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
         </div>
         <div class="card-body">
-            <p class="small mb-2" style="color: #94a3b8;">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
+            <p class="small mb-2 pa-text-muted-soft">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
@@ -371,10 +401,10 @@
         </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4 pa-stats-table-card">
         <div class="card-header py-3">
-            <h6 class="m-0" style="color: #10b981;">{{ __('Eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Tutti i tag inviati con indiestats.track nel periodo') }}</small>
+            <h6 class="m-0">{{ __('Eventi') }}</h6>
+            <small>{{ __('Tutti i tag inviati con indiestats.track nel periodo') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -398,10 +428,10 @@
         </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4 pa-stats-table-card">
         <div class="card-header py-3">
-            <h6 class="m-0" style="color: #10b981;">{{ __('Dettaglio eventi') }}</h6>
-            <small style="color: #94a3b8;">{{ __('Singole occorrenze nel periodo; payload salvato e ripulito lato server (paginazione server)') }}</small>
+            <h6 class="m-0">{{ __('Dettaglio eventi') }}</h6>
+            <small>{{ __('Singole occorrenze nel periodo; payload salvato e ripulito lato server (paginazione server)') }}</small>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -428,6 +458,7 @@
     </div>
 
         </div>
+        @endif
     </div>
 @endsection
 
@@ -437,6 +468,7 @@
             (function () {
                 var primary = 'rgb(16, 185, 129)';
                 var primaryFill = 'rgba(16, 185, 129, 0.06)';
+                var secondary = 'rgb(6, 182, 212)';
                 var cfg = @json($site_chart_payload);
 
                 function run() {
@@ -454,13 +486,24 @@
                             datasets: [
                                 {
                                     label: @json(__('Visualizzazioni')),
-                                    data: cfg.data,
+                                    data: cfg.pageviews,
                                     borderColor: primary,
                                     backgroundColor: primaryFill,
                                     borderWidth: 1.5,
                                     pointRadius: 0,
                                     pointHoverRadius: 3,
                                     fill: true,
+                                    tension: 0.4,
+                                },
+                                {
+                                    label: @json(__('Visitatori')),
+                                    data: cfg.visitors,
+                                    borderColor: secondary,
+                                    backgroundColor: 'transparent',
+                                    borderWidth: 1.5,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 3,
+                                    fill: false,
                                     tension: 0.4,
                                 },
                             ],

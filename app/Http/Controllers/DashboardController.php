@@ -53,7 +53,8 @@ class DashboardController extends Controller
             return [
                 'id' => $site['id'],
                 'labels' => $labels,
-                'data' => array_column($site['by_day'], 'pageviews'),
+                'pageviews' => array_column($site['by_day'], 'pageviews'),
+                'visitors' => array_column($site['by_day'], 'visitors'),
             ];
         })->values()->all();
 

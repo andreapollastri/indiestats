@@ -12,7 +12,7 @@
     $filterActiveCount = count($analytics_filters->toQueryArray());
 @endphp
 
-<form method="get" action="{{ route('sites.show', $site['public_key']) }}" id="pa-site-filters-form" class="mb-3">
+<form method="get" action="{{ route('sites.show', $site['public_key']) }}" id="pa-site-filters-form" class="mb-3 pa-filters-panel">
     <input type="hidden" name="range" value="{{ $range }}">
     @if ($siteTab !== 'summary')
         <input type="hidden" name="tab" value="{{ $siteTab }}">
@@ -30,11 +30,11 @@
                     aria-controls="pa-site-filters-collapse"
                 >
                     <span class="d-flex flex-column flex-sm-row align-items-sm-center gap-1 gap-sm-3 text-start w-100 pe-2">
-                        <span class="fw-bold" style="color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">{{ __('Filtri') }}</span>
+                        <span class="fw-bold pa-filters-panel__title">{{ __('Filtri') }}</span>
                         @if ($filtersActive)
-                            <span class="badge rounded-pill fw-semibold" style="background: rgba(234, 88, 12, 0.18); color: #c2410c; border: 1px solid rgba(234, 88, 12, 0.35);">{{ $filterActiveCount }} {{ $filterActiveCount === 1 ? __('filtro attivo') : __('filtri attivi') }}</span>
+                            <span class="badge rounded-pill fw-semibold pa-filters-panel__badge">{{ $filterActiveCount }} {{ $filterActiveCount === 1 ? __('filtro attivo') : __('filtri attivi') }}</span>
                         @endif
-                        <span class="small fw-normal" style="color: #94a3b8;">{{ __('Applica dei filtri alle statistiche') }}</span>
+                        <span class="small fw-normal pa-filters-panel__hint">{{ __('Applica dei filtri alle statistiche') }}</span>
                     </span>
                 </button>
             </h2>
@@ -44,7 +44,7 @@
                 aria-labelledby="pa-site-filters-heading"
                 data-bs-parent="#pa-site-filters-accordion"
             >
-                <div class="accordion-body border-top px-3 py-2" style="border-color: #f1f5f9 !important;">
+                <div class="accordion-body border-top px-3 py-2">
                     <div class="d-flex flex-wrap justify-content-end gap-2 mb-2">
                         <button type="submit" class="btn btn-sm btn-primary">{{ __('Applica') }}</button>
                         <a href="{{ $filterResetUrl }}" class="btn btn-sm btn-outline-secondary">{{ __('Azzera filtri') }}</a>

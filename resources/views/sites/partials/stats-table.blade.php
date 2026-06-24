@@ -1,11 +1,11 @@
 @php
     $dtUrl = route('sites.stats.datatables', $site['public_key']);
 @endphp
-<div class="card mb-4">
+<div class="card mb-4 pa-stats-table-card {{ $cardClass ?? '' }}">
     <div class="card-header py-3">
-        <h6 class="m-0" style="color: #10b981;">{{ __($title) }}</h6>
+        <h6 class="m-0">{{ __($title) }}</h6>
         @if (!empty($description))
-            <small style="color: #94a3b8;">{{ __($description) }}</small>
+            <small>{{ __($description) }}</small>
         @endif
     </div>
     <div class="card-body">

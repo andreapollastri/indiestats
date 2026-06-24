@@ -39,6 +39,7 @@ class SiteController extends Controller
             ],
             'sites' => $sites,
             'canManageSites' => $canManageSites,
+            'siteCreated' => session('site_created'),
         ]);
     }
 
@@ -60,12 +61,18 @@ class SiteController extends Controller
             ]);
         }
 
-        $request->user()->ownedSites()->create([
+        $site = $request->user()->ownedSites()->create([
             'name' => $data['name'],
             'allowed_domains' => $allowedDomains,
         ]);
 
-        return redirect()->route('sites.index')->with('success', __('Sito aggiunto.'));
+        return redirect()->route('sites.index')
+            ->with('success', __('Sito aggiunto.'))
+            ->with('site_created', [
+                'name' => $site->name,
+                'embed_code' => $this->embedCode($site),
+                'stats_url' => route('sites.show', $site->public_key),
+            ]);
     }
 
     public function show(Request $request, Site $site, AnalyticsQueryService $analytics, SiteFilterOptionsService $filterOptions): View
@@ -101,7 +108,8 @@ class SiteController extends Controller
                 'labels' => collect($seriesFilled)->map(function (array $row) {
                     return Carbon::parse($row['date'])->translatedFormat('H:i');
                 })->all(),
-                'data' => array_column($seriesFilled, 'pageviews'),
+                'pageviews' => array_column($seriesFilled, 'pageviews'),
+                'visitors' => array_column($seriesFilled, 'visitors'),
             ];
         } else {
             $byDayFilled = $analytics->fillDaySeries($stats['by_day'], $from, $to);
@@ -109,7 +117,8 @@ class SiteController extends Controller
                 'labels' => collect($byDayFilled)->map(function (array $row) {
                     return Carbon::parse($row['date'])->translatedFormat('j M');
                 })->all(),
-                'data' => array_column($byDayFilled, 'pageviews'),
+                'pageviews' => array_column($byDayFilled, 'pageviews'),
+                'visitors' => array_column($byDayFilled, 'visitors'),
             ];
         }
 

@@ -10,16 +10,22 @@
         '6m' => __('6 mesi'),
         '1y' => __('1 anno'),
     ];
+
+    $rangeUrls = [];
+    foreach ($rangeLabels as $key => $label) {
+        $rangeUrls[$key] = route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray()));
+    }
 @endphp
 
 @section('content')
     <div class="row g-3 align-items-start align-items-lg-center mb-4">
         <div class="col-12 col-lg order-2 order-lg-1">
-            <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('Dashboard') }}</h1>
-            <p class="small mb-0" style="font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 0.75rem;">{{ $period['from'] }} — {{ $period['to'] }}</p>
+            <h1 class="h3 mb-1 fw-bold pa-page-header__title">{{ __('Dashboard') }}</h1>
+            <p class="small mb-0 pa-page-header__period">{{ $period['from'] }} — {{ $period['to'] }}</p>
         </div>
-        <div class="col-12 col-lg-auto d-flex flex-wrap gap-1 align-items-center justify-content-end order-1 order-lg-2">
-            <div class="dropdown">
+        <div class="col-12 col-lg-auto d-flex flex-wrap gap-2 align-items-center justify-content-end order-1 order-lg-2">
+            <x-range-pills :ranges="$rangeLabels" :current="$range" :urls="$rangeUrls" class="d-none d-md-flex" />
+            <div class="dropdown d-md-none">
                 <button
                     class="btn btn-sm btn-outline-secondary dropdown-toggle"
                     type="button"
@@ -34,7 +40,7 @@
                     @foreach ($rangeLabels as $key => $label)
                         <li>
                             <a
-                                href="{{ route('dashboard', array_merge(['range' => $key], $analytics_filters->toQueryArray())) }}"
+                                href="{{ $rangeUrls[$key] }}"
                                 class="dropdown-item {{ $range === $key ? 'active' : '' }}"
                             >{{ $label }}</a>
                         </li>
@@ -55,22 +61,22 @@
             </div>
         </div>
     @else
-        <div class="row">
+        <div class="row g-3">
             @foreach ($sites as $site)
-                <div class="col-xl-4 col-lg-6 mb-4">
-                    <div class="card h-100 border-left-primary overflow-hidden">
+                <div class="col-xl-4 col-lg-6">
+                    <div class="card h-100 pa-site-card overflow-hidden">
                         <div class="card-body position-relative pb-3">
                             <div class="d-flex justify-content-between align-items-start mb-2 pe-2">
-                                <h2 class="h6 fw-bold mb-0" style="color: #0f172a;">{{ $site['name'] }}</h2>
-                                <span class="badge rounded-pill" style="background: rgba(16,185,129,0.08); color: #10b981; font-size: 0.7rem;" title="{{ __('Visualizzazioni') }}">{{ number_format($site['total_pageviews']) }}</span>
+                                <h2 class="h6 fw-bold mb-0 pa-site-card__name">{{ $site['name'] }}</h2>
+                                <span class="badge rounded-pill pa-site-card__metric-badge" title="{{ __('Visualizzazioni') }}">{{ number_format($site['total_pageviews']) }}</span>
                             </div>
-                            <p class="text-xs mb-3" style="color: #94a3b8;">
-                                {{ __('Visitatori unici') }}: <span class="fw-bold" style="color: #334155;">{{ number_format($site['unique_visitors']) }}</span>
+                            <p class="text-xs mb-3 pa-text-muted-soft">
+                                {{ __('Visitatori unici') }}: <span class="fw-bold text-gray-700">{{ number_format($site['unique_visitors']) }}</span>
                             </p>
                             <div class="pa-dashboard-chart-wrap mb-2">
                                 <canvas id="chart-site-{{ $site['id'] }}" aria-hidden="true"></canvas>
                             </div>
-                            <p class="text-xs text-center mb-0 fw-bold" style="color: #10b981;">
+                            <p class="text-xs text-center mb-0 fw-bold pa-site-card__cta">
                                 <i class="fas fa-arrow-right me-1"></i>{{ __('Apri statistiche') }}
                             </p>
                             <a href="{{ route('sites.show', array_merge(['site' => $site['public_key'], 'range' => $range], $analytics_filters->toQueryArray())) }}" class="stretched-link" aria-label="{{ __('Statistiche per :name', ['name' => $site['name']]) }}"></a>
@@ -106,7 +112,7 @@
                             datasets: [
                                 {
                                     label: @json(__('Visualizzazioni')),
-                                    data: cfg.data,
+                                    data: cfg.pageviews,
                                     borderColor: primary,
                                     backgroundColor: primaryFill,
                                     borderWidth: 1.5,

@@ -21,7 +21,7 @@ class AnalyticsQueryService
      * Fill days with no data using zeros (same shape as the dashboard chart).
      *
      * @param  list<array{date: string, pageviews: int, visitors: int}>  $byDay
-     * @return list<array{date: string, pageviews: int}>
+     * @return list<array{date: string, pageviews: int, visitors: int}>
      */
     public function fillDaySeries(array $byDay, CarbonInterface $from, CarbonInterface $to): array
     {
@@ -34,6 +34,7 @@ class AnalyticsQueryService
             $out[] = [
                 'date' => $key,
                 'pageviews' => $row ? (int) $row['pageviews'] : 0,
+                'visitors' => $row ? (int) ($row['visitors'] ?? 0) : 0,
             ];
         }
 
@@ -44,7 +45,7 @@ class AnalyticsQueryService
      * Fill each clock hour in the user's local day with zeros when missing (used for the "today" chart).
      *
      * @param  list<array{date: string, pageviews: int, visitors?: int}>  $byHour
-     * @return list<array{date: string, pageviews: int}>
+     * @return list<array{date: string, pageviews: int, visitors: int}>
      */
     public function fillHourSeries(array $byHour, CarbonInterface $from, CarbonInterface $to): array
     {
@@ -60,6 +61,7 @@ class AnalyticsQueryService
             $out[] = [
                 'date' => $key,
                 'pageviews' => $row ? (int) $row['pageviews'] : 0,
+                'visitors' => $row ? (int) ($row['visitors'] ?? 0) : 0,
             ];
             $cursor->addHour();
         }

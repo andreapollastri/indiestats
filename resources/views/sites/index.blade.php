@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="mb-4">
-        <h1 class="h3 mb-1 fw-bold" style="color: #0f172a; letter-spacing: -0.02em;">{{ __('I tuoi siti') }}</h1>
-        <p class="small mb-0" style="color: #94a3b8;">
+        <h1 class="h3 mb-1 fw-bold pa-page-header__title">{{ __('I tuoi siti') }}</h1>
+        <p class="small mb-0 pa-text-muted-soft">
             @if ($canManageSites)
                 {{ __('Aggiungi un sito e incolla lo snippet sulle pagine che vuoi misurare.') }}
             @else
@@ -14,13 +14,17 @@
 
     @include('partials.flash')
 
+    @if (! empty($siteCreated))
+        @include('sites.partials.created-site-snippet', ['siteCreated' => $siteCreated])
+    @endif
+
     @if ($canManageSites)
-        <div class="card mb-4">
+        <div class="card mb-4 pa-stats-table-card">
             <div class="card-header py-3">
-                <h6 class="m-0" style="color: #10b981;">{{ __('Nuovo sito') }}</h6>
+                <h6 class="m-0">{{ __('Nuovo sito') }}</h6>
             </div>
             <div class="card-body">
-                <p class="small mb-3" style="color: #94a3b8;">{{ __('Nome interno e gli host da cui è consentito inviare dati (stesso dominio del sito dove incolli lo snippet).') }}</p>
+                <p class="small mb-3 pa-text-muted-soft">{{ __('Nome interno e gli host da cui è consentito inviare dati (stesso dominio del sito dove incolli lo snippet).') }}</p>
                 <form method="POST" action="{{ route('sites.store') }}">
                     @csrf
                     <div class="row g-3">
@@ -30,7 +34,7 @@
                             @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
-                            <label for="allowed_domains" class="form-label">{{ __('Domini consentiti') }} <span style="color: #ef4444;">*</span></label>
+                            <label for="allowed_domains" class="form-label">{{ __('Domini consentiti') }} <span class="text-danger">*</span></label>
                             <input id="allowed_domains" name="allowed_domains" type="text" class="form-control @error('allowed_domains') is-invalid @enderror" value="{{ old('allowed_domains') }}" required autocomplete="off" placeholder="{{ __('esempio.com, www.esempio.com') }}">
                             @error('allowed_domains')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
@@ -44,7 +48,7 @@
     @endif
 
     @if (empty($sites) || count($sites) === 0)
-        <p class="small" style="color: #94a3b8;">
+        <p class="small pa-text-muted-soft">
             @if ($canManageSites)
                 {{ __('Nessun sito ancora. Creane uno qui sopra.') }}
             @else
@@ -52,30 +56,57 @@
             @endif
         </p>
     @else
-        @foreach ($sites as $site)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="row g-2 align-items-start align-items-md-center mb-2">
-                        <div class="col-12 col-md order-2 order-md-1">
-                            <h2 class="h6 mb-1 fw-bold">
-                                <a href="{{ route('sites.show', $site['public_key']) }}" class="text-decoration-none" style="color: #0f172a;">{{ $site['name'] }}</a>
-                            </h2>
-                            <p class="small font-monospace mb-0" style="color: #94a3b8; font-size: 0.7rem;">{{ $site['public_key'] }}</p>
-                        </div>
-                        <div class="col-12 col-md-auto d-flex flex-wrap align-items-center justify-content-end gap-1 ms-md-auto order-1 order-md-2">
-                            <a href="{{ route('sites.show', $site['public_key']) }}" class="btn btn-outline-primary btn-sm">{{ __('Statistiche') }}</a>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-copy="{{ $site['embed_code'] }}" data-copy-done="{{ __('Copiato') }}" title="{{ __('Copia snippet') }}"><i class="fas fa-copy"></i></button>
-                            @if ($canManageSites)
-                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSiteModal" data-delete-url="{{ route('sites.destroy', $site['public_key']) }}" data-site-name="{{ e($site['name']) }}" title="{{ __('Elimina') }}" aria-label="{{ __('Elimina') }}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                    <pre class="mb-0" style="max-height: 8rem; overflow: auto; white-space: pre-wrap;">{{ $site['embed_code'] }}</pre>
+        <div class="card mb-4 pa-stats-table-card">
+            <div class="card-header py-3">
+                <h6 class="m-0">{{ __('Siti') }}</h6>
+                <small>{{ __('Cerca, ordina e filtra l\'elenco dei siti') }}</small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table
+                        id="pa-sites-index-table"
+                        class="table table-bordered table-sm mb-0 w-100 pa-site-dt"
+                        width="100%"
+                    >
+                        <thead>
+                            <tr>
+                                <th>{{ __('Nome') }}</th>
+                                <th>{{ __('Chiave') }}</th>
+                                <th>{{ __('Domini consentiti') }}</th>
+                                <th>{{ __('Creato') }}</th>
+                                <th class="text-end">{{ __('Azioni') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
-        @endforeach
+        </div>
+
+        @php
+            $sitesIndexConfig = [
+                'canManageSites' => $canManageSites,
+                'sites' => collect($sites)->map(fn (array $site) => [
+                    'name' => $site['name'],
+                    'public_key' => $site['public_key'],
+                    'allowed_domains' => $site['allowed_domains'],
+                    'created_at' => $site['created_at'],
+                    'created_at_label' => \Illuminate\Support\Carbon::parse($site['created_at'])->translatedFormat('j M Y'),
+                    'embed_code' => $site['embed_code'],
+                    'show_url' => route('sites.show', $site['public_key']),
+                    'destroy_url' => $canManageSites ? route('sites.destroy', $site['public_key']) : null,
+                ])->values()->all(),
+                'labels' => [
+                    'stats' => __('Statistiche'),
+                    'copy' => __('Copia snippet'),
+                    'copyDone' => __('Copiato'),
+                    'delete' => __('Elimina'),
+                ],
+            ];
+        @endphp
+        <script type="application/json" id="pa-sites-index-config">
+@json($sitesIndexConfig)
+        </script>
 
         @if ($canManageSites)
             <div class="modal fade" id="deleteSiteModal" tabindex="-1" aria-labelledby="deleteSiteModalLabel" aria-hidden="true">

@@ -122,5 +122,28 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertOk();
         $response->assertSee('id="pa-datatables-language"', false);
         $response->assertSee(__('datatables.empty_table', [], 'it'), false);
+        $response->assertSee('pa-stat-card', false);
+    }
+
+    public function test_site_detail_tab_groups_stats_into_sections(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'tab' => 'detail',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('pa-stats-section', false);
+        $response->assertSee(__('Contenuto'), false);
+        $response->assertSee(__('Campagne UTM'), false);
+        $response->assertSee(__('Geografia'), false);
     }
 }
