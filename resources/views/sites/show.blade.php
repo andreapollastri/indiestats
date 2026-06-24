@@ -14,16 +14,15 @@
         $siteTab = 'events';
     }
     $summaryTabActive = $siteTab === 'summary';
+    $realtimeTabActive = $siteTab === 'realtime';
     $detailTabActive = $siteTab === 'detail';
     $eventsTabActive = $siteTab === 'events';
 
     $rangeUrls = [];
     foreach ($rangeLabels as $key => $label) {
         $rangeQuery = $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $key]);
-        if ($siteTab === 'detail') {
-            $rangeQuery['tab'] = 'detail';
-        } elseif ($siteTab === 'events') {
-            $rangeQuery['tab'] = 'events';
+        if ($siteTab !== 'summary') {
+            $rangeQuery['tab'] = $siteTab;
         }
         $rangeUrls[$key] = route('sites.show', $rangeQuery);
     }
@@ -90,6 +89,7 @@
 
     @php
         $tabSummaryHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range]));
+        $tabRealtimeHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'realtime']));
         $tabDetailHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'detail']));
         $tabEventsHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'events']));
     @endphp
@@ -103,6 +103,16 @@
                 aria-controls="tab-site-summary"
                 aria-selected="{{ $summaryTabActive ? 'true' : 'false' }}"
             >{{ __('Sommario') }}</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a
+                class="nav-link {{ $realtimeTabActive ? 'active' : '' }}"
+                id="site-tab-realtime"
+                href="{{ $tabRealtimeHref }}"
+                role="tab"
+                aria-controls="tab-site-realtime"
+                aria-selected="{{ $realtimeTabActive ? 'true' : 'false' }}"
+            >{{ __('In tempo reale') }}</a>
         </li>
         <li class="nav-item" role="presentation">
             <a
@@ -135,8 +145,6 @@
             aria-labelledby="site-tab-summary"
             tabindex="0"
         >
-            @include('sites.partials.realtime-stats', ['site' => $site])
-
             <div class="row g-3 mb-3">
                 @foreach ([
                     ['label' => __('Visitatori unici'), 'val' => number_format($stats['unique_visitors']), 'icon' => 'fa-users', 'accent' => 'emerald'],
@@ -180,6 +188,18 @@
                     </div>
                 </div>
             @endif
+        </div>
+        @endif
+
+        @if ($realtimeTabActive)
+        <div
+            class="tab-pane fade show active"
+            id="tab-site-realtime"
+            role="tabpanel"
+            aria-labelledby="site-tab-realtime"
+            tabindex="0"
+        >
+            @include('sites.partials.realtime-stats', ['site' => $site])
         </div>
         @endif
 

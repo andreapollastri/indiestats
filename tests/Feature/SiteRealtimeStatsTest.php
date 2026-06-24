@@ -80,7 +80,7 @@ class SiteRealtimeStatsTest extends TestCase
         ]);
     }
 
-    public function test_site_summary_page_includes_realtime_panel(): void
+    public function test_site_summary_page_does_not_include_realtime_panel(): void
     {
         $user = User::factory()->admin()->create(['locale' => 'en']);
         $site = $user->ownedSites()->create([
@@ -91,6 +91,25 @@ class SiteRealtimeStatsTest extends TestCase
         $response = $this->actingAs($user)->get(route('sites.show', $site->public_key));
 
         $response->assertOk();
+        $response->assertDontSee('id="pa-realtime-panel"', false);
+        $response->assertDontSee('id="pa-realtime-config"', false);
+    }
+
+    public function test_site_realtime_tab_includes_realtime_panel(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'en']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Live site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'tab' => 'realtime',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="site-tab-realtime"', false);
         $response->assertSee('id="pa-realtime-panel"', false);
         $response->assertSee('id="pa-realtime-config"', false);
         $response->assertSee('Real-time', false);
