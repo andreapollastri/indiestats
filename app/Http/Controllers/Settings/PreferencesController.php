@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\PreferencesUpdateRequest;
 use App\Models\AppSetting;
+use App\Services\AsnLookupService;
 use App\Support\UserPreferences;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,10 +24,13 @@ class PreferencesController extends Controller
         if ($user->isAdmin()) {
             $settings = AppSetting::instance();
             $mmdbPath = storage_path('app/geoip/GeoLite2-Country.mmdb');
+            $asnPath = storage_path('app/geoip/'.AsnLookupService::DATABASE_FILENAME);
             $geoipSettings = [
                 'license_configured' => $settings->geoip_maxmind_license_key !== null,
                 'database_exists' => is_readable($mmdbPath),
                 'database_updated_at' => $settings->geoip_database_updated_at,
+                'asn_database_exists' => is_readable($asnPath),
+                'asn_database_updated_at' => $settings->dbip_asn_database_updated_at,
             ];
         }
 

@@ -18,6 +18,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('settings/geoip/download', [GeoIpSettingsController::class, 'download'])
             ->middleware('throttle:12,1')
             ->name('geoip.settings.download');
+        Route::post('settings/geoip/asn/download', [GeoIpSettingsController::class, 'downloadAsn'])
+            ->middleware('throttle:12,1')
+            ->name('geoip.asn.download');
     });
 
     Route::get('settings/account', [AccountController::class, 'edit'])

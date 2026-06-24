@@ -101,6 +101,18 @@ class SiteStatsDataTableService
                 $draw,
                 $filters
             ),
+            'asn' => $this->asnAggregated(
+                $siteId,
+                $from,
+                $to,
+                $search,
+                $orderCol,
+                $orderDir,
+                $start,
+                $length,
+                $draw,
+                $filters
+            ),
             'event_names' => $this->eventNames(
                 $siteId,
                 $from,
@@ -242,6 +254,85 @@ class SiteStatsDataTableService
             'recordsFiltered' => $recordsFiltered,
             'data' => $rows,
         ];
+    }
+
+    /**
+     * @return array{draw: int, recordsTotal: int, recordsFiltered: int, data: list<array<string, mixed>>}
+     */
+    private function asnAggregated(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        string $search,
+        int $orderCol,
+        string $orderDir,
+        int $start,
+        int $length,
+        int $draw,
+        AnalyticsFilters $filters
+    ): array {
+        $like = $search !== '' ? '%'.addcslashes($search, '%_\\').'%' : null;
+
+        $base = PageView::query();
+        $this->filterScope->applyToPageViews($base, $siteId, $from, $to, $filters);
+        $base->whereNotNull('asn');
+
+        $base->select('asn')
+            ->selectRaw('MAX(as_organization) as as_organization')
+            ->selectRaw('COUNT(*) as pageviews')
+            ->selectRaw('COUNT(DISTINCT visitor_id) as visitors')
+            ->groupBy('asn');
+
+        $countQuery = function (bool $applySearch) use ($base, $like): int {
+            $q = clone $base;
+            if ($applySearch && $like !== null) {
+                $q->havingRaw('CAST(asn AS CHAR) LIKE ? OR as_organization LIKE ?', [$like, $like]);
+            }
+
+            return (int) DB::query()->fromSub($q->toBase(), 'agg')->count();
+        };
+
+        $recordsTotal = $countQuery(false);
+        $recordsFiltered = $countQuery(true);
+
+        $dataQuery = clone $base;
+        if ($like !== null) {
+            $dataQuery->havingRaw('CAST(asn AS CHAR) LIKE ? OR as_organization LIKE ?', [$like, $like]);
+        }
+
+        $orderColumns = ['asn', 'pageviews', 'visitors'];
+        $orderBy = $orderColumns[$orderCol] ?? 'pageviews';
+        $dataQuery->orderBy($orderBy, $orderDir);
+        $dataQuery->offset($start)->limit($length);
+
+        $rows = $dataQuery->get()->map(function ($row) {
+            $asn = (int) $row->asn;
+            $organization = (string) ($row->as_organization ?? '');
+
+            return [
+                'asn' => $asn,
+                'as_organization' => $organization,
+                'label' => $this->asnLabel($asn, $organization),
+                'pageviews' => (int) $row->pageviews,
+                'visitors' => (int) $row->visitors,
+            ];
+        })->all();
+
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ];
+    }
+
+    private function asnLabel(int $asn, string $organization): string
+    {
+        if ($organization !== '') {
+            return 'AS'.$asn.' '.$organization;
+        }
+
+        return 'AS'.$asn;
     }
 
     private function countryLabel(?string $code): string

@@ -28,6 +28,8 @@ class PageView extends Model
         'os',
         'device_type',
         'country_code',
+        'asn',
+        'as_organization',
         'duration_seconds',
         'created_at',
     ];

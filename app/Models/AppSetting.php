@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['geoip_maxmind_license_key', 'geoip_database_updated_at'])]
+#[Fillable(['geoip_maxmind_license_key', 'geoip_database_updated_at', 'dbip_asn_database_updated_at'])]
 class AppSetting extends Model
 {
     /**
@@ -31,6 +31,7 @@ class AppSetting extends Model
         return [
             'geoip_maxmind_license_key' => 'encrypted',
             'geoip_database_updated_at' => 'datetime',
+            'dbip_asn_database_updated_at' => 'datetime',
         ];
     }
 }

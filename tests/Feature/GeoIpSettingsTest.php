@@ -67,7 +67,8 @@ class GeoIpSettingsTest extends TestCase
         $this->actingAs($admin)
             ->get(route('preferences.edit'))
             ->assertOk()
-            ->assertSee('data-test="geoip-download"', false);
+            ->assertSee('data-test="geoip-download"', false)
+            ->assertSee('data-test="dbip-asn-download"', false);
     }
 
     public function test_base_user_preferences_page_does_not_show_geoip_download_button(): void

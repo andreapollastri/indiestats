@@ -279,7 +279,7 @@
                 ])
             </x-stats-section>
 
-            <x-stats-section id="tech" :title="__('Tecnologia')" :description="__('Browser, OS e dispositivo')">
+            <x-stats-section id="tech" :title="__('Tecnologia')" :description="__('Browser, OS, dispositivo e rete')">
                 @include('sites.partials.stats-table', [
                     'title' => __('Browser'),
                     'description' => __('Rilevato dal tracciamento (User-Agent)'),
@@ -303,6 +303,15 @@
                     'description' => null,
                     'dtType' => 'device',
                     'dimLabel' => __('Tipo'),
+                    'site' => $site,
+                    'range' => $range,
+                ])
+
+                @include('sites.partials.stats-table', [
+                    'title' => __('Rete (ASN)'),
+                    'description' => __('Autonomous System da DB-IP ASN Lite'),
+                    'dtType' => 'asn',
+                    'dimLabel' => __('Rete'),
                     'site' => $site,
                     'range' => $range,
                 ])

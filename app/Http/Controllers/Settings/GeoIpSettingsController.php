@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\GeoIpSettingsUpdateRequest;
 use App\Models\AppSetting;
+use App\Services\DbIpAsnDatabaseUpdater;
 use App\Services\GeoIpDatabaseUpdater;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
@@ -51,6 +52,19 @@ class GeoIpSettingsController extends Controller
         }
 
         return back()->with('success', __('GeoIP database updated successfully.'));
+    }
+
+    public function downloadAsn(DbIpAsnDatabaseUpdater $updater): RedirectResponse
+    {
+        try {
+            $updater->download();
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->with('error', __('DB-IP ASN download failed: :message', ['message' => $e->getMessage()]));
+        }
+
+        return back()->with('success', __('DB-IP ASN database updated successfully.'));
     }
 
     private function resolveLicenseKey(): ?string

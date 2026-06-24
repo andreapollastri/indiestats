@@ -221,5 +221,21 @@
     "GeoIP license key saved.": "Clé de licence GeoIP enregistrée.",
     "No GeoIP license key is configured. Save a key above or set GEOIP_MAXMIND_LICENSE_KEY in .env.": "Aucune clé GeoIP configurée. Enregistrez une clé ci-dessus ou définissez GEOIP_MAXMIND_LICENSE_KEY dans .env.",
     "GeoIP download failed: :message": "Échec du téléchargement GeoIP : :message",
-    "GeoIP database updated successfully.": "Base GeoIP mise à jour avec succès."
+    "GeoIP database updated successfully.": "Base GeoIP mise à jour avec succès.",
+    "ASN (rete)": "ASN (réseau)",
+    "DB-IP ASN Lite resolves the visitor Autonomous System (ISP / hosting provider) from IP addresses. The database is free under Creative Commons Attribution; a link to DB-IP is shown in the footer when ASN data is used.": "DB-IP ASN Lite identifie le système autonome (FAI / hébergeur) du visiteur à partir de son IP. La base est gratuite sous licence Creative Commons Attribution ; un lien vers DB-IP apparaît dans le pied de page lorsque les données ASN sont utilisées.",
+    "DB-IP IP to ASN Lite": "DB-IP IP to ASN Lite",
+    "is updated monthly and requires no API key.": "est mise à jour mensuellement et ne nécessite aucune clé API.",
+    "Click “Download or update ASN database” to install it on the server.": "Cliquez sur « Télécharger ou mettre à jour la base ASN » pour l’installer sur le serveur.",
+    "ASN database file is present.": "Fichier de base ASN présent.",
+    "ASN database file is not installed yet. Download it below or set GEOIP_ASN_DATABASE to an existing .mmdb path.": "Base ASN pas encore installée. Téléchargez-la ci-dessous ou définissez GEOIP_ASN_DATABASE vers un fichier .mmdb existant.",
+    "Download or update ASN database": "Télécharger ou mettre à jour la base ASN",
+    "Optional: set GEOIP_ASN_DATABASE in .env to point to a custom DB-IP ASN Lite .mmdb file.": "Optionnel : définissez GEOIP_ASN_DATABASE dans .env vers un fichier DB-IP ASN Lite .mmdb personnalisé.",
+    "DB-IP ASN download failed: :message": "Échec du téléchargement ASN DB-IP : :message",
+    "DB-IP ASN database updated successfully.": "Base ASN DB-IP mise à jour avec succès.",
+    "IP Geolocation by DB-IP": "Géolocalisation IP par DB-IP",
+    "Rete (ASN)": "Réseau (ASN)",
+    "Autonomous System da DB-IP ASN Lite": "Système autonome via DB-IP ASN Lite",
+    "Rete": "Réseau",
+    "Browser, OS, dispositivo e rete": "Navigateur, OS, appareil et réseau"
 }

@@ -240,6 +240,29 @@ function tableConfig(type, csrf, tableEl) {
                     metricColumn('visitors'),
                 ],
             };
+        case 'asn':
+            return {
+                ...base,
+                order: [[1, 'desc']],
+                columns: [
+                    {
+                        data: 'label',
+                        orderable: true,
+                        render: function (data, cellType, row) {
+                            if (cellType !== 'display' && cellType !== 'filter') {
+                                return row.label || '';
+                            }
+                            const asn = row.asn
+                                ? '<span class="text-muted font-monospace">AS' + escapeHtml(String(row.asn)) + '</span>'
+                                : '';
+                            const org = escapeHtml(row.as_organization || data || '');
+                            return org + (asn ? ' ' + asn : '');
+                        },
+                    },
+                    metricColumn('pageviews'),
+                    metricColumn('visitors'),
+                ],
+            };
         case 'event_names':
             return {
                 ...base,

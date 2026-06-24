@@ -221,5 +221,21 @@
     "GeoIP license key saved.": "GeoIP license key saved.",
     "No GeoIP license key is configured. Save a key above or set GEOIP_MAXMIND_LICENSE_KEY in .env.": "No GeoIP license key is configured. Save a key above or set GEOIP_MAXMIND_LICENSE_KEY in .env.",
     "GeoIP download failed: :message": "GeoIP download failed: :message",
-    "GeoIP database updated successfully.": "GeoIP database updated successfully."
+    "GeoIP database updated successfully.": "GeoIP database updated successfully.",
+    "ASN (rete)": "ASN (network)",
+    "DB-IP ASN Lite resolves the visitor Autonomous System (ISP / hosting provider) from IP addresses. The database is free under Creative Commons Attribution; a link to DB-IP is shown in the footer when ASN data is used.": "DB-IP ASN Lite resolves the visitor Autonomous System (ISP / hosting provider) from IP addresses. The database is free under Creative Commons Attribution; a link to DB-IP is shown in the footer when ASN data is used.",
+    "DB-IP IP to ASN Lite": "DB-IP IP to ASN Lite",
+    "is updated monthly and requires no API key.": "is updated monthly and requires no API key.",
+    "Click “Download or update ASN database” to install it on the server.": "Click “Download or update ASN database” to install it on the server.",
+    "ASN database file is present.": "ASN database file is present.",
+    "ASN database file is not installed yet. Download it below or set GEOIP_ASN_DATABASE to an existing .mmdb path.": "ASN database file is not installed yet. Download it below or set GEOIP_ASN_DATABASE to an existing .mmdb path.",
+    "Download or update ASN database": "Download or update ASN database",
+    "Optional: set GEOIP_ASN_DATABASE in .env to point to a custom DB-IP ASN Lite .mmdb file.": "Optional: set GEOIP_ASN_DATABASE in .env to point to a custom DB-IP ASN Lite .mmdb file.",
+    "DB-IP ASN download failed: :message": "DB-IP ASN download failed: :message",
+    "DB-IP ASN database updated successfully.": "DB-IP ASN database updated successfully.",
+    "IP Geolocation by DB-IP": "IP Geolocation by DB-IP",
+    "Rete (ASN)": "Network (ASN)",
+    "Autonomous System da DB-IP ASN Lite": "Autonomous System from DB-IP ASN Lite",
+    "Rete": "Network",
+    "Browser, OS, dispositivo e rete": "Browser, OS, device and network"
 }

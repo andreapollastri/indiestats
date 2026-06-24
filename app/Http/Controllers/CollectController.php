@@ -6,6 +6,7 @@ use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Models\Site;
 use App\Models\TrackingEvent;
+use App\Services\AsnLookupService;
 use App\Services\EventPayloadSanitizer;
 use App\Services\GeoIpService;
 use App\Services\ReferrerSourceService;
@@ -16,7 +17,7 @@ use Jenssegers\Agent\Agent;
 
 class CollectController extends Controller
 {
-    public function pageview(Request $request, ReferrerSourceService $referrerService, GeoIpService $geo): JsonResponse
+    public function pageview(Request $request, ReferrerSourceService $referrerService, GeoIpService $geo, AsnLookupService $asn): JsonResponse
     {
         $data = $request->validate([
             'site_key' => 'required|uuid',
@@ -53,6 +54,7 @@ class CollectController extends Controller
         $deviceType = $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop');
 
         $country = $geo->countryCode($request->ip());
+        $asnData = $asn->lookup($request->ip());
 
         $pageView = PageView::query()->create([
             'site_id' => $site->id,
@@ -70,6 +72,8 @@ class CollectController extends Controller
             'os' => $os,
             'device_type' => $deviceType,
             'country_code' => $country,
+            'asn' => $asnData['asn'],
+            'as_organization' => $asnData['as_organization'],
             'created_at' => now(),
         ]);
 
@@ -257,7 +261,7 @@ class CollectController extends Controller
         return $out === [] ? null : $out;
     }
 
-    public function pixel(Request $request, ReferrerSourceService $referrerService, GeoIpService $geo): Response
+    public function pixel(Request $request, ReferrerSourceService $referrerService, GeoIpService $geo, AsnLookupService $asn): Response
     {
         $data = $request->validate([
             'k' => 'required|uuid',
@@ -286,6 +290,7 @@ class CollectController extends Controller
         $deviceType = $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop');
 
         $country = $geo->countryCode($request->ip());
+        $asnData = $asn->lookup($request->ip());
 
         PageView::query()->create([
             'site_id' => $site->id,
@@ -303,6 +308,8 @@ class CollectController extends Controller
             'os' => $os,
             'device_type' => $deviceType,
             'country_code' => $country,
+            'asn' => $asnData['asn'],
+            'as_organization' => $asnData['as_organization'],
             'created_at' => now(),
         ]);
 

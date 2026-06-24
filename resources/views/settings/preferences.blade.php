@@ -9,6 +9,7 @@
 
     @if ($geoipSettings !== null)
         @include('settings.partials.geoip-settings-section', ['geoipSettings' => $geoipSettings])
+        @include('settings.partials.dbip-asn-settings-section', ['geoipSettings' => $geoipSettings])
     @endif
 
     <div class="card mb-4">

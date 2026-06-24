@@ -38,6 +38,7 @@ return [
     'geoip' => [
         'database' => env('GEOIP_DATABASE'),
         'maxmind_license_key' => env('GEOIP_MAXMIND_LICENSE_KEY'),
+        'asn_database' => env('GEOIP_ASN_DATABASE'),
     ],
 
 ];

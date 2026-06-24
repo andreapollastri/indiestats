@@ -116,6 +116,10 @@
                             rel="noopener noreferrer"
                             title="{{ config('app.name') }} — GitHub"
                         >&copy; {{ config('app.name') }} {{ date('Y') }}</a>
+                        @if (! empty($dbipAsnAttributionRequired))
+                            <span class="mx-1 text-muted" aria-hidden="true">·</span>
+                            <a href="https://db-ip.com/" class="text-muted text-decoration-none" target="_blank" rel="noopener noreferrer">{{ __('IP Geolocation by DB-IP') }}</a>
+                        @endif
                     </div>
                 </div>
             </footer>
