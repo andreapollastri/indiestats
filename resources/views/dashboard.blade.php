@@ -61,6 +61,12 @@
             </div>
         </div>
     @else
+        @include('sites.partials.realtime-stats', [
+            'realtimeUrl' => route('dashboard.stats.realtime'),
+            'realtimeSubtitle' => __('Tutti i siti'),
+            'updateSiteCards' => true,
+        ])
+
         <div class="row g-3">
             @foreach ($sites as $site)
                 <div class="col-xl-4 col-lg-6">
@@ -70,6 +76,10 @@
                                 <h2 class="h6 fw-bold mb-0 pa-site-card__name">{{ $site['name'] }}</h2>
                                 <span class="badge rounded-pill pa-site-card__metric-badge" title="{{ __('Visualizzazioni') }}">{{ number_format($site['total_pageviews']) }}</span>
                             </div>
+                            <p class="text-xs mb-2 pa-site-card__live" id="pa-dashboard-site-live-{{ $site['id'] }}">
+                                <span class="pa-site-card__live-dot" aria-hidden="true"></span>
+                                <span class="pa-site-card__live-copy">{{ __('Caricamento…') }}</span>
+                            </p>
                             <p class="text-xs mb-3 pa-text-muted-soft">
                                 {{ __('Visitatori unici') }}: <span class="fw-bold text-gray-700">{{ number_format($site['unique_visitors']) }}</span>
                             </p>

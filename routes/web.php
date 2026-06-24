@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CollectController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardRealtimeStatsController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteExportController;
@@ -39,6 +40,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
 
 Route::middleware(['auth'])->group(function (): void {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/stats/realtime', DashboardRealtimeStatsController::class)
+        ->middleware('throttle:120,1')
+        ->name('dashboard.stats.realtime');
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show')->whereUuid('site');

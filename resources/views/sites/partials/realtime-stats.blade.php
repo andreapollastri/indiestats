@@ -4,6 +4,9 @@
             <span class="pa-realtime-panel__pulse" aria-hidden="true"></span>
             <div class="min-w-0">
                 <h6 class="m-0">{{ __('In tempo reale') }}</h6>
+                @if (! empty($realtimeSubtitle))
+                    <small class="d-block pa-text-muted-soft">{{ $realtimeSubtitle }}</small>
+                @endif
                 <small class="pa-realtime-panel__updated" id="pa-realtime-updated">{{ __('Caricamento…') }}</small>
             </div>
         </div>
@@ -55,8 +58,9 @@
 
 @php
     $realtimeConfig = [
-        'url' => route('sites.stats.realtime', $site['public_key']),
+        'url' => $realtimeUrl ?? route('sites.stats.realtime', $site['public_key']),
         'pollMs' => 15000,
+        'updateSiteCards' => $updateSiteCards ?? false,
         'labels' => [
             'pageviews' => __('Visualizzazioni'),
             'visitors' => __('Visitatori'),
@@ -66,6 +70,8 @@
             'noActivity' => __('Nessuna attività recente'),
             'updated' => __('Aggiornato :time'),
             'loading' => __('Caricamento…'),
+            'siteLive' => __(':active attivi · :pageviews view (5 min)'),
+            'siteLiveIdle' => __('Nessun visitatore attivo'),
         ],
     ];
 @endphp

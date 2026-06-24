@@ -60,6 +60,9 @@ function renderRecentList(items, labels) {
     }
     list.innerHTML = items
         .map(function (item) {
+            const siteName = item.site_name
+                ? '<span class="pa-realtime-recent__site">' + escapeHtml(item.site_name) + '</span>'
+                : '';
             const country = item.country_code
                 ? '<span class="pa-realtime-recent__country font-monospace">' +
                   escapeHtml(item.country_code) +
@@ -67,6 +70,7 @@ function renderRecentList(items, labels) {
                 : '';
             return (
                 '<li class="pa-realtime-recent__item">' +
+                siteName +
                 '<span class="pa-realtime-recent__path text-truncate font-monospace" title="' +
                 escapeHtml(item.path || '/') +
                 '">' +
@@ -80,6 +84,35 @@ function renderRecentList(items, labels) {
             );
         })
         .join('');
+}
+
+function formatSiteLiveCopy(active, pageviews, labels) {
+    if ((active ?? 0) <= 0 && (pageviews ?? 0) <= 0) {
+        return labels.siteLiveIdle || 'No active visitors';
+    }
+    return (labels.siteLive || ':active active · :pageviews views (5 min)')
+        .replace(':active', String(active ?? 0))
+        .replace(':pageviews', String(pageviews ?? 0));
+}
+
+function updateDashboardSiteCards(sites, labels) {
+    if (!Array.isArray(sites)) {
+        return;
+    }
+    sites.forEach(function (row) {
+        const el = document.getElementById('pa-dashboard-site-live-' + row.id);
+        if (!el) {
+            return;
+        }
+        const copyEl = el.querySelector('.pa-site-card__live-copy');
+        if (!copyEl) {
+            return;
+        }
+        const active = row.active_visitors ?? 0;
+        const pageviews = row.pageviews_last_5m ?? 0;
+        copyEl.textContent = formatSiteLiveCopy(active, pageviews, labels);
+        el.classList.toggle('pa-site-card__live--active', active > 0);
+    });
 }
 
 function initRealtimeChart(canvas, labels) {
@@ -174,7 +207,7 @@ function updateRealtimeChart(chart, series) {
     chart.update('none');
 }
 
-function applyRealtimePayload(payload, chart, labels) {
+function applyRealtimePayload(payload, chart, labels, config) {
     const activeEl = document.getElementById('pa-realtime-active');
     const pageviewsEl = document.getElementById('pa-realtime-pageviews-5m');
     const updatedEl = document.getElementById('pa-realtime-updated');
@@ -191,6 +224,10 @@ function applyRealtimePayload(payload, chart, labels) {
 
     updateRealtimeChart(chart, payload.series);
     renderRecentList(payload.recent, labels);
+
+    if (config && config.updateSiteCards) {
+        updateDashboardSiteCards(payload.sites, labels);
+    }
 }
 
 function init() {
@@ -234,7 +271,7 @@ function init() {
             })
             .then(function (payload) {
                 ensureChart();
-                applyRealtimePayload(payload, chart, labels);
+                applyRealtimePayload(payload, chart, labels, config);
             })
             .catch(function () {
                 const updatedEl = document.getElementById('pa-realtime-updated');
