@@ -90,9 +90,12 @@ class SiteController extends Controller
 
         $siteTab = $request->query('tab', 'summary');
         if ($request->query('analytics') === 'detail') {
-            $siteTab = 'detail';
+            $siteTab = 'content';
         }
-        if (! in_array($siteTab, ['summary', 'realtime', 'detail', 'events'], true)) {
+        if ($siteTab === 'detail') {
+            $siteTab = 'content';
+        }
+        if (! in_array($siteTab, ['summary', 'realtime', 'content', 'traffic', 'utm', 'tech', 'geo', 'events'], true)) {
             $siteTab = 'summary';
         }
         $errorsBag = $request->session()->get('errors');

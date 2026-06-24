@@ -13,9 +13,15 @@
     if ($errors->has('label') || $errors->has('event_name')) {
         $siteTab = 'events';
     }
+    $analyticsTabs = [
+        'content' => __('Contenuto'),
+        'traffic' => __('Traffico'),
+        'utm' => __('UTM'),
+        'tech' => __('Tecnologia'),
+        'geo' => __('Geografia'),
+    ];
     $summaryTabActive = $siteTab === 'summary';
     $realtimeTabActive = $siteTab === 'realtime';
-    $detailTabActive = $siteTab === 'detail';
     $eventsTabActive = $siteTab === 'events';
 
     $rangeUrls = [];
@@ -90,8 +96,15 @@
     @php
         $tabSummaryHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range]));
         $tabRealtimeHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'realtime']));
-        $tabDetailHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'detail']));
         $tabEventsHref = route('sites.show', $analytics_filters->mergeQuery(['site' => $site['public_key'], 'range' => $range, 'tab' => 'events']));
+        $analyticsTabHrefs = [];
+        foreach ($analyticsTabs as $tabKey => $tabLabel) {
+            $analyticsTabHrefs[$tabKey] = route('sites.show', $analytics_filters->mergeQuery([
+                'site' => $site['public_key'],
+                'range' => $range,
+                'tab' => $tabKey,
+            ]));
+        }
     @endphp
     <ul class="nav nav-tabs mb-4" id="siteStatsTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -114,16 +127,18 @@
                 aria-selected="{{ $realtimeTabActive ? 'true' : 'false' }}"
             >{{ __('In tempo reale') }}</a>
         </li>
-        <li class="nav-item" role="presentation">
-            <a
-                class="nav-link {{ $detailTabActive ? 'active' : '' }}"
-                id="site-tab-detail"
-                href="{{ $tabDetailHref }}"
-                role="tab"
-                aria-controls="tab-site-detail"
-                aria-selected="{{ $detailTabActive ? 'true' : 'false' }}"
-            >{{ __('Dettaglio') }}</a>
-        </li>
+        @foreach ($analyticsTabs as $tabKey => $tabLabel)
+            <li class="nav-item" role="presentation">
+                <a
+                    class="nav-link {{ $siteTab === $tabKey ? 'active' : '' }}"
+                    id="site-tab-{{ $tabKey }}"
+                    href="{{ $analyticsTabHrefs[$tabKey] }}"
+                    role="tab"
+                    aria-controls="tab-site-{{ $tabKey }}"
+                    aria-selected="{{ $siteTab === $tabKey ? 'true' : 'false' }}"
+                >{{ $tabLabel }}</a>
+            </li>
+        @endforeach
         <li class="nav-item" role="presentation">
             <a
                 class="nav-link {{ $eventsTabActive ? 'active' : '' }}"
@@ -203,171 +218,23 @@
         </div>
         @endif
 
-        @if ($detailTabActive)
-        <div
-            class="tab-pane fade show active"
-            id="tab-site-detail"
-            role="tabpanel"
-            aria-labelledby="site-tab-detail"
-            tabindex="0"
-        >
-            @include('sites.partials.detail-jump-nav')
-
-            <x-stats-section id="content" :title="__('Contenuto')" :description="__('Pagine e query di ricerca')" :expanded="true">
-                @include('sites.partials.stats-table', [
-                    'title' => __('Pagine'),
-                    'description' => __('Top percorsi'),
-                    'dtType' => 'paths',
-                    'dimLabel' => __('Percorso'),
+        @foreach ($analyticsTabs as $tabKey => $tabLabel)
+            @if ($siteTab === $tabKey)
+            <div
+                class="tab-pane fade show active"
+                id="tab-site-{{ $tabKey }}"
+                role="tabpanel"
+                aria-labelledby="site-tab-{{ $tabKey }}"
+                tabindex="0"
+            >
+                @include('sites.partials.tab-'.$tabKey.'-section', [
                     'site' => $site,
                     'range' => $range,
+                    'dtUrl' => $dtUrl,
                 ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('Query di ricerca'),
-                    'description' => __('Termini da motori di ricerca o parametri ?q= sulla pagina'),
-                    'dtType' => 'search',
-                    'dimLabel' => __('Query'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-            </x-stats-section>
-
-            <x-stats-section id="traffic" :title="__('Traffico')" :description="__('Provenienza e link in uscita')">
-                @include('sites.partials.stats-table', [
-                    'title' => __('Sorgenti'),
-                    'description' => __('Referrer / motore'),
-                    'dtType' => 'source',
-                    'dimLabel' => __('Sorgente'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table-outbound', [
-                    'title' => __('Link in uscita'),
-                    'description' => __('URL di destinazione; provenienza = primo referrer della sessione (come per gli eventi)'),
-                    'dimLabel' => __('URL destinazione'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-            </x-stats-section>
-
-            <x-stats-section id="utm" :title="__('Campagne UTM')" :description="__('Parametri di tracciamento campagne')">
-                @include('sites.partials.stats-table', [
-                    'title' => __('UTM source'),
-                    'description' => __('Parametro utm_source dalla pagina di atterraggio'),
-                    'dtType' => 'utm_source',
-                    'dimLabel' => 'utm_source',
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('UTM medium'),
-                    'description' => __('Parametro utm_medium (es. cpc, email, social)'),
-                    'dtType' => 'utm_medium',
-                    'dimLabel' => 'utm_medium',
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('UTM campaign'),
-                    'description' => __('Parametro utm_campaign'),
-                    'dtType' => 'utm_campaign',
-                    'dimLabel' => 'utm_campaign',
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('UTM term'),
-                    'description' => __('Parametro utm_term (parole chiave a pagamento)'),
-                    'dtType' => 'utm_term',
-                    'dimLabel' => 'utm_term',
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('UTM content'),
-                    'description' => __('Parametro utm_content (varianti A/B o link)'),
-                    'dtType' => 'utm_content',
-                    'dimLabel' => 'utm_content',
-                    'site' => $site,
-                    'range' => $range,
-                ])
-            </x-stats-section>
-
-            <x-stats-section id="tech" :title="__('Tecnologia')" :description="__('Browser, OS, dispositivo e rete')">
-                @include('sites.partials.stats-table', [
-                    'title' => __('Browser'),
-                    'description' => __('Rilevato dal tracciamento (User-Agent)'),
-                    'dtType' => 'browser',
-                    'dimLabel' => __('Browser'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('Sistema operativo'),
-                    'description' => __('Rilevato dal tracciamento (User-Agent)'),
-                    'dtType' => 'os',
-                    'dimLabel' => __('OS'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('Dispositivo'),
-                    'description' => null,
-                    'dtType' => 'device',
-                    'dimLabel' => __('Tipo'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-
-                @include('sites.partials.stats-table', [
-                    'title' => __('Rete (ASN)'),
-                    'description' => __('Autonomous System da DB-IP ASN Lite'),
-                    'dtType' => 'asn',
-                    'dimLabel' => __('Rete'),
-                    'site' => $site,
-                    'range' => $range,
-                ])
-            </x-stats-section>
-
-            <x-stats-section id="geo" :title="__('Geografia')" :description="__('Distribuzione per paese')">
-                @include('sites.partials.country-map', ['site' => $site, 'range' => $range])
-
-                <div class="card mb-0 pa-stats-table-card">
-                    <div class="card-header py-3">
-                        <h6 class="m-0">{{ __('Paese') }}</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table
-                                class="table table-bordered table-sm mb-0 w-100 pa-site-dt"
-                                width="100%"
-                                data-pa-dt-url="{{ $dtUrl }}"
-                                data-pa-dt-type="country"
-                                data-pa-dt-range="{{ $range }}"
-                            >
-                                <thead>
-                                    <tr>
-                                        <th>{{ __('Paese') }}</th>
-                                        <th class="text-end">{{ __('Viste') }}</th>
-                                        <th class="text-end">{{ __('Univoci') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </x-stats-section>
-        </div>
-        @endif
+            </div>
+            @endif
+        @endforeach
 
         @if ($eventsTabActive)
         <div

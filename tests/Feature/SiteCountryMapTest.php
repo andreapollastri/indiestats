@@ -70,7 +70,7 @@ class SiteCountryMapTest extends TestCase
         ]);
     }
 
-    public function test_detail_tab_includes_country_map_above_country_table(): void
+    public function test_geo_tab_includes_country_map_above_country_table(): void
     {
         $user = User::factory()->admin()->create(['locale' => 'en']);
         $site = $user->ownedSites()->create([
@@ -80,7 +80,7 @@ class SiteCountryMapTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('sites.show', [
             'site' => $site->public_key,
-            'tab' => 'detail',
+            'tab' => 'geo',
         ]));
 
         $response->assertOk();

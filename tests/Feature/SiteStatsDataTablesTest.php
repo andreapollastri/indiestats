@@ -125,9 +125,47 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertSee('pa-stat-card', false);
     }
 
-    public function test_site_detail_tab_groups_stats_into_sections(): void
+    public function test_site_analytics_tabs_render_dedicated_sections(): void
     {
-        $user = User::factory()->admin()->create();
+        $user = User::factory()->admin()->create(['locale' => 'it']);
+
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $contentResponse = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'tab' => 'content',
+        ]));
+        $contentResponse->assertOk();
+        $contentResponse->assertSee('id="site-tab-content"', false);
+        $contentResponse->assertSee('data-pa-dt-type="paths"', false);
+        $contentResponse->assertSee('data-pa-dt-type="search"', false);
+
+        $utmResponse = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'tab' => 'utm',
+        ]));
+        $utmResponse->assertOk();
+        $utmResponse->assertSee('id="site-tab-utm"', false);
+        $utmResponse->assertSee('data-pa-dt-type="utm_source"', false);
+
+        $geoResponse = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'tab' => 'geo',
+        ]));
+        $geoResponse->assertOk();
+        $geoResponse->assertSee('id="site-tab-geo"', false);
+        $geoResponse->assertSee('data-pa-dt-type="country"', false);
+    }
+
+    public function test_legacy_detail_tab_redirects_to_content_tab(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it']);
 
         $site = $user->ownedSites()->create([
             'name' => 'Test site',
@@ -141,9 +179,8 @@ class SiteStatsDataTablesTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertSee('pa-stats-section', false);
-        $response->assertSee(__('Contenuto'), false);
-        $response->assertSee(__('Campagne UTM'), false);
-        $response->assertSee(__('Geografia'), false);
+        $response->assertSee('id="site-tab-content"', false);
+        $response->assertSee('data-pa-dt-type="paths"', false);
+        $response->assertDontSee('id="site-tab-detail"', false);
     }
 }
