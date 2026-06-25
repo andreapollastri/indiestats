@@ -95,6 +95,9 @@ class AnalyticsFilterScope
         if ($filters->sessionId !== null) {
             $q->where('session_id', $filters->sessionId);
         }
+        if ($filters->visitorId !== null) {
+            $q->where('visitor_id', $filters->visitorId);
+        }
         if ($filters->isBot !== null) {
             $q->where('is_bot', $filters->isBot);
         }
@@ -126,7 +129,11 @@ class AnalyticsFilterScope
             $q->where('referrer_source', $filters->source);
         }
 
-        $pv = $filters->withoutEvent()->withoutPathAndSource();
+        if ($filters->visitorId !== null) {
+            $q->where($visitorColumn, $filters->visitorId);
+        }
+
+        $pv = $filters->withoutEvent()->withoutPathAndSource()->withoutVisitorId();
 
         if ($pv->hasPageViewRowFilters()) {
             $q->whereIn($visitorColumn, function ($sub) use ($siteId, $from, $to, $pv): void {
@@ -170,7 +177,15 @@ class AnalyticsFilterScope
             return;
         }
 
+        if ($filters->visitorId !== null) {
+            $q->where('visitor_id', $filters->visitorId);
+        }
+
         $pvFilters = $filters->withoutEvent();
+
+        if ($filters->visitorId !== null) {
+            $pvFilters = $pvFilters->withoutVisitorId();
+        }
 
         if ($pvFilters->hasPageViewRowFilters()) {
             $q->whereExists(function ($sub) use ($siteId, $from, $to, $pvFilters): void {

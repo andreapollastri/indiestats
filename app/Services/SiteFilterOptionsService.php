@@ -72,6 +72,12 @@ class SiteFilterOptionsService
             'language' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'browser_language', $like, $limit),
             'timezone' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'timezone', $like, $limit),
             'session_id' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'session_id', $like, $limit),
+            'visitor_id' => $this->distinctColumn(
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
+                'visitor_id',
+                $like,
+                $limit
+            ),
             'is_bot' => $this->isBotOptions(),
             'asn' => $this->asnOptions($siteId, $from, $to, $q, $limit),
             'search' => $this->distinctColumn(
@@ -111,6 +117,7 @@ class SiteFilterOptionsService
             'language',
             'timezone',
             'session_id',
+            'visitor_id',
             'is_bot',
             'country',
             'asn',

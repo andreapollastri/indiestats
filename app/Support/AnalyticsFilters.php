@@ -31,6 +31,7 @@ final class AnalyticsFilters
         'filter_language',
         'filter_timezone',
         'filter_session_id',
+        'filter_visitor_id',
         'filter_is_bot',
         'filter_asn',
     ];
@@ -58,6 +59,7 @@ final class AnalyticsFilters
         public readonly ?string $language = null,
         public readonly ?string $timezone = null,
         public readonly ?string $sessionId = null,
+        public readonly ?string $visitorId = null,
         public readonly ?bool $isBot = null,
         public readonly ?int $asn = null,
     ) {}
@@ -120,6 +122,7 @@ final class AnalyticsFilters
             language: $s('filter_language', 16),
             timezone: $s('filter_timezone', 64),
             sessionId: $s('filter_session_id', 64),
+            visitorId: $s('filter_visitor_id', 64),
             isBot: self::parseIsBot($request->input('filter_is_bot')),
             asn: self::parseAsn($request->input('filter_asn')),
         );
@@ -246,6 +249,9 @@ final class AnalyticsFilters
         if ($this->sessionId !== null) {
             $o['filter_session_id'] = $this->sessionId;
         }
+        if ($this->visitorId !== null) {
+            $o['filter_visitor_id'] = $this->visitorId;
+        }
         if ($this->isBot !== null) {
             $o['filter_is_bot'] = $this->isBot ? '1' : '0';
         }
@@ -284,6 +290,7 @@ final class AnalyticsFilters
             || $this->language !== null
             || $this->timezone !== null
             || $this->sessionId !== null
+            || $this->visitorId !== null
             || $this->isBot !== null
             || $this->asn !== null;
     }
@@ -313,6 +320,7 @@ final class AnalyticsFilters
             language: $this->language,
             timezone: $this->timezone,
             sessionId: $this->sessionId,
+            visitorId: $this->visitorId,
             isBot: $this->isBot,
             asn: $this->asn,
         );
@@ -320,7 +328,7 @@ final class AnalyticsFilters
 
     /**
      * For outbound_clicks queries: path and source map to from_path / referrer_source;
-     * they must not be repeated in the page_views visitor_id subquery.
+     * visitor_id maps to the row column and must not be repeated in the page_views subquery.
      */
     public function withoutPathAndSource(): self
     {
@@ -347,6 +355,38 @@ final class AnalyticsFilters
             language: $this->language,
             timezone: $this->timezone,
             sessionId: $this->sessionId,
+            visitorId: $this->visitorId,
+            isBot: $this->isBot,
+            asn: $this->asn,
+        );
+    }
+
+    public function withoutVisitorId(): self
+    {
+        return new self(
+            source: $this->source,
+            path: $this->path,
+            pageTitle: $this->pageTitle,
+            pageQuery: $this->pageQuery,
+            utmSource: $this->utmSource,
+            utmMedium: $this->utmMedium,
+            utmCampaign: $this->utmCampaign,
+            utmTerm: $this->utmTerm,
+            utmContent: $this->utmContent,
+            gclid: $this->gclid,
+            fbclid: $this->fbclid,
+            msclkid: $this->msclkid,
+            event: $this->event,
+            device: $this->device,
+            country: $this->country,
+            searchQuery: $this->searchQuery,
+            browser: $this->browser,
+            browserVersion: $this->browserVersion,
+            os: $this->os,
+            language: $this->language,
+            timezone: $this->timezone,
+            sessionId: $this->sessionId,
+            visitorId: null,
             isBot: $this->isBot,
             asn: $this->asn,
         );

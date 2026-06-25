@@ -15,7 +15,7 @@ class SiteFilterOptionsController extends Controller
         $this->authorize('view', $site);
 
         $validated = $request->validate([
-            'type' => 'required|string|in:source,path,page_title,page_query,utm,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,msclkid,event,device,browser,browser_version,os,language,timezone,session_id,is_bot,country,asn,search',
+            'type' => 'required|string|in:source,path,page_title,page_query,utm,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,msclkid,event,device,browser,browser_version,os,language,timezone,session_id,visitor_id,is_bot,country,asn,search',
             'range' => 'required|string|in:today,7d,30d,3m,6m,1y',
             'q' => 'nullable|string|max:256',
         ]);

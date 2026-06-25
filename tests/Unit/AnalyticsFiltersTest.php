@@ -139,6 +139,7 @@ class AnalyticsFiltersTest extends TestCase
             'filter_language' => 'it-IT',
             'filter_timezone' => 'Europe/Rome',
             'filter_session_id' => 'sess-1',
+            'filter_visitor_id' => 'visitor-abc',
             'filter_is_bot' => '0',
         ]);
 
@@ -151,6 +152,7 @@ class AnalyticsFiltersTest extends TestCase
         $this->assertSame('it-IT', $filters->language);
         $this->assertSame('Europe/Rome', $filters->timezone);
         $this->assertSame('sess-1', $filters->sessionId);
+        $this->assertSame('visitor-abc', $filters->visitorId);
         $this->assertFalse($filters->isBot);
         $this->assertSame([
             'filter_page_title' => 'Home',
@@ -162,7 +164,18 @@ class AnalyticsFiltersTest extends TestCase
             'filter_language' => 'it-IT',
             'filter_timezone' => 'Europe/Rome',
             'filter_session_id' => 'sess-1',
+            'filter_visitor_id' => 'visitor-abc',
             'filter_is_bot' => '0',
         ], $filters->toQueryArray());
+    }
+
+    public function test_from_query_array_round_trips_visitor_id_filter(): void
+    {
+        $filters = AnalyticsFilters::fromQueryArray([
+            'filter_visitor_id' => 'abc-123-def',
+        ]);
+
+        $this->assertSame('abc-123-def', $filters->visitorId);
+        $this->assertSame(['filter_visitor_id' => 'abc-123-def'], $filters->toQueryArray());
     }
 }

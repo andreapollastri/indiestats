@@ -390,4 +390,142 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertOk();
         $response->assertJsonFragment(['value' => 'it-IT', 'text' => 'it-IT']);
     }
+
+    public function test_datatable_applies_search_query_filter_from_post_body(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Filtered site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'search_query' => 'ristoranti milano',
+            'browser' => 'Chrome',
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v2',
+            'search_query' => 'hotel roma',
+            'browser' => 'Firefox',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
+            'type' => 'browser',
+            'range' => '7d',
+            'draw' => 1,
+            'start' => 0,
+            'length' => 10,
+            'filter_q' => 'ristoranti milano',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('recordsTotal', 1);
+        $response->assertJsonPath('data.0.name', 'Chrome');
+    }
+
+    public function test_site_page_includes_search_query_filter_field(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'filter_q' => 'ristoranti milano',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="pa-f-search"', false);
+        $response->assertSee('data-pa-filter-type="search"', false);
+        $response->assertSee('name="filter_q"', false);
+        $response->assertSee('ristoranti milano', false);
+    }
+
+    public function test_datatable_applies_visitor_id_filter_from_post_body(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Filtered site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-abc',
+            'browser' => 'Chrome',
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-xyz',
+            'browser' => 'Firefox',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
+            'type' => 'browser',
+            'range' => '7d',
+            'draw' => 1,
+            'start' => 0,
+            'length' => 10,
+            'filter_visitor_id' => 'visitor-abc',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('recordsTotal', 1);
+        $response->assertJsonPath('data.0.name', 'Chrome');
+    }
+
+    public function test_site_page_includes_visitor_id_filter_field(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'filter_visitor_id' => 'visitor-abc',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="pa-f-visitor-id"', false);
+        $response->assertSee('data-pa-filter-type="visitor_id"', false);
+        $response->assertSee('name="filter_visitor_id"', false);
+        $response->assertSee('visitor-abc', false);
+    }
+
+    public function test_filter_options_returns_visitor_id_values(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-abc',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.filter-options', [
+            'site' => $site->public_key,
+            'type' => 'visitor_id',
+            'range' => '7d',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonFragment(['value' => 'visitor-abc', 'text' => 'visitor-abc']);
+    }
 }

@@ -3,6 +3,7 @@ import TomSelect from 'tom-select';
 const TYPE_TO_PARAM = {
     source: 'filter_source',
     path: 'filter_path',
+    search: 'filter_q',
     page_title: 'filter_page_title',
     page_query: 'filter_page_query',
     utm: 'filter_utm_source',
@@ -22,6 +23,7 @@ const TYPE_TO_PARAM = {
     language: 'filter_language',
     timezone: 'filter_timezone',
     session_id: 'filter_session_id',
+    visitor_id: 'filter_visitor_id',
     is_bot: 'filter_is_bot',
     country: 'filter_country',
     asn: 'filter_asn',
@@ -49,6 +51,7 @@ const FILTER_PARAM_KEYS = [
     'filter_language',
     'filter_timezone',
     'filter_session_id',
+    'filter_visitor_id',
     'filter_is_bot',
     'filter_country',
     'filter_asn',

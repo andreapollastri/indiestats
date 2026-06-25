@@ -77,6 +77,15 @@
                             </select>
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label small mb-1" for="pa-f-search">{{ __('Termine di ricerca') }}</label>
+                            <select name="filter_q" id="pa-f-search" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="search" placeholder="{{ __('Cerca…') }}">
+                                <option value=""></option>
+                                @if ($analytics_filters->searchQuery)
+                                    <option value="{{ $analytics_filters->searchQuery }}" selected>{{ $analytics_filters->searchQuery }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-path">{{ __('Pagina') }}</label>
                             <select name="filter_path" id="pa-f-path" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="path" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -244,6 +253,15 @@
                                 <option value=""></option>
                                 @if ($analytics_filters->sessionId)
                                     <option value="{{ $analytics_filters->sessionId }}" selected>{{ $analytics_filters->sessionId }}</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small mb-1" for="pa-f-visitor-id">{{ __('Visitatore') }}</label>
+                            <select name="filter_visitor_id" id="pa-f-visitor-id" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="visitor_id" placeholder="{{ __('Cerca…') }}">
+                                <option value=""></option>
+                                @if ($analytics_filters->visitorId)
+                                    <option value="{{ $analytics_filters->visitorId }}" selected>{{ $analytics_filters->visitorId }}</option>
                                 @endif
                             </select>
                         </div>
