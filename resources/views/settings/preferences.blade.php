@@ -37,7 +37,7 @@
                         @endforeach
                     </select>
                     @error('timezone')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    <p class="small mt-2 mb-0" style="color: #94a3b8;">{{ __('Le date e gli orari nell’app sono memorizzati in UTC e mostrati in questo fuso.') }}</p>
+                    <p class="small mt-2 mb-0" style="color: #94a3b8;">{{ __("Le date e gli orari nell'app sono memorizzati in UTC e mostrati in questo fuso.") }}</p>
                 </div>
                 <button type="submit" class="btn btn-primary" data-test="save-preferences-button">{{ __('Salva') }}</button>
             </form>

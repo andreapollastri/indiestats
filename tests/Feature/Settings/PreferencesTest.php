@@ -78,6 +78,17 @@ class PreferencesTest extends TestCase
         $response->assertSessionHasErrors('timezone');
     }
 
+    public function test_preferences_page_shows_timezone_hint_in_user_locale(): void
+    {
+        $user = User::factory()->create(['locale' => 'en']);
+
+        $this->actingAs($user)
+            ->get(route('preferences.edit'))
+            ->assertOk()
+            ->assertSee('Dates and times are stored in UTC and shown in this time zone.', false)
+            ->assertDontSee("Le date e gli orari nell'app sono memorizzati in UTC e mostrati in questo fuso.", false);
+    }
+
     public function test_guest_cannot_access_preferences(): void
     {
         $this->get(route('preferences.edit'))->assertRedirect(route('login'));
