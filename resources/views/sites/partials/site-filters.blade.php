@@ -67,7 +67,7 @@
                         <a href="{{ $filterResetUrl }}" class="btn btn-sm btn-outline-secondary">{{ __('Azzera filtri') }}</a>
                     </div>
                     <div class="row g-2">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-source">{{ __('Provenienza') }}</label>
                             <select name="filter_source" id="pa-f-source" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="source" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -76,7 +76,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-path">{{ __('Pagina') }}</label>
                             <select name="filter_path" id="pa-f-path" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="path" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -85,7 +85,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-page-title">{{ __('Titolo pagina') }}</label>
                             <select name="filter_page_title" id="pa-f-page-title" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="page_title" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -94,7 +94,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-page-query">{{ __('Query string') }}</label>
                             <select name="filter_page_query" id="pa-f-page-query" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="page_query" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -103,7 +103,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-utm-source">{{ __('UTM source') }}</label>
                             <select name="filter_utm_source" id="pa-f-utm-source" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_source" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -112,7 +112,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-utm-medium">{{ __('UTM medium') }}</label>
                             <select name="filter_utm_medium" id="pa-f-utm-medium" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_medium" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -121,7 +121,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-utm-campaign">{{ __('UTM campaign') }}</label>
                             <select name="filter_utm_campaign" id="pa-f-utm-campaign" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_campaign" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -130,7 +130,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-utm-term">{{ __('UTM term') }}</label>
                             <select name="filter_utm_term" id="pa-f-utm-term" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_term" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -139,7 +139,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-utm-content">{{ __('UTM content') }}</label>
                             <select name="filter_utm_content" id="pa-f-utm-content" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="utm_content" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -148,7 +148,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-gclid">{{ __('Google Ads (gclid)') }}</label>
                             <select name="filter_gclid" id="pa-f-gclid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="gclid" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -157,7 +157,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-fbclid">{{ __('Facebook (fbclid)') }}</label>
                             <select name="filter_fbclid" id="pa-f-fbclid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="fbclid" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -166,7 +166,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-msclkid">{{ __('Microsoft Ads (msclkid)') }}</label>
                             <select name="filter_msclkid" id="pa-f-msclkid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="msclkid" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -175,7 +175,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-event">{{ __('Evento') }}</label>
                             <select name="filter_event" id="pa-f-event" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="event" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -184,7 +184,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-device">{{ __('Dispositivo') }}</label>
                             <select name="filter_device" id="pa-f-device" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="device" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -193,7 +193,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-browser">{{ __('Browser') }}</label>
                             <select name="filter_browser" id="pa-f-browser" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="browser" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -202,7 +202,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-browser-version">{{ __('Versione browser') }}</label>
                             <select name="filter_browser_version" id="pa-f-browser-version" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="browser_version" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -211,7 +211,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-os">{{ __('Sistema operativo') }}</label>
                             <select name="filter_os" id="pa-f-os" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="os" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -220,7 +220,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-language">{{ __('Lingua browser') }}</label>
                             <select name="filter_language" id="pa-f-language" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="language" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -229,7 +229,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-timezone">{{ __('Fuso orario') }}</label>
                             <select name="filter_timezone" id="pa-f-timezone" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="timezone" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -238,7 +238,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-session-id">{{ __('Sessione') }}</label>
                             <select name="filter_session_id" id="pa-f-session-id" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="session_id" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -247,7 +247,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-is-bot">{{ __('Tipo visitatore') }}</label>
                             <select name="filter_is_bot" id="pa-f-is-bot" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="is_bot" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -256,7 +256,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-country">{{ __('Paese') }}</label>
                             <select name="filter_country" id="pa-f-country" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="country" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -265,7 +265,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-asn">{{ __('Rete') }}</label>
                             <select name="filter_asn" id="pa-f-asn" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="asn" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
