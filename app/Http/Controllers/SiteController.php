@@ -95,7 +95,7 @@ class SiteController extends Controller
         if ($siteTab === 'detail') {
             $siteTab = 'content';
         }
-        if (! in_array($siteTab, ['summary', 'realtime', 'content', 'traffic', 'utm', 'tech', 'geo', 'events'], true)) {
+        if (! in_array($siteTab, ['summary', 'realtime', 'content', 'traffic', 'utm', 'tech', 'geo', 'visitor', 'events'], true)) {
             $siteTab = 'summary';
         }
         $errorsBag = $request->session()->get('errors');

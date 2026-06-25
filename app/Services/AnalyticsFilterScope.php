@@ -59,15 +59,6 @@ class AnalyticsFilterScope
         if ($filters->utmContent !== null) {
             $q->where('utm_content', $filters->utmContent);
         }
-        if ($filters->gclid !== null) {
-            $q->where('gclid', $filters->gclid);
-        }
-        if ($filters->fbclid !== null) {
-            $q->where('fbclid', $filters->fbclid);
-        }
-        if ($filters->msclkid !== null) {
-            $q->where('msclkid', $filters->msclkid);
-        }
         if ($filters->device !== null) {
             $q->where('device_type', $filters->device);
         }
@@ -91,9 +82,6 @@ class AnalyticsFilterScope
         }
         if ($filters->timezone !== null) {
             $q->where('timezone', $filters->timezone);
-        }
-        if ($filters->sessionId !== null) {
-            $q->where('session_id', $filters->sessionId);
         }
         if ($filters->visitorId !== null) {
             $q->where('visitor_id', $filters->visitorId);

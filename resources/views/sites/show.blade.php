@@ -19,6 +19,7 @@
         'utm' => __('UTM'),
         'tech' => __('Tecnologia'),
         'geo' => __('Geografia'),
+        'visitor' => __('Visitatore'),
     ];
     $summaryTabActive = $siteTab === 'summary';
     $realtimeTabActive = $siteTab === 'realtime';

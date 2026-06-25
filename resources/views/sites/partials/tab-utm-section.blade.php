@@ -1,13 +1,4 @@
 @include('sites.partials.stats-table', [
-    'title' => __('Click ID campagne'),
-    'description' => __('gclid, fbclid e msclkid dalla URL di atterraggio'),
-    'dtType' => 'click_ids',
-    'dimLabel' => __('Parametro'),
-    'site' => $site,
-    'range' => $range,
-])
-
-@include('sites.partials.stats-table', [
     'title' => __('UTM source'),
     'description' => __('Parametro utm_source dalla pagina di atterraggio'),
     'dtType' => 'utm_source',

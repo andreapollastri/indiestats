@@ -18,9 +18,6 @@ final class AnalyticsFilters
         'filter_utm_campaign',
         'filter_utm_term',
         'filter_utm_content',
-        'filter_gclid',
-        'filter_fbclid',
-        'filter_msclkid',
         'filter_event',
         'filter_device',
         'filter_country',
@@ -30,7 +27,6 @@ final class AnalyticsFilters
         'filter_os',
         'filter_language',
         'filter_timezone',
-        'filter_session_id',
         'filter_visitor_id',
         'filter_is_bot',
         'filter_asn',
@@ -46,9 +42,6 @@ final class AnalyticsFilters
         public readonly ?string $utmCampaign = null,
         public readonly ?string $utmTerm = null,
         public readonly ?string $utmContent = null,
-        public readonly ?string $gclid = null,
-        public readonly ?string $fbclid = null,
-        public readonly ?string $msclkid = null,
         public readonly ?string $event = null,
         public readonly ?string $device = null,
         public readonly ?string $country = null,
@@ -58,7 +51,6 @@ final class AnalyticsFilters
         public readonly ?string $os = null,
         public readonly ?string $language = null,
         public readonly ?string $timezone = null,
-        public readonly ?string $sessionId = null,
         public readonly ?string $visitorId = null,
         public readonly ?bool $isBot = null,
         public readonly ?int $asn = null,
@@ -109,9 +101,6 @@ final class AnalyticsFilters
             utmCampaign: $s('filter_utm_campaign', 255),
             utmTerm: $s('filter_utm_term', 255),
             utmContent: $s('filter_utm_content', 255),
-            gclid: $s('filter_gclid', 255),
-            fbclid: $s('filter_fbclid', 255),
-            msclkid: $s('filter_msclkid', 255),
             event: $s('filter_event', 128),
             device: $s('filter_device', 32),
             country: $s('filter_country', 2),
@@ -121,7 +110,6 @@ final class AnalyticsFilters
             os: $s('filter_os', 64),
             language: $s('filter_language', 16),
             timezone: $s('filter_timezone', 64),
-            sessionId: $s('filter_session_id', 64),
             visitorId: $s('filter_visitor_id', 64),
             isBot: self::parseIsBot($request->input('filter_is_bot')),
             asn: self::parseAsn($request->input('filter_asn')),
@@ -210,15 +198,6 @@ final class AnalyticsFilters
         if ($this->utmContent !== null) {
             $o['filter_utm_content'] = $this->utmContent;
         }
-        if ($this->gclid !== null) {
-            $o['filter_gclid'] = $this->gclid;
-        }
-        if ($this->fbclid !== null) {
-            $o['filter_fbclid'] = $this->fbclid;
-        }
-        if ($this->msclkid !== null) {
-            $o['filter_msclkid'] = $this->msclkid;
-        }
         if ($this->event !== null) {
             $o['filter_event'] = $this->event;
         }
@@ -245,9 +224,6 @@ final class AnalyticsFilters
         }
         if ($this->timezone !== null) {
             $o['filter_timezone'] = $this->timezone;
-        }
-        if ($this->sessionId !== null) {
-            $o['filter_session_id'] = $this->sessionId;
         }
         if ($this->visitorId !== null) {
             $o['filter_visitor_id'] = $this->visitorId;
@@ -278,9 +254,6 @@ final class AnalyticsFilters
             || $this->utmCampaign !== null
             || $this->utmTerm !== null
             || $this->utmContent !== null
-            || $this->gclid !== null
-            || $this->fbclid !== null
-            || $this->msclkid !== null
             || $this->device !== null
             || $this->country !== null
             || $this->searchQuery !== null
@@ -289,7 +262,6 @@ final class AnalyticsFilters
             || $this->os !== null
             || $this->language !== null
             || $this->timezone !== null
-            || $this->sessionId !== null
             || $this->visitorId !== null
             || $this->isBot !== null
             || $this->asn !== null;
@@ -307,9 +279,6 @@ final class AnalyticsFilters
             utmCampaign: $this->utmCampaign,
             utmTerm: $this->utmTerm,
             utmContent: $this->utmContent,
-            gclid: $this->gclid,
-            fbclid: $this->fbclid,
-            msclkid: $this->msclkid,
             event: null,
             device: $this->device,
             country: $this->country,
@@ -319,7 +288,6 @@ final class AnalyticsFilters
             os: $this->os,
             language: $this->language,
             timezone: $this->timezone,
-            sessionId: $this->sessionId,
             visitorId: $this->visitorId,
             isBot: $this->isBot,
             asn: $this->asn,
@@ -342,9 +310,6 @@ final class AnalyticsFilters
             utmCampaign: $this->utmCampaign,
             utmTerm: $this->utmTerm,
             utmContent: $this->utmContent,
-            gclid: $this->gclid,
-            fbclid: $this->fbclid,
-            msclkid: $this->msclkid,
             event: $this->event,
             device: $this->device,
             country: $this->country,
@@ -354,7 +319,6 @@ final class AnalyticsFilters
             os: $this->os,
             language: $this->language,
             timezone: $this->timezone,
-            sessionId: $this->sessionId,
             visitorId: $this->visitorId,
             isBot: $this->isBot,
             asn: $this->asn,
@@ -373,9 +337,6 @@ final class AnalyticsFilters
             utmCampaign: $this->utmCampaign,
             utmTerm: $this->utmTerm,
             utmContent: $this->utmContent,
-            gclid: $this->gclid,
-            fbclid: $this->fbclid,
-            msclkid: $this->msclkid,
             event: $this->event,
             device: $this->device,
             country: $this->country,
@@ -385,7 +346,6 @@ final class AnalyticsFilters
             os: $this->os,
             language: $this->language,
             timezone: $this->timezone,
-            sessionId: $this->sessionId,
             visitorId: null,
             isBot: $this->isBot,
             asn: $this->asn,

@@ -158,33 +158,6 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small mb-1" for="pa-f-gclid">{{ __('Google Ads (gclid)') }}</label>
-                            <select name="filter_gclid" id="pa-f-gclid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="gclid" placeholder="{{ __('Cerca…') }}">
-                                <option value=""></option>
-                                @if ($analytics_filters->gclid)
-                                    <option value="{{ $analytics_filters->gclid }}" selected>{{ $analytics_filters->gclid }}</option>
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small mb-1" for="pa-f-fbclid">{{ __('Facebook (fbclid)') }}</label>
-                            <select name="filter_fbclid" id="pa-f-fbclid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="fbclid" placeholder="{{ __('Cerca…') }}">
-                                <option value=""></option>
-                                @if ($analytics_filters->fbclid)
-                                    <option value="{{ $analytics_filters->fbclid }}" selected>{{ $analytics_filters->fbclid }}</option>
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small mb-1" for="pa-f-msclkid">{{ __('Microsoft Ads (msclkid)') }}</label>
-                            <select name="filter_msclkid" id="pa-f-msclkid" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="msclkid" placeholder="{{ __('Cerca…') }}">
-                                <option value=""></option>
-                                @if ($analytics_filters->msclkid)
-                                    <option value="{{ $analytics_filters->msclkid }}" selected>{{ $analytics_filters->msclkid }}</option>
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-4">
                             <label class="form-label small mb-1" for="pa-f-event">{{ __('Evento') }}</label>
                             <select name="filter_event" id="pa-f-event" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="event" placeholder="{{ __('Cerca…') }}">
                                 <option value=""></option>
@@ -244,15 +217,6 @@
                                 <option value=""></option>
                                 @if ($analytics_filters->timezone)
                                     <option value="{{ $analytics_filters->timezone }}" selected>{{ $analytics_filters->timezone }}</option>
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small mb-1" for="pa-f-session-id">{{ __('Sessione') }}</label>
-                            <select name="filter_session_id" id="pa-f-session-id" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="session_id" placeholder="{{ __('Cerca…') }}">
-                                <option value=""></option>
-                                @if ($analytics_filters->sessionId)
-                                    <option value="{{ $analytics_filters->sessionId }}" selected>{{ $analytics_filters->sessionId }}</option>
                                 @endif
                             </select>
                         </div>

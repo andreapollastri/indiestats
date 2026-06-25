@@ -57,6 +57,9 @@ class SiteStatsDataTableService
             'browser_version' => ['group' => 'browser_version', 'json_key' => 'name', 'where' => function (Builder $q): void {
                 $q->whereNotNull('browser_version')->where('browser_version', '!=', '');
             }],
+            'visitor_id' => ['group' => 'visitor_id', 'json_key' => 'visitor_id', 'where' => function (Builder $q): void {
+                $q->whereNotNull('visitor_id')->where('visitor_id', '!=', '');
+            }],
         ];
     }
 
@@ -100,7 +103,7 @@ class SiteStatsDataTableService
         $displayTimezone = $request->user()?->timezone ?? 'UTC';
 
         return match ($type) {
-            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'os', 'country', 'language', 'timezone', 'page_title', 'browser_version' => $this->pageAggregated(
+            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'os', 'country', 'language', 'timezone', 'page_title', 'browser_version', 'visitor_id' => $this->pageAggregated(
                 $siteId,
                 $from,
                 $to,
@@ -113,7 +116,7 @@ class SiteStatsDataTableService
                 $draw,
                 $filters
             ),
-            'click_ids' => $this->clickIdsAggregated(
+            'is_bot' => $this->isBotAggregated(
                 $siteId,
                 $from,
                 $to,
@@ -283,7 +286,7 @@ class SiteStatsDataTableService
     /**
      * @return array{draw: int, recordsTotal: int, recordsFiltered: int, data: list<array<string, mixed>>}
      */
-    private function clickIdsAggregated(
+    private function isBotAggregated(
         int $siteId,
         CarbonInterface $from,
         CarbonInterface $to,
@@ -296,17 +299,15 @@ class SiteStatsDataTableService
         AnalyticsFilters $filters
     ): array {
         $definitions = [
-            ['column' => 'gclid', 'label' => 'Google Ads (gclid)'],
-            ['column' => 'fbclid', 'label' => 'Facebook (fbclid)'],
-            ['column' => 'msclkid', 'label' => 'Microsoft Ads (msclkid)'],
+            ['value' => false, 'label' => __('Visitatori umani')],
+            ['value' => true, 'label' => __('Bot / crawler')],
         ];
 
         $rows = [];
         foreach ($definitions as $definition) {
-            $column = $definition['column'];
             $base = PageView::query();
             $this->filterScope->applyToPageViews($base, $siteId, $from, $to, $filters);
-            $base->whereNotNull($column)->where($column, '!=', '');
+            $base->where('is_bot', $definition['value']);
 
             $rows[] = [
                 'name' => $definition['label'],
