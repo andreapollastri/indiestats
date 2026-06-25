@@ -117,14 +117,15 @@ function mergePresetOptions(presets, currentValue, currentLabel) {
     const seen = new Set();
     const opts = [];
     (presets || []).forEach(function (p) {
-        if (!p || typeof p.value !== 'string') {
+        if (p == null || p.value === null || p.value === undefined || p.value === '') {
             return;
         }
-        if (seen.has(p.value)) {
+        const value = String(p.value);
+        if (seen.has(value)) {
             return;
         }
-        seen.add(p.value);
-        opts.push({ value: p.value, text: p.text != null ? String(p.text) : p.value });
+        seen.add(value);
+        opts.push({ value: value, text: p.text != null ? String(p.text) : value });
     });
     if (currentValue && !seen.has(currentValue)) {
         opts.push({
@@ -160,59 +161,74 @@ function init() {
 
         const placeholder = select.getAttribute('placeholder') || '';
 
-        new TomSelect(select, {
-            valueField: 'value',
-            labelField: 'text',
-            searchField: ['text', 'value'],
-            options: initialOptions,
-            items: currentVal ? [currentVal] : [],
-            maxItems: 1,
-            create: false,
-            allowEmptyOption: true,
-            placeholder: placeholder,
-            openOnFocus: true,
-            preload: 'focus',
-            /**
-             * dropdown_input: search field in the panel (otherwise with a selected value Tom Select
-             * hides the input so typing is impossible and load() never runs).
-             * clear_button: button to go back to “All” and search again.
-             */
-            plugins: [
-                'caret_position',
-                'dropdown_input',
-                { name: 'clear_button', options: { title: 'Clear filter' } },
-            ],
-            loadThrottle: 300,
-            // Do not use document.body: Tom Select only applies top/left when dropdownParent === 'body' (string);
-            // with an HTMLElement, positionDropdown() does not run and the menu is misplaced.
-            // Default: parent = .ts-wrapper wrapper (position: relative) → dropdown below the field.
-            load: function (query, callback) {
-                const url = new URL(cfg.optionsUrl, window.location.origin);
-                url.searchParams.set('type', type);
-                url.searchParams.set('range', cfg.range);
-                const q = query != null ? String(query).trim() : '';
-                if (q.length) {
-                    url.searchParams.set('q', q);
-                }
-                fetch(url.toString(), {
-                    headers: {
-                        Accept: 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    credentials: 'same-origin',
-                })
-                    .then(function (r) {
-                        return r.json();
-                    })
-                    .then(function (data) {
-                        const results = data && Array.isArray(data.results) ? data.results : [];
-                        callback(results);
-                    })
-                    .catch(function () {
-                        callback();
-                    });
-            },
+        // Empty options labeled "Tutti" / "Tutte" prevent the Tom Select placeholder from showing.
+        select.querySelectorAll('option[value=""]').forEach(function (opt) {
+            opt.textContent = '';
         });
+
+        let ts;
+        try {
+            ts = new TomSelect(select, {
+                valueField: 'value',
+                labelField: 'text',
+                searchField: ['text', 'value'],
+                options: initialOptions,
+                items: currentVal ? [currentVal] : [],
+                maxItems: 1,
+                create: false,
+                allowEmptyOption: true,
+                placeholder: placeholder,
+                openOnFocus: true,
+                preload: 'focus',
+                /**
+                 * dropdown_input: search field in the panel (otherwise with a selected value Tom Select
+                 * hides the input so typing is impossible and load() never runs).
+                 * clear_button: button to go back to “All” and search again.
+                 */
+                plugins: [
+                    'caret_position',
+                    'dropdown_input',
+                    { name: 'clear_button', options: { title: 'Clear filter' } },
+                ],
+                loadThrottle: 300,
+                // Do not use document.body: Tom Select only applies top/left when dropdownParent === 'body' (string);
+                // with an HTMLElement, positionDropdown() does not run and the menu is misplaced.
+                // Default: parent = .ts-wrapper wrapper (position: relative) → dropdown below the field.
+                load: function (query, callback) {
+                    const url = new URL(cfg.optionsUrl, window.location.origin);
+                    url.searchParams.set('type', type);
+                    url.searchParams.set('range', cfg.range);
+                    const q = query != null ? String(query).trim() : '';
+                    if (q.length) {
+                        url.searchParams.set('q', q);
+                    }
+                    fetch(url.toString(), {
+                        headers: {
+                            Accept: 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        credentials: 'same-origin',
+                    })
+                        .then(function (r) {
+                            return r.json();
+                        })
+                        .then(function (data) {
+                            const results = data && Array.isArray(data.results) ? data.results : [];
+                            callback(results);
+                        })
+                        .catch(function () {
+                            callback();
+                        });
+                },
+            });
+        } catch (err) {
+            console.error('[pa-site-filters] Tom Select init failed:', type, err);
+            return;
+        }
+
+        if (!currentVal) {
+            ts.clear(true);
+        }
     });
 
     const filterCollapse = document.getElementById('pa-site-filters-collapse');

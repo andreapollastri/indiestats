@@ -268,7 +268,7 @@
                         <div class="col-md-6">
                             <label class="form-label small mb-1" for="pa-f-asn">{{ __('Rete') }}</label>
                             <select name="filter_asn" id="pa-f-asn" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="asn" placeholder="{{ __('Cerca…') }}">
-                                <option value="">{{ __('Tutti') }}</option>
+                                <option value=""></option>
                                 @if ($analytics_filters->asn)
                                     <option value="{{ $analytics_filters->asn }}" selected>{{ $filterCurrentLabels['filter_asn'] ?? ('AS'.$analytics_filters->asn) }}</option>
                                 @endif

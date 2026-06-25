@@ -339,6 +339,8 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertSee('id="pa-f-asn"', false);
         $response->assertSee('data-pa-filter-type="asn"', false);
         $response->assertSee('placeholder="'.__('Cerca…').'"', false);
-        $response->assertSee('AS15169', false);
+        $response->assertSee('<option value=""></option>', false);
+        $response->assertDontSee('name="filter_asn" id="pa-f-asn" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="asn" placeholder="'.__('Cerca…').'">
+                                <option value="">'.__('Tutti').'</option>', false);
     }
 }
