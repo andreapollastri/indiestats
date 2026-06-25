@@ -23,6 +23,7 @@ class CollectController extends Controller
         $data = $request->validate([
             'site_key' => 'required|uuid',
             'visitor_id' => 'required|string|max:64',
+            'session_id' => 'nullable|string|max:64',
             'path' => 'required|string|max:2048',
             'page_title' => 'nullable|string|max:512',
             'page_query' => 'nullable|string|max:2048',
@@ -60,6 +61,7 @@ class CollectController extends Controller
         $pageView = PageView::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
+            'session_id' => $this->optionalCollectedString($data, 'session_id', 64),
             'path' => EventPayloadSanitizer::normalizeStoredPath($data['path']),
             'page_title' => $this->optionalCollectedString($data, 'page_title', 512),
             'page_query' => $this->optionalCollectedString($data, 'page_query', 2048),

@@ -15,6 +15,7 @@ class PageView extends Model
     protected $fillable = [
         'site_id',
         'visitor_id',
+        'session_id',
         'path',
         'page_title',
         'page_query',

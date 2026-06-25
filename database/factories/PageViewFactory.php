@@ -70,6 +70,7 @@ class PageViewFactory extends Factory
         return [
             'site_id' => Site::factory(),
             'visitor_id' => fake()->uuid(),
+            'session_id' => fake()->uuid(),
             'path' => $path,
             'page_title' => fake()->randomElement(self::PAGE_TITLES),
             'page_query' => fake()->boolean(25) ? 'ref='.fake()->word().'&utm_source=test' : null,

@@ -28,6 +28,14 @@ return v;
 }catch(e){return 'anon_'+Math.random().toString(36).slice(2);}
 }
 var origRefKey='is_origref_'+K.replace(/-/g,'').slice(0,12);
+var sessKey='is_sid_'+K.replace(/-/g,'').slice(0,12);
+function sid(){
+try{
+var v=sessionStorage.getItem(sessKey);
+if(!v){v=crypto.randomUUID();sessionStorage.setItem(sessKey,v);}
+return v;
+}catch(e){return 'sess_'+Math.random().toString(36).slice(2);}
+}
 function referralOrigin(){
 try{
 var s=sessionStorage.getItem(origRefKey);
@@ -69,7 +77,7 @@ utm_content:u.searchParams.get('utm_content')
 };
 }
 function clientContext(){
-var ctx={};
+var ctx={session_id:sid()};
 var qs=location.search;
 if(qs&&qs.length>1)ctx.page_query=qs.slice(1);
 if(document.title)ctx.page_title=document.title.slice(0,512);

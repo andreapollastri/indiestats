@@ -23,6 +23,7 @@ class CollectPageviewTest extends TestCase
         $response = $this->postJson('/collect/pageview', [
             'site_key' => $site->public_key,
             'visitor_id' => 'visitor-abc',
+            'session_id' => 'session-xyz',
             'path' => '/landing',
             'page_title' => 'Landing page',
             'page_query' => 'utm_source=newsletter',
@@ -41,6 +42,7 @@ class CollectPageviewTest extends TestCase
         $pageView = PageView::query()->findOrFail($response->json('id'));
 
         $this->assertSame('visitor-abc', $pageView->visitor_id);
+        $this->assertSame('session-xyz', $pageView->session_id);
         $this->assertSame('/landing', $pageView->path);
         $this->assertSame('Landing page', $pageView->page_title);
         $this->assertSame('utm_source=newsletter', $pageView->page_query);
