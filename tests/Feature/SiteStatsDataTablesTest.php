@@ -284,6 +284,43 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertJsonPath('data.0.name', 'Chrome');
     }
 
+    public function test_datatable_applies_language_filter_from_post_body(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Filtered site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'browser_language' => 'it-IT',
+            'browser' => 'Chrome',
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v2',
+            'browser_language' => 'en-US',
+            'browser' => 'Firefox',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
+            'type' => 'browser',
+            'range' => '7d',
+            'draw' => 1,
+            'start' => 0,
+            'length' => 10,
+            'filter_language' => 'it-IT',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('recordsTotal', 1);
+        $response->assertJsonPath('data.0.name', 'Chrome');
+    }
+
     public function test_site_page_includes_asn_filter_field(): void
     {
         $user = User::factory()->admin()->create(['locale' => 'it']);

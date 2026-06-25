@@ -126,4 +126,43 @@ class AnalyticsFiltersTest extends TestCase
 
         $this->assertNull($filters->asn);
     }
+
+    public function test_from_query_array_round_trips_visitor_context_filters(): void
+    {
+        $filters = AnalyticsFilters::fromQueryArray([
+            'filter_page_title' => 'Home',
+            'filter_page_query' => 'ref=email',
+            'filter_gclid' => 'abc123',
+            'filter_fbclid' => 'fb456',
+            'filter_msclkid' => 'ms789',
+            'filter_browser_version' => '120.0.0.0',
+            'filter_language' => 'it-IT',
+            'filter_timezone' => 'Europe/Rome',
+            'filter_session_id' => 'sess-1',
+            'filter_is_bot' => '0',
+        ]);
+
+        $this->assertSame('Home', $filters->pageTitle);
+        $this->assertSame('ref=email', $filters->pageQuery);
+        $this->assertSame('abc123', $filters->gclid);
+        $this->assertSame('fb456', $filters->fbclid);
+        $this->assertSame('ms789', $filters->msclkid);
+        $this->assertSame('120.0.0.0', $filters->browserVersion);
+        $this->assertSame('it-IT', $filters->language);
+        $this->assertSame('Europe/Rome', $filters->timezone);
+        $this->assertSame('sess-1', $filters->sessionId);
+        $this->assertFalse($filters->isBot);
+        $this->assertSame([
+            'filter_page_title' => 'Home',
+            'filter_page_query' => 'ref=email',
+            'filter_gclid' => 'abc123',
+            'filter_fbclid' => 'fb456',
+            'filter_msclkid' => 'ms789',
+            'filter_browser_version' => '120.0.0.0',
+            'filter_language' => 'it-IT',
+            'filter_timezone' => 'Europe/Rome',
+            'filter_session_id' => 'sess-1',
+            'filter_is_bot' => '0',
+        ], $filters->toQueryArray());
+    }
 }

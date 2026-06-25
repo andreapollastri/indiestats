@@ -30,11 +30,16 @@ class SiteFilterOptionsService
                 $like,
                 $limit
             ),
+            'page_title' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'page_title', $like, $limit),
+            'page_query' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'page_query', $like, $limit),
             'utm', 'utm_source' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_source', $like, $limit),
             'utm_medium' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_medium', $like, $limit),
             'utm_campaign' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_campaign', $like, $limit),
             'utm_term' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_term', $like, $limit),
             'utm_content' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_content', $like, $limit),
+            'gclid' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'gclid', $like, $limit),
+            'fbclid' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'fbclid', $like, $limit),
+            'msclkid' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'msclkid', $like, $limit),
             'event' => $this->distinctColumn(
                 TrackingEvent::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
                 'name',
@@ -55,6 +60,7 @@ class SiteFilterOptionsService
                 $like,
                 $limit
             ),
+            'browser_version' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'browser_version', $like, $limit),
             'os' => $this->distinctColumn(
                 PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
                     ->whereNotNull('os'),
@@ -63,6 +69,10 @@ class SiteFilterOptionsService
                 $limit
             ),
             'country' => $this->countryOptions($siteId, $from, $to, $like, $limit),
+            'language' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'browser_language', $like, $limit),
+            'timezone' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'timezone', $like, $limit),
+            'session_id' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'session_id', $like, $limit),
+            'is_bot' => $this->isBotOptions(),
             'asn' => $this->asnOptions($siteId, $from, $to, $q, $limit),
             'search' => $this->distinctColumn(
                 PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
@@ -83,15 +93,25 @@ class SiteFilterOptionsService
         $types = [
             'source',
             'path',
+            'page_title',
+            'page_query',
             'utm_source',
             'utm_medium',
             'utm_campaign',
             'utm_term',
             'utm_content',
+            'gclid',
+            'fbclid',
+            'msclkid',
             'event',
             'device',
             'browser',
+            'browser_version',
             'os',
+            'language',
+            'timezone',
+            'session_id',
+            'is_bot',
             'country',
             'asn',
             'search',
@@ -102,6 +122,37 @@ class SiteFilterOptionsService
         }
 
         return $out;
+    }
+
+    /**
+     * @return list<array{value: string, text: string}>
+     */
+    private function nonEmptyDistinctColumn(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        string $column,
+        ?string $like,
+        int $limit
+    ): array {
+        $q = PageView::query()
+            ->where('site_id', $siteId)
+            ->whereBetween('created_at', [$from, $to])
+            ->whereNotNull($column)
+            ->where($column, '!=', '');
+
+        return $this->distinctColumn($q, $column, $like, $limit);
+    }
+
+    /**
+     * @return list<array{value: string, text: string}>
+     */
+    private function isBotOptions(): array
+    {
+        return [
+            ['value' => '0', 'text' => __('Visitatori umani')],
+            ['value' => '1', 'text' => __('Bot / crawler')],
+        ];
     }
 
     /**

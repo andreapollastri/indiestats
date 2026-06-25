@@ -38,6 +38,12 @@ class AnalyticsFilterScope
         if ($filters->path !== null) {
             $q->where('path', $filters->path);
         }
+        if ($filters->pageTitle !== null) {
+            $q->where('page_title', $filters->pageTitle);
+        }
+        if ($filters->pageQuery !== null) {
+            $q->where('page_query', $filters->pageQuery);
+        }
         if ($filters->utmSource !== null) {
             $q->where('utm_source', $filters->utmSource);
         }
@@ -53,6 +59,15 @@ class AnalyticsFilterScope
         if ($filters->utmContent !== null) {
             $q->where('utm_content', $filters->utmContent);
         }
+        if ($filters->gclid !== null) {
+            $q->where('gclid', $filters->gclid);
+        }
+        if ($filters->fbclid !== null) {
+            $q->where('fbclid', $filters->fbclid);
+        }
+        if ($filters->msclkid !== null) {
+            $q->where('msclkid', $filters->msclkid);
+        }
         if ($filters->device !== null) {
             $q->where('device_type', $filters->device);
         }
@@ -65,8 +80,23 @@ class AnalyticsFilterScope
         if ($filters->browser !== null) {
             $q->where('browser', $filters->browser);
         }
+        if ($filters->browserVersion !== null) {
+            $q->where('browser_version', $filters->browserVersion);
+        }
         if ($filters->os !== null) {
             $q->where('os', $filters->os);
+        }
+        if ($filters->language !== null) {
+            $q->where('browser_language', $filters->language);
+        }
+        if ($filters->timezone !== null) {
+            $q->where('timezone', $filters->timezone);
+        }
+        if ($filters->sessionId !== null) {
+            $q->where('session_id', $filters->sessionId);
+        }
+        if ($filters->isBot !== null) {
+            $q->where('is_bot', $filters->isBot);
         }
         if ($filters->asn !== null) {
             $q->where('asn', $filters->asn);
