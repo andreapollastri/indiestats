@@ -369,6 +369,30 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertDontSee('id="pa-f-session-id"', false);
     }
 
+    public function test_site_page_shows_english_labels_for_en_locale(): void
+    {
+        $user = User::factory()->admin()->create([
+            'locale' => 'en',
+        ]);
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'tab' => 'content',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Page title', false);
+        $response->assertSee('Page titles', false);
+        $response->assertSee('Content', false);
+        $response->assertDontSee('Titolo pagina', false);
+        $response->assertDontSee('Titoli pagina', false);
+    }
+
     public function test_filter_options_returns_language_values(): void
     {
         $user = User::factory()->admin()->create();

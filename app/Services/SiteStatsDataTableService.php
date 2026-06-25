@@ -426,10 +426,10 @@ class SiteStatsDataTableService
     private function countryLabel(?string $code): string
     {
         if ($code === null || $code === '') {
-            return 'Sconosciuto';
+            return __('Sconosciuto');
         }
         try {
-            return \Locale::getDisplayRegion('-'.strtoupper($code), 'it') ?: $code;
+            return \Locale::getDisplayRegion('-'.strtoupper($code), app()->getLocale()) ?: $code;
         } catch (\Throwable) {
             return $code;
         }

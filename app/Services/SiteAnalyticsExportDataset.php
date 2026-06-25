@@ -50,43 +50,43 @@ class SiteAnalyticsExportDataset
             ->orderByDesc('pageviews');
 
         $header = match ($type) {
-            'country' => ['Paese', 'Codice', 'Viste', 'Univoci'],
-            'is_bot' => ['Tipo visitatore', 'Viste', 'Univoci'],
-            default => ['Valore', 'Viste', 'Univoci'],
+            'country' => [__('Paese'), __('Codice'), __('Viste'), __('Univoci')],
+            'is_bot' => [__('Tipo visitatore'), __('Viste'), __('Univoci')],
+            default => [__('Valore'), __('Viste'), __('Univoci')],
         };
 
         if ($type === 'paths') {
-            $header[0] = 'Percorso';
+            $header[0] = __('Percorso');
         }
         if ($type === 'search') {
-            $header[0] = 'Query';
+            $header[0] = __('Query');
         }
         if ($type === 'source') {
-            $header[0] = 'Sorgente';
+            $header[0] = __('Sorgente');
         }
         if ($type === 'device') {
-            $header[0] = 'Dispositivo';
+            $header[0] = __('Dispositivo');
         }
         if ($type === 'browser') {
-            $header[0] = 'Browser';
+            $header[0] = __('Browser');
         }
         if ($type === 'browser_version') {
-            $header[0] = 'Versione browser';
+            $header[0] = __('Versione browser');
         }
         if ($type === 'language') {
-            $header[0] = 'Lingua browser';
+            $header[0] = __('Lingua browser');
         }
         if ($type === 'timezone') {
-            $header[0] = 'Fuso orario';
+            $header[0] = __('Fuso orario');
         }
         if ($type === 'page_title') {
-            $header[0] = 'Titolo pagina';
+            $header[0] = __('Titolo pagina');
         }
         if ($type === 'os') {
-            $header[0] = 'Sistema operativo';
+            $header[0] = __('Sistema operativo');
         }
         if ($type === 'visitor_id') {
-            $header[0] = 'Visitatore';
+            $header[0] = __('Visitatore');
         }
         if (str_starts_with($type, 'utm_')) {
             $header[0] = $type;
@@ -140,7 +140,7 @@ class SiteAnalyticsExportDataset
         }
 
         return [
-            'header' => ['URL destinazione', 'Provenienza', 'Viste', 'Univoci'],
+            'header' => [__('URL destinazione'), __('Provenienza'), __('Viste'), __('Univoci')],
             'rows' => $rows,
         ];
     }
@@ -168,7 +168,7 @@ class SiteAnalyticsExportDataset
         }
 
         return [
-            'header' => ['Tag', 'Volte', 'Visitatori unici'],
+            'header' => [__('Tag'), __('Volte'), __('Visitatori unici')],
             'rows' => $rows,
         ];
     }
@@ -221,7 +221,7 @@ class SiteAnalyticsExportDataset
         }
 
         return [
-            'header' => ['Data/ora', 'Tag', 'Visitatore', 'Percorso', 'Payload (JSON)'],
+            'header' => [__('Data/ora'), __('Tag'), __('Visitatore'), __('Percorso'), __('Payload (JSON)')],
             'rows' => $rows,
             'truncated' => $truncated,
         ];
@@ -260,7 +260,7 @@ class SiteAnalyticsExportDataset
         }
 
         return [
-            'header' => ['Descrizione', 'Tag', 'Volte (periodo)', 'Visitatori unici'],
+            'header' => [__('Descrizione'), __('Tag'), __('Volte (periodo)'), __('Visitatori unici')],
             'rows' => $rows,
         ];
     }
@@ -327,10 +327,10 @@ class SiteAnalyticsExportDataset
     private function countryLabel(?string $code): string
     {
         if ($code === null || $code === '') {
-            return 'Sconosciuto';
+            return __('Sconosciuto');
         }
         try {
-            return \Locale::getDisplayRegion('-'.strtoupper($code), 'it') ?: $code;
+            return \Locale::getDisplayRegion('-'.strtoupper($code), app()->getLocale()) ?: $code;
         } catch (\Throwable) {
             return $code;
         }

@@ -27,6 +27,8 @@ class SiteAnalyticsExcelExportService
             throw new \RuntimeException('Export site or user missing.');
         }
 
+        app()->setLocale($user->preferredLocale());
+
         $query = array_merge($export->filters_payload ?? [], ['range' => $export->range]);
         $request = Request::create('/', 'GET', $query);
         $request->setUserResolver(static fn () => $user);
@@ -64,24 +66,24 @@ class SiteAnalyticsExcelExportService
         ];
 
         $titles = [
-            'paths' => 'Pagine',
-            'page_title' => 'Titoli pagina',
-            'utm_source' => 'UTM source',
-            'utm_medium' => 'UTM medium',
-            'utm_campaign' => 'UTM campaign',
-            'utm_term' => 'UTM term',
-            'utm_content' => 'UTM content',
-            'search' => 'Query ricerca',
-            'source' => 'Sorgenti',
-            'browser' => 'Browser',
-            'browser_version' => 'Versione browser',
-            'device' => 'Dispositivo',
-            'os' => 'Sistema operativo',
-            'language' => 'Lingua browser',
-            'timezone' => 'Fuso orario',
-            'country' => 'Paese',
-            'visitor_id' => 'Visitatore',
-            'is_bot' => 'Tipo visitatore',
+            'paths' => __('Pagine'),
+            'page_title' => __('Titoli pagina'),
+            'utm_source' => __('UTM source'),
+            'utm_medium' => __('UTM medium'),
+            'utm_campaign' => __('UTM campaign'),
+            'utm_term' => __('UTM term'),
+            'utm_content' => __('UTM content'),
+            'search' => __('Query ricerca'),
+            'source' => __('Sorgenti'),
+            'browser' => __('Browser'),
+            'browser_version' => __('Versione browser'),
+            'device' => __('Dispositivo'),
+            'os' => __('Sistema operativo'),
+            'language' => __('Lingua browser'),
+            'timezone' => __('Fuso orario'),
+            'country' => __('Paese'),
+            'visitor_id' => __('Visitatore'),
+            'is_bot' => __('Tipo visitatore'),
         ];
 
         foreach ($pageTypes as $type) {
@@ -92,12 +94,12 @@ class SiteAnalyticsExcelExportService
         }
 
         $out = $this->dataset->outboundSheet($siteId, $from, $to, $filters);
-        $sheetOut = new Worksheet($spreadsheet, $this->sheetTitle('Link in uscita'));
+        $sheetOut = new Worksheet($spreadsheet, $this->sheetTitle(__('Link in uscita')));
         $spreadsheet->addSheet($sheetOut);
         $this->fillDataSheet($sheetOut, $out);
 
         $evNames = $this->dataset->eventNamesSheet($siteId, $from, $to, $filters);
-        $sheetEv = new Worksheet($spreadsheet, $this->sheetTitle('Nomi eventi'));
+        $sheetEv = new Worksheet($spreadsheet, $this->sheetTitle(__('Nomi eventi')));
         $spreadsheet->addSheet($sheetEv);
         $this->fillDataSheet($sheetEv, $evNames);
 
@@ -106,11 +108,11 @@ class SiteAnalyticsExcelExportService
         $evRows = $evDetail['rows'];
         if ($truncated) {
             $evRows = array_merge(
-                [['NOTA: export limitato alle prime '.SiteAnalyticsExportDataset::MAX_TRACKING_EVENT_ROWS.' righe.', '', '', '', '']],
+                [[__('NOTA: export limitato alle prime :count righe.', ['count' => SiteAnalyticsExportDataset::MAX_TRACKING_EVENT_ROWS]), '', '', '', '']],
                 $evRows
             );
         }
-        $sheetDet = new Worksheet($spreadsheet, $this->sheetTitle('Dettaglio eventi'));
+        $sheetDet = new Worksheet($spreadsheet, $this->sheetTitle(__('Dettaglio eventi')));
         $spreadsheet->addSheet($sheetDet);
         $this->fillDataSheet($sheetDet, [
             'header' => $evDetail['header'],
@@ -118,7 +120,7 @@ class SiteAnalyticsExcelExportService
         ]);
 
         $goals = $this->dataset->goalsSheet($siteId, $from, $to);
-        $sheetGoals = new Worksheet($spreadsheet, $this->sheetTitle('Obiettivi'));
+        $sheetGoals = new Worksheet($spreadsheet, $this->sheetTitle(__('Obiettivi')));
         $spreadsheet->addSheet($sheetGoals);
         $this->fillDataSheet($sheetGoals, $goals);
 
@@ -154,16 +156,16 @@ class SiteAnalyticsExcelExportService
         AnalyticsFilters $filters
     ): void {
         $lines = [
-            ['Sito', $siteName],
-            ['Periodo da', $from],
-            ['Periodo a', $to],
-            ['Intervallo', $range],
+            [__('Sito'), $siteName],
+            [__('Periodo da'), $from],
+            [__('Periodo a'), $to],
+            [__('Intervallo'), $range],
         ];
         $fa = $filters->toQueryArray();
         if ($fa === []) {
-            $lines[] = ['Filtri', 'nessuno'];
+            $lines[] = [__('Filtri'), __('nessuno')];
         } else {
-            $lines[] = ['Filtri', ''];
+            $lines[] = [__('Filtri'), ''];
             foreach ($fa as $k => $v) {
                 $lines[] = [$k, $v];
             }

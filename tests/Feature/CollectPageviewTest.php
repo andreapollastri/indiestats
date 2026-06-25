@@ -131,12 +131,12 @@ class CollectPageviewTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('recordsTotal', 2);
         $response->assertJsonFragment([
-            'name' => 'Visitatori umani',
+            'name' => __('Visitatori umani'),
             'pageviews' => 1,
             'visitors' => 1,
         ]);
         $response->assertJsonFragment([
-            'name' => 'Bot / crawler',
+            'name' => __('Bot / crawler'),
             'pageviews' => 1,
             'visitors' => 1,
         ]);
