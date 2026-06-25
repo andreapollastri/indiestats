@@ -41,6 +41,22 @@ class PageViewFactory extends Factory
 
     private const COUNTRIES = ['IT', 'IT', 'IT', 'US', 'US', 'GB', 'DE', 'FR', 'ES', 'NL', 'BR', 'IN', 'CA', 'AU', 'JP'];
 
+    private const PAGE_TITLES = [
+        'Home',
+        'About us',
+        'Pricing',
+        'Blog',
+        'Contact',
+        'Documentation',
+        'Sign in',
+    ];
+
+    private const LANGUAGES = ['it-IT', 'it-IT', 'en-US', 'en-US', 'en-GB', 'de-DE', 'fr-FR', 'es-ES'];
+
+    private const TIMEZONES = ['Europe/Rome', 'Europe/Rome', 'Europe/London', 'America/New_York', 'America/Los_Angeles', 'Asia/Tokyo'];
+
+    private const BROWSER_VERSIONS = ['120.0.0.0', '119.0.0.0', '118.0.0.0', '17.2', '16.6', '121.0.0.0'];
+
     /**
      * @return array<string, mixed>
      */
@@ -49,11 +65,17 @@ class PageViewFactory extends Factory
         $referrerSource = fake()->randomElement(self::REFERRER_SOURCES);
         $referrerUrl = $referrerSource !== '' ? 'https://www.'.$referrerSource.'.com/' : null;
         $hasUtm = $referrerSource !== '' && fake()->boolean(30);
+        $path = fake()->randomElement(self::PATHS);
+        $hasAdsClick = fake()->boolean(12);
+        $adsNetwork = fake()->randomElement(['gclid', 'fbclid', 'msclkid']);
 
         return [
             'site_id' => Site::factory(),
             'visitor_id' => fake()->uuid(),
-            'path' => fake()->randomElement(self::PATHS),
+            'session_id' => fake()->uuid(),
+            'path' => $path,
+            'page_title' => fake()->randomElement(self::PAGE_TITLES),
+            'page_query' => fake()->boolean(25) ? 'ref='.fake()->word().'&utm_source=test' : null,
             'referrer_url' => $referrerUrl,
             'referrer_source' => $referrerSource,
             'utm_source' => $hasUtm && $referrerSource !== '' ? $referrerSource : null,
@@ -61,10 +83,17 @@ class PageViewFactory extends Factory
             'utm_campaign' => $hasUtm ? fake()->randomElement(['spring_sale', 'launch', 'newsletter', 'retargeting']) : null,
             'utm_term' => null,
             'utm_content' => null,
+            'gclid' => $hasAdsClick && $adsNetwork === 'gclid' ? fake()->regexify('[A-Za-z0-9]{20}') : null,
+            'fbclid' => $hasAdsClick && $adsNetwork === 'fbclid' ? fake()->regexify('[A-Za-z0-9]{24}') : null,
+            'msclkid' => $hasAdsClick && $adsNetwork === 'msclkid' ? fake()->regexify('[A-Za-z0-9]{20}') : null,
             'search_query' => $referrerSource === 'google' ? fake()->words(fake()->numberBetween(1, 3), true) : null,
             'browser' => fake()->randomElement(self::BROWSERS),
+            'browser_version' => fake()->randomElement(self::BROWSER_VERSIONS),
+            'is_bot' => fake()->boolean(2),
             'os' => fake()->randomElement(self::OS_LIST),
             'device_type' => fake()->randomElement(self::DEVICE_TYPES),
+            'browser_language' => fake()->randomElement(self::LANGUAGES),
+            'timezone' => fake()->randomElement(self::TIMEZONES),
             'country_code' => fake()->randomElement(self::COUNTRIES),
             'duration_seconds' => fake()->numberBetween(2, 600),
             'created_at' => fake()->dateTimeBetween('-18 months', 'now'),

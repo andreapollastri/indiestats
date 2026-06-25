@@ -343,4 +343,51 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertDontSee('name="filter_asn" id="pa-f-asn" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="asn" placeholder="'.__('Cerca…').'">
                                 <option value="">'.__('Tutti').'</option>', false);
     }
+
+    public function test_site_page_includes_visitor_context_filter_fields(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'filter_language' => 'it-IT',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="pa-f-language"', false);
+        $response->assertSee('data-pa-filter-type="language"', false);
+        $response->assertSee('placeholder="'.__('Cerca…').'"', false);
+        $response->assertSee('name="filter_language"', false);
+        $response->assertSee('id="pa-f-gclid"', false);
+        $response->assertSee('data-pa-filter-type="gclid"', false);
+    }
+
+    public function test_filter_options_returns_language_values(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'browser_language' => 'it-IT',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.filter-options', [
+            'site' => $site->public_key,
+            'type' => 'language',
+            'range' => '7d',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonFragment(['value' => 'it-IT', 'text' => 'it-IT']);
+    }
 }
