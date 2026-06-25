@@ -15,7 +15,10 @@ class PageView extends Model
     protected $fillable = [
         'site_id',
         'visitor_id',
+        'session_id',
         'path',
+        'page_title',
+        'page_query',
         'referrer_url',
         'referrer_source',
         'utm_source',
@@ -23,10 +26,17 @@ class PageView extends Model
         'utm_campaign',
         'utm_term',
         'utm_content',
+        'gclid',
+        'fbclid',
+        'msclkid',
         'search_query',
         'browser',
+        'browser_version',
+        'is_bot',
         'os',
         'device_type',
+        'browser_language',
+        'timezone',
         'ip_address',
         'country_code',
         'asn',
@@ -38,6 +48,7 @@ class PageView extends Model
     protected function casts(): array
     {
         return [
+            'is_bot' => 'boolean',
             'created_at' => 'datetime',
         ];
     }

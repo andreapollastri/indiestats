@@ -44,6 +44,7 @@ class SiteAnalyticsExcelExportService
 
         $pageTypes = [
             'paths',
+            'page_title',
             'utm_source',
             'utm_medium',
             'utm_campaign',
@@ -52,13 +53,17 @@ class SiteAnalyticsExcelExportService
             'search',
             'source',
             'browser',
+            'browser_version',
             'device',
             'os',
+            'language',
+            'timezone',
             'country',
         ];
 
         $titles = [
             'paths' => 'Pagine',
+            'page_title' => 'Titoli pagina',
             'utm_source' => 'UTM source',
             'utm_medium' => 'UTM medium',
             'utm_campaign' => 'UTM campaign',
@@ -67,8 +72,11 @@ class SiteAnalyticsExcelExportService
             'search' => 'Query ricerca',
             'source' => 'Sorgenti',
             'browser' => 'Browser',
+            'browser_version' => 'Versione browser',
             'device' => 'Dispositivo',
             'os' => 'Sistema operativo',
+            'language' => 'Lingua browser',
+            'timezone' => 'Fuso orario',
             'country' => 'Paese',
         ];
 
@@ -78,6 +86,11 @@ class SiteAnalyticsExcelExportService
             $spreadsheet->addSheet($sheet);
             $this->fillDataSheet($sheet, $data);
         }
+
+        $clickIds = $this->dataset->clickIdsSheet($siteId, $from, $to, $filters);
+        $sheetClickIds = new Worksheet($spreadsheet, $this->sheetTitle('Click ID campagne'));
+        $spreadsheet->addSheet($sheetClickIds);
+        $this->fillDataSheet($sheetClickIds, $clickIds);
 
         $out = $this->dataset->outboundSheet($siteId, $from, $to, $filters);
         $sheetOut = new Worksheet($spreadsheet, $this->sheetTitle('Link in uscita'));

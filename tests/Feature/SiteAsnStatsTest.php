@@ -104,4 +104,66 @@ class SiteAsnStatsTest extends TestCase
         $response->assertJsonPath('results.0.value', '15169');
         $response->assertJsonPath('results.0.text', 'AS15169 Google LLC');
     }
+
+    public function test_asn_filter_options_search_by_organization_name(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'ASN site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'asn' => 15169,
+            'as_organization' => 'Google LLC',
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v2',
+            'asn' => 13335,
+            'as_organization' => 'Cloudflare, Inc.',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.filter-options', [
+            'site' => $site->public_key,
+            'type' => 'asn',
+            'range' => '7d',
+            'q' => 'Google',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'results');
+        $response->assertJsonPath('results.0.value', '15169');
+    }
+
+    public function test_asn_filter_options_search_accepts_as_prefix(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'ASN site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'asn' => 15169,
+            'as_organization' => 'Google LLC',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.filter-options', [
+            'site' => $site->public_key,
+            'type' => 'asn',
+            'range' => '7d',
+            'q' => 'AS15169',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('results.0.value', '15169');
+    }
 }

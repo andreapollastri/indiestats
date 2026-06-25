@@ -63,7 +63,7 @@ class SiteFilterOptionsService
                 $limit
             ),
             'country' => $this->countryOptions($siteId, $from, $to, $like, $limit),
-            'asn' => $this->asnOptions($siteId, $from, $to, $like, $limit),
+            'asn' => $this->asnOptions($siteId, $from, $to, $q, $limit),
             'search' => $this->distinctColumn(
                 PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
                     ->whereNotNull('search_query')->where('search_query', '!=', ''),
@@ -181,21 +181,24 @@ class SiteFilterOptionsService
     /**
      * @return list<array{value: string, text: string}>
      */
-    private function asnOptions(int $siteId, CarbonInterface $from, CarbonInterface $to, ?string $like, int $limit): array
+    private function asnOptions(int $siteId, CarbonInterface $from, CarbonInterface $to, ?string $q, int $limit): array
     {
-        $q = PageView::query()
+        $q = $this->normalizeAsnSearch($q);
+        $like = $q !== null && $q !== '' ? '%'.addcslashes($q, '%_\\').'%' : null;
+
+        $query = PageView::query()
             ->where('site_id', $siteId)
             ->whereBetween('created_at', [$from, $to])
             ->whereNotNull('asn');
 
         if ($like !== null) {
-            $q->where(function ($w) use ($like): void {
+            $query->where(function ($w) use ($like): void {
                 $w->whereRaw('CAST(asn AS CHAR) LIKE ?', [$like])
                     ->orWhere('as_organization', 'like', $like);
             });
         }
 
-        $rows = $q->select('asn')
+        $rows = $query->select('asn')
             ->selectRaw('MAX(as_organization) as as_organization')
             ->selectRaw('COUNT(*) as c')
             ->groupBy('asn')
@@ -207,11 +210,38 @@ class SiteFilterOptionsService
         foreach ($rows as $row) {
             $asn = (int) $row->asn;
             $organization = (string) ($row->as_organization ?? '');
-            $label = $organization !== '' ? 'AS'.$asn.' '.$organization : 'AS'.$asn;
+            $label = $this->asnLabel($asn, $organization);
             $out[] = ['value' => (string) $asn, 'text' => $label];
         }
 
         return $out;
+    }
+
+    private function normalizeAsnSearch(?string $q): ?string
+    {
+        if ($q === null) {
+            return null;
+        }
+
+        $q = trim($q);
+        if ($q === '') {
+            return null;
+        }
+
+        if (preg_match('/^as(\d+)/i', $q, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return $q;
+    }
+
+    private function asnLabel(int $asn, string $organization): string
+    {
+        if ($organization !== '') {
+            return 'AS'.$asn.' '.$organization;
+        }
+
+        return 'AS'.$asn;
     }
 
     private function countryLabel(string $code): string

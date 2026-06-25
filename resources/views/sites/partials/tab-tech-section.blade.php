@@ -1,4 +1,31 @@
 @include('sites.partials.stats-table', [
+    'title' => __('Lingua browser'),
+    'description' => __('navigator.language del visitatore'),
+    'dtType' => 'language',
+    'dimLabel' => __('Lingua'),
+    'site' => $site,
+    'range' => $range,
+])
+
+@include('sites.partials.stats-table', [
+    'title' => __('Fuso orario'),
+    'description' => __('Timezone IANA rilevato dal browser'),
+    'dtType' => 'timezone',
+    'dimLabel' => __('Timezone'),
+    'site' => $site,
+    'range' => $range,
+])
+
+@include('sites.partials.stats-table', [
+    'title' => __('Versione browser'),
+    'description' => __('Versione major/minor dal User-Agent'),
+    'dtType' => 'browser_version',
+    'dimLabel' => __('Versione'),
+    'site' => $site,
+    'range' => $range,
+])
+
+@include('sites.partials.stats-table', [
     'title' => __('Browser'),
     'description' => __('Rilevato dal tracciamento (User-Agent)'),
     'dtType' => 'browser',

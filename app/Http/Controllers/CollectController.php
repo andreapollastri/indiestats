@@ -23,14 +23,22 @@ class CollectController extends Controller
         $data = $request->validate([
             'site_key' => 'required|uuid',
             'visitor_id' => 'required|string|max:64',
+            'session_id' => 'nullable|string|max:64',
             'path' => 'required|string|max:2048',
+            'page_title' => 'nullable|string|max:512',
+            'page_query' => 'nullable|string|max:2048',
             'referrer' => 'nullable|string|max:2048',
             'utm_source' => 'nullable|string|max:255',
             'utm_medium' => 'nullable|string|max:255',
             'utm_campaign' => 'nullable|string|max:255',
             'utm_term' => 'nullable|string|max:255',
             'utm_content' => 'nullable|string|max:255',
+            'gclid' => 'nullable|string|max:255',
+            'fbclid' => 'nullable|string|max:255',
+            'msclkid' => 'nullable|string|max:255',
             'search_query' => 'nullable|string|max:512',
+            'browser_language' => 'nullable|string|max:16',
+            'timezone' => 'nullable|string|max:64',
             'user_agent' => 'nullable|string|max:512',
         ]);
 
@@ -47,12 +55,7 @@ class CollectController extends Controller
         $analysis = $referrerService->analyze($referrerUrl);
         $searchQuery = $data['search_query'] ?? $analysis['search_query'];
 
-        $agent = new Agent;
-        $agent->setUserAgent($this->userAgentStringForParsing($request, $data));
-
-        $browser = $agent->browser() ?: 'unknown';
-        $os = $agent->platform() ?: 'unknown';
-        $deviceType = $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop');
+        $uaMeta = $this->parseUserAgent($this->userAgentStringForParsing($request, $data));
 
         $ipAddress = $clientIp->resolve($request);
         $country = $geo->countryCode($ipAddress);
@@ -61,7 +64,10 @@ class CollectController extends Controller
         $pageView = PageView::query()->create([
             'site_id' => $site->id,
             'visitor_id' => $data['visitor_id'],
+            'session_id' => $this->optionalCollectedString($data, 'session_id', 64),
             'path' => EventPayloadSanitizer::normalizeStoredPath($data['path']),
+            'page_title' => $this->optionalCollectedString($data, 'page_title', 512),
+            'page_query' => $this->optionalCollectedString($data, 'page_query', 2048),
             'referrer_url' => $referrerUrl,
             'referrer_source' => $analysis['source'],
             'utm_source' => $data['utm_source'] ?? null,
@@ -69,10 +75,17 @@ class CollectController extends Controller
             'utm_campaign' => $data['utm_campaign'] ?? null,
             'utm_term' => $data['utm_term'] ?? null,
             'utm_content' => $data['utm_content'] ?? null,
+            'gclid' => $this->optionalCollectedString($data, 'gclid', 255),
+            'fbclid' => $this->optionalCollectedString($data, 'fbclid', 255),
+            'msclkid' => $this->optionalCollectedString($data, 'msclkid', 255),
             'search_query' => $searchQuery,
-            'browser' => $browser,
-            'os' => $os,
-            'device_type' => $deviceType,
+            'browser' => $uaMeta['browser'],
+            'browser_version' => $uaMeta['browser_version'],
+            'is_bot' => $uaMeta['is_bot'],
+            'os' => $uaMeta['os'],
+            'device_type' => $uaMeta['device_type'],
+            'browser_language' => $this->optionalCollectedString($data, 'browser_language', 16),
+            'timezone' => $this->optionalCollectedString($data, 'timezone', 64),
             'ip_address' => $ipAddress,
             'country_code' => $country,
             'asn' => $asnData['asn'],
@@ -205,6 +218,45 @@ class CollectController extends Controller
     }
 
     /**
+     * @return array{browser: string, browser_version: ?string, os: string, device_type: string, is_bot: bool}
+     */
+    private function parseUserAgent(string $userAgent): array
+    {
+        $agent = new Agent;
+        $agent->setUserAgent($userAgent);
+
+        $browser = $agent->browser() ?: 'unknown';
+        $version = $agent->version($browser);
+        $browserVersion = is_string($version) && $version !== '' ? mb_substr($version, 0, 32) : null;
+
+        return [
+            'browser' => $browser,
+            'browser_version' => $browserVersion,
+            'os' => $agent->platform() ?: 'unknown',
+            'device_type' => $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop'),
+            'is_bot' => $agent->isRobot(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function optionalCollectedString(array $data, string $key, int $maxLength): ?string
+    {
+        $value = $data[$key] ?? null;
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = EventPayloadSanitizer::sanitizePropertyStringValue($value);
+        if ($value === '') {
+            return null;
+        }
+
+        return mb_substr($value, 0, $maxLength);
+    }
+
+    /**
      * Prefer an explicit UA from the JSON body (sent by the tracker) so parsing matches the client
      * even when intermediate proxies alter the User-Agent header.
      *
@@ -285,12 +337,7 @@ class CollectController extends Controller
 
         $analysis = $referrerService->analyze($referrerUrl);
 
-        $agent = new Agent;
-        $agent->setUserAgent($request->userAgent() ?? '');
-
-        $browser = $agent->browser() ?: 'unknown';
-        $os = $agent->platform() ?: 'unknown';
-        $deviceType = $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop');
+        $uaMeta = $this->parseUserAgent($request->userAgent() ?? '');
 
         $ipAddress = $clientIp->resolve($request);
         $country = $geo->countryCode($ipAddress);
@@ -308,9 +355,11 @@ class CollectController extends Controller
             'utm_term' => null,
             'utm_content' => null,
             'search_query' => $analysis['search_query'],
-            'browser' => $browser,
-            'os' => $os,
-            'device_type' => $deviceType,
+            'browser' => $uaMeta['browser'],
+            'browser_version' => $uaMeta['browser_version'],
+            'is_bot' => $uaMeta['is_bot'],
+            'os' => $uaMeta['os'],
+            'device_type' => $uaMeta['device_type'],
             'ip_address' => $ipAddress,
             'country_code' => $country,
             'asn' => $asnData['asn'],

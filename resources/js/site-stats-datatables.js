@@ -212,9 +212,18 @@ function tableConfig(type, csrf, tableEl) {
         case 'browser':
         case 'os':
         case 'device':
+        case 'language':
+        case 'timezone':
+        case 'browser_version':
+        case 'click_ids':
             return {
                 ...base,
                 columns: num('name', true),
+            };
+        case 'page_title':
+            return {
+                ...base,
+                columns: num('title', false),
             };
         case 'country':
             return {

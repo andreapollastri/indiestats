@@ -1,5 +1,13 @@
 @include('sites.partials.stats-table', [
-    'title' => __('Pagine'),
+    'title' => __('Titoli pagina'),
+    'description' => __('document.title al momento della visita'),
+    'dtType' => 'page_title',
+    'dimLabel' => __('Titolo'),
+    'site' => $site,
+    'range' => $range,
+])
+
+@include('sites.partials.stats-table', [
     'description' => __('Top percorsi'),
     'dtType' => 'paths',
     'dimLabel' => __('Percorso'),

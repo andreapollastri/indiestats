@@ -93,7 +93,7 @@ function wireFilterFormSubmit() {
     );
 }
 
-function mergePresetOptions(presets, currentValue) {
+function mergePresetOptions(presets, currentValue, currentLabel) {
     const seen = new Set();
     const opts = [];
     (presets || []).forEach(function (p) {
@@ -107,7 +107,10 @@ function mergePresetOptions(presets, currentValue) {
         opts.push({ value: p.value, text: p.text != null ? String(p.text) : p.value });
     });
     if (currentValue && !seen.has(currentValue)) {
-        opts.push({ value: currentValue, text: currentValue });
+        opts.push({
+            value: currentValue,
+            text: currentLabel != null && String(currentLabel) !== '' ? String(currentLabel) : currentValue,
+        });
     }
     return opts;
 }
@@ -122,6 +125,7 @@ function init() {
 
     const presetsByType = cfg.presets && typeof cfg.presets === 'object' ? cfg.presets : {};
     const current = cfg.current && typeof cfg.current === 'object' ? cfg.current : {};
+    const currentLabels = cfg.currentLabels && typeof cfg.currentLabels === 'object' ? cfg.currentLabels : {};
 
     document.querySelectorAll('select.pa-ts-filter').forEach(function (select) {
         const type = select.dataset.paFilterType;
@@ -132,7 +136,7 @@ function init() {
         const param = TYPE_TO_PARAM[type];
         const currentVal = current[param] ? String(current[param]) : '';
         const presets = presetsByType[type];
-        const initialOptions = mergePresetOptions(presets, currentVal);
+        const initialOptions = mergePresetOptions(presets, currentVal, currentLabels[param]);
 
         const placeholder = select.getAttribute('placeholder') || '';
 
@@ -147,6 +151,7 @@ function init() {
             allowEmptyOption: true,
             placeholder: placeholder,
             openOnFocus: true,
+            preload: 'focus',
             /**
              * dropdown_input: search field in the panel (otherwise with a selected value Tom Select
              * hides the input so typing is impossible and load() never runs).

@@ -45,6 +45,18 @@ class SiteStatsDataTableService
                 $q->whereNotNull('os');
             }],
             'country' => ['group' => 'country_code', 'json_key' => 'code', 'where' => null],
+            'language' => ['group' => 'browser_language', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('browser_language')->where('browser_language', '!=', '');
+            }],
+            'timezone' => ['group' => 'timezone', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('timezone')->where('timezone', '!=', '');
+            }],
+            'page_title' => ['group' => 'page_title', 'json_key' => 'title', 'where' => function (Builder $q): void {
+                $q->whereNotNull('page_title')->where('page_title', '!=', '');
+            }],
+            'browser_version' => ['group' => 'browser_version', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('browser_version')->where('browser_version', '!=', '');
+            }],
         ];
     }
 
@@ -88,11 +100,23 @@ class SiteStatsDataTableService
         $displayTimezone = $request->user()?->timezone ?? 'UTC';
 
         return match ($type) {
-            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'os', 'country' => $this->pageAggregated(
+            'paths', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'search', 'source', 'browser', 'device', 'os', 'country', 'language', 'timezone', 'page_title', 'browser_version' => $this->pageAggregated(
                 $siteId,
                 $from,
                 $to,
                 $type,
+                $search,
+                $orderCol,
+                $orderDir,
+                $start,
+                $length,
+                $draw,
+                $filters
+            ),
+            'click_ids' => $this->clickIdsAggregated(
+                $siteId,
+                $from,
+                $to,
                 $search,
                 $orderCol,
                 $orderDir,
@@ -247,6 +271,69 @@ class SiteStatsDataTableService
 
             return $out;
         })->all();
+
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ];
+    }
+
+    /**
+     * @return array{draw: int, recordsTotal: int, recordsFiltered: int, data: list<array<string, mixed>>}
+     */
+    private function clickIdsAggregated(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        string $search,
+        int $orderCol,
+        string $orderDir,
+        int $start,
+        int $length,
+        int $draw,
+        AnalyticsFilters $filters
+    ): array {
+        $definitions = [
+            ['column' => 'gclid', 'label' => 'Google Ads (gclid)'],
+            ['column' => 'fbclid', 'label' => 'Facebook (fbclid)'],
+            ['column' => 'msclkid', 'label' => 'Microsoft Ads (msclkid)'],
+        ];
+
+        $rows = [];
+        foreach ($definitions as $definition) {
+            $column = $definition['column'];
+            $base = PageView::query();
+            $this->filterScope->applyToPageViews($base, $siteId, $from, $to, $filters);
+            $base->whereNotNull($column)->where($column, '!=', '');
+
+            $rows[] = [
+                'name' => $definition['label'],
+                'pageviews' => (int) (clone $base)->count(),
+                'visitors' => (int) (clone $base)->distinct('visitor_id')->count('visitor_id'),
+            ];
+        }
+
+        $like = $search !== '' ? mb_strtolower($search) : null;
+        if ($like !== null) {
+            $rows = array_values(array_filter(
+                $rows,
+                fn (array $row): bool => str_contains(mb_strtolower($row['name']), $like)
+            ));
+        }
+
+        usort($rows, function (array $a, array $b) use ($orderCol, $orderDir): int {
+            $keys = ['name', 'pageviews', 'visitors'];
+            $key = $keys[$orderCol] ?? 'pageviews';
+            $cmp = $a[$key] <=> $b[$key];
+
+            return $orderDir === 'asc' ? $cmp : -$cmp;
+        });
+
+        $recordsTotal = count($definitions);
+        $recordsFiltered = count($rows);
+        $rows = array_slice($rows, $start, $length);
 
         return [
             'draw' => $draw,

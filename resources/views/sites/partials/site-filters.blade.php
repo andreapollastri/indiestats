@@ -2,14 +2,26 @@
     /** @var \App\Support\AnalyticsFilters $analytics_filters */
     $filterResetUrl = route('sites.show', ['site' => $site['public_key'], 'range' => $range] + ($siteTab === 'summary' ? [] : ['tab' => $siteTab]));
     $filterOptionsUrl = route('sites.stats.filter-options', $site['public_key']);
+    $filtersActive = $analytics_filters->hasAny();
+    $filterActiveCount = count($analytics_filters->toQueryArray());
+    $filterCurrentLabels = [];
+    if ($analytics_filters->asn !== null) {
+        $asnKey = (string) $analytics_filters->asn;
+        foreach ($filter_presets['asn'] ?? [] as $row) {
+            if (($row['value'] ?? '') === $asnKey) {
+                $filterCurrentLabels['filter_asn'] = $row['text'] ?? ('AS'.$asnKey);
+                break;
+            }
+        }
+        $filterCurrentLabels['filter_asn'] ??= 'AS'.$asnKey;
+    }
     $paFilterConfig = [
         'optionsUrl' => $filterOptionsUrl,
         'range' => $range,
         'presets' => $filter_presets,
         'current' => $analytics_filters->toQueryArray(),
+        'currentLabels' => $filterCurrentLabels,
     ];
-    $filtersActive = $analytics_filters->hasAny();
-    $filterActiveCount = count($analytics_filters->toQueryArray());
 @endphp
 
 <form method="get" action="{{ route('sites.show', $site['public_key']) }}" id="pa-site-filters-form" class="mb-3 pa-filters-panel">
@@ -159,11 +171,11 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small mb-1" for="pa-f-asn">{{ __('Rete (ASN)') }}</label>
+                            <label class="form-label small mb-1" for="pa-f-asn">{{ __('Rete') }}</label>
                             <select name="filter_asn" id="pa-f-asn" class="form-select form-select-sm pa-ts-filter" data-pa-filter-type="asn" placeholder="{{ __('Cerca…') }}">
-                                <option value="">{{ __('Tutte') }}</option>
+                                <option value="">{{ __('Tutti') }}</option>
                                 @if ($analytics_filters->asn)
-                                    <option value="{{ $analytics_filters->asn }}" selected>AS{{ $analytics_filters->asn }}</option>
+                                    <option value="{{ $analytics_filters->asn }}" selected>{{ $filterCurrentLabels['filter_asn'] ?? ('AS'.$analytics_filters->asn) }}</option>
                                 @endif
                             </select>
                         </div>

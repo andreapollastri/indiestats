@@ -69,6 +69,18 @@ class SiteAnalyticsExportDataset
         if ($type === 'browser') {
             $header[0] = 'Browser';
         }
+        if ($type === 'browser_version') {
+            $header[0] = 'Versione browser';
+        }
+        if ($type === 'language') {
+            $header[0] = 'Lingua browser';
+        }
+        if ($type === 'timezone') {
+            $header[0] = 'Fuso orario';
+        }
+        if ($type === 'page_title') {
+            $header[0] = 'Titolo pagina';
+        }
         if ($type === 'os') {
             $header[0] = 'Sistema operativo';
         }
@@ -89,6 +101,41 @@ class SiteAnalyticsExportDataset
         }
 
         return ['header' => $header, 'rows' => $rows];
+    }
+
+    /**
+     * @return array{header: list<string>, rows: list<list<string|int|float>>}
+     */
+    public function clickIdsSheet(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        AnalyticsFilters $filters
+    ): array {
+        $definitions = [
+            ['column' => 'gclid', 'label' => 'Google Ads (gclid)'],
+            ['column' => 'fbclid', 'label' => 'Facebook (fbclid)'],
+            ['column' => 'msclkid', 'label' => 'Microsoft Ads (msclkid)'],
+        ];
+
+        $rows = [];
+        foreach ($definitions as $definition) {
+            $column = $definition['column'];
+            $base = PageView::query();
+            $this->filterScope->applyToPageViews($base, $siteId, $from, $to, $filters);
+            $base->whereNotNull($column)->where($column, '!=', '');
+
+            $rows[] = [
+                $definition['label'],
+                (int) (clone $base)->count(),
+                (int) (clone $base)->distinct('visitor_id')->count('visitor_id'),
+            ];
+        }
+
+        return [
+            'header' => ['Parametro', 'Viste', 'Univoci'],
+            'rows' => $rows,
+        ];
     }
 
     /**
@@ -273,6 +320,18 @@ class SiteAnalyticsExportDataset
                 $q->whereNotNull('os');
             }],
             'country' => ['group' => 'country_code', 'json_key' => 'code', 'where' => null],
+            'language' => ['group' => 'browser_language', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('browser_language')->where('browser_language', '!=', '');
+            }],
+            'timezone' => ['group' => 'timezone', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('timezone')->where('timezone', '!=', '');
+            }],
+            'page_title' => ['group' => 'page_title', 'json_key' => 'title', 'where' => function (Builder $q): void {
+                $q->whereNotNull('page_title')->where('page_title', '!=', '');
+            }],
+            'browser_version' => ['group' => 'browser_version', 'json_key' => 'name', 'where' => function (Builder $q): void {
+                $q->whereNotNull('browser_version')->where('browser_version', '!=', '');
+            }],
         ];
     }
 
