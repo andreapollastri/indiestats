@@ -5,19 +5,28 @@ Privacy-friendly, self-hosted web analytics built with [Laravel 13](https://lara
 ## Features
 
 - **Pageview tracking** with localStorage-based visitor identification (no cookies)
+- **Session-scoped ID** stored per browser tab (`sessionStorage`) for internal analytics — not exposed in the UI
+- **Rich page context** on each pageview: `document.title`, full query string, browser language, IANA timezone, and on-site search terms (`q`, `query`, `s` URL params)
+- **Bot detection** via User-Agent parsing (`is_bot` flag)
 - **Time on page** measurement (duration sent on tab hide / page unload)
 - **Outbound click tracking** on external links
 - **Custom event tracking** with up to 20 key-value properties per event
 - **UTM parameter support** (source, medium, campaign, term, content)
 - **Referrer & search query detection** with automatic source classification (Google, Bing, social, etc.)
 - **Device, browser, OS and country detection** (GeoIP via MaxMind)
+- **Network (ASN) detection** via DB-IP ASN Lite — ISP / hosting provider per visit
+- **Real-time analytics** on the dashboard and per-site (active visitors, live activity feed, charts)
+- **Interactive country map** on the Geography tab
 - **Noscript fallback** using a 1x1 tracking pixel
 - **Goal management** to monitor specific custom events per site
 - **Dashboard** with daily charts, date range selectors and advanced filters
-- **Data export** to Excel (XLSX) via background jobs
+- **Advanced analytics filters** (Tom Select with live search) applied consistently across summary, realtime, all detail tabs, DataTables AJAX, and Excel export
+- **Multi-tab site analytics**: Summary, Real-time, Content, Traffic, UTM, Technology, Geography, Visitor, Events
+- **Data export** to Excel (XLSX) in the user's language via background jobs
 - **Automatic data pruning** with configurable retention period (default: 375 days)
 - **Multi-site support** with domain allowlisting per site
-- **Localized UI**: analytics tables (DataTables) use your account language for labels, pagination, and number formatting
+- **Cloudflare-aware client IP** resolution for accurate GeoIP/ASN behind `CF-Connecting-IP`
+- **Localized UI** (IT, EN, DE, FR, ES): labels, DataTables, country names, and export sheets follow the signed-in user's locale
 - **Branded error pages** for HTTP 403, 404, and 429, consistent with the app design
 
 ## Screenshots
@@ -40,7 +49,7 @@ Privacy-friendly, self-hosted web analytics built with [Laravel 13](https://lara
 <p align="center">
   <img src="screenshots/is-filters.png" alt="IndieStats — analytics filters" width="920">
 </p>
-<p align="center"><em>Filters — path, source, UTM, device, country, and more</em></p>
+<p align="center"><em>Filters — source, path, page title, UTM, device, country, ASN, visitor, and more</em></p>
 
 <p align="center">
   <img src="screenshots/is-tables.png" alt="IndieStats — DataTables analytics" width="920">
@@ -59,10 +68,58 @@ Privacy-friendly, self-hosted web analytics built with [Laravel 13](https://lara
 
 ## Recent updates
 
-- **Authentication**: email verification is not required to use the app (Fortify’s email-verification flow is disabled). You can still change email in account settings; `MAIL_*` is used for password reset and other mail.
-- **Analytics tables**: DataTables strings are injected from Laravel translations and follow the signed-in user’s locale (same as the rest of the UI).
-- **Error pages**: Custom 403 / 404 / 429 pages use the marketing layout and translated copy.
-- **Demo seeding**: `DatabaseSeeder` creates an **admin** demo user (`admin@users.test` / `password`). Optional fake analytics data is still controlled with `SEED_FAKE_DATA=true` (see below).
+_Changes from the last 24 hours (June 2026)._
+
+### Analytics & UI
+
+- **Site detail redesign** — analytics split into dedicated tabs: **Summary**, **Real-time**, **Content**, **Traffic**, **UTM**, **Technology**, **Geography**, **Visitor**, and **Events** (replacing the old single “Detail” view).
+- **Real-time tab** — active visitors, pageviews in the last 5 minutes, sparkline for the last 30 minutes, and a live activity feed with human-readable relative timestamps. Real-time counts on the **Dashboard** site cards respect active filters.
+- **Geography tab** — choropleth **country map** plus the country breakdown table.
+- **Visitor tab** — DataTables for **visitor ID** and **visitor type** (human vs bot/crawler).
+- **Technology tab** — browser language, timezone, browser version, browser, OS, device, and **network (ASN)** tables.
+- **Summary highlights** — top pages and top sources on the Summary tab; full breakdowns live in the other tabs.
+- **Filters apply everywhere** — active filters affect summary metrics, charts, realtime, all DataTables (including AJAX POST), and Excel export (query string + request body merged server-side).
+
+### Filters
+
+New searchable filters (Tom Select, 3-column layout, dynamic options from your data):
+
+| Filter | Description |
+|--------|-------------|
+| Source | Referrer / engine |
+| Search term | On-site search query (`search_query`) |
+| Page | Path |
+| Page title | `document.title` at visit time |
+| Query string | Full landing-page query string |
+| UTM (5) | source, medium, campaign, term, content |
+| Event | Custom event name (narrows visitors) |
+| Device / Browser / Browser version / OS | From User-Agent |
+| Browser language / Timezone | From the tracker script |
+| Visitor | Persistent visitor ID |
+| Visitor type | Human vs bot |
+| Country | GeoIP country code |
+| Network (ASN) | Autonomous System (ISP / host) |
+
+**Removed from tracking and filters:** Google Ads (`gclid`), Facebook (`fbclid`), and Microsoft Ads (`msclkid`) click IDs.
+
+### Tracking & enrichment
+
+- **Session ID** — generated in `sessionStorage` per tab and stored on each pageview (for future analysis; not shown as a dashboard filter).
+- **Visitor context fields** — page title, page query, browser language, timezone, search query, bot flag.
+- **ASN lookup** — DB-IP ASN Lite (`.mmdb`), optional admin download in Settings, monthly scheduler.
+- **Cloudflare** — when `CF-Connecting-IP` is present, it is used as the client IP for GeoIP and ASN.
+
+### Export & i18n
+
+- Excel export includes **visitor** and **visitor type** sheets; sheet titles and column headers follow the exporting user's locale.
+- **40+ missing UI strings** added across IT, EN, DE, FR, ES (e.g. “Page title” / “Page titles” no longer leak Italian in English mode).
+- Country labels in tables and export use the user's locale.
+
+### Other
+
+- **Authentication**: email verification is not required (Fortify flow disabled). `MAIL_*` is still used for password reset.
+- **Demo seeding**: `DatabaseSeeder` creates an **admin** demo user (`admin@users.test` / `password`). Optional fake analytics with `SEED_FAKE_DATA=true`.
+- **Branded error pages** for HTTP 403, 404, and 429.
 
 ## Requirements
 
@@ -123,6 +180,7 @@ This creates a demo **admin** user (`admin@users.test`, password `password`) and
 | `QUEUE_CONNECTION` | Queue driver for background jobs (exports) | `database` |
 | `GEOIP_DATABASE` | Optional override: absolute path to GeoLite2-Country.mmdb (skips the default storage path) | _(auto)_ |
 | `GEOIP_MAXMIND_LICENSE_KEY` | Optional MaxMind license key for `php artisan geoip:update` / scheduler (overrides the key stored in **Settings** when set) | _(empty)_ |
+| `GEOIP_ASN_DATABASE` | Optional override: absolute path to DB-IP ASN Lite `.mmdb` | _(auto)_ |
 | `ANALYTICS_RETENTION_DAYS` | Days to keep raw analytics data before pruning | `375` |
 | `TRACKING_EXTRA_ALLOWED_HOSTS` | Comma-separated extra hosts allowed for tracking (useful for local dev) | `localhost,127.0.0.1` (local env) |
 | `MAIL_*` | Mail configuration (password reset, etc.) | `log` (local) |
@@ -144,6 +202,24 @@ Country resolution uses the **GeoLite2-Country** database (`.mmdb`). IndieStats 
 
 If no database is available, country stats show as unknown — everything else works normally. The download step requires the `tar` command (standard on Linux and macOS).
 
+### ASN (Network Detection)
+
+Network resolution uses the free **DB-IP ASN Lite** database (`.mmdb`, Creative Commons Attribution). No API key is required.
+
+**Recommended (admin UI):**
+
+1. Sign in as an **admin** and open **Settings**.
+2. In the **ASN (network)** card, click **Download or update ASN database**.
+3. The file is stored at `storage/app/geoip/dbip-asn-lite.mmdb`. The scheduler runs `php artisan dbip-asn:update` monthly (3rd of each month at 04:30) if cron is configured.
+
+**Optional:** set `GEOIP_ASN_DATABASE` in `.env` to point to a custom `.mmdb` file.
+
+If ASN data is unavailable, network stats are omitted — pageviews and other metrics still work.
+
+### Cloudflare & client IP
+
+When requests include the `CF-Connecting-IP` header (typical behind Cloudflare), IndieStats uses it for GeoIP and ASN instead of the proxy IP. For other reverse proxies, configure Laravel **trusted proxies** so `request()->ip()` returns the real visitor address.
+
 ## Cron & Scheduled Commands
 
 IndieStats uses Laravel's task scheduler for automated maintenance. Add this single cron entry to your server:
@@ -158,12 +234,14 @@ IndieStats uses Laravel's task scheduler for automated maintenance. Add this sin
 |---------|----------|-------------|
 | `analytics:prune` | Daily at 02:00 | Removes pageviews, tracking events, and outbound clicks older than the configured retention period (default: 375 days, ~1 year + 10 days margin) |
 | `geoip:update` | Weekly (Mondays 04:15) | Downloads GeoLite2-Country from MaxMind when a license key is configured (Settings or `GEOIP_MAXMIND_LICENSE_KEY`) |
+| `dbip-asn:update` | Monthly (3rd at 04:30) | Downloads DB-IP ASN Lite for network (ASN) resolution |
 
 You can also run these manually:
 
 ```bash
 php artisan analytics:prune
 php artisan geoip:update
+php artisan dbip-asn:update
 ```
 
 Optional: `php artisan geoip:update --key=your_license_key` for a one-off download with a specific key.
@@ -232,6 +310,10 @@ The script automatically tracks:
 - **Time on page** when the visitor leaves or switches tab
 - **Outbound clicks** on links to external domains
 - **UTM parameters** and **search queries** from the URL (`q`, `query`, `s` params)
+- **Page context**: `document.title`, full query string, `navigator.language`, IANA timezone
+- **Session ID** (per browser tab, in `sessionStorage` — stored server-side, not used as a dashboard filter)
+
+Collected per pageview server-side from the User-Agent and client IP: **browser**, **browser version**, **OS**, **device type**, **country** (GeoIP), **ASN**, **bot flag**.
 
 ### Custom Event Tracking
 
@@ -263,39 +345,56 @@ The main **Dashboard** (`/dashboard`) shows all your sites at a glance:
 
 - Unique visitors and total pageviews per site for the selected period
 - Sparkline charts showing daily traffic trends
-- Date range selector: today, 7 days, 30 days, 3 months, 6 months, 1 year, or custom range
+- **Live visitor counts** on each site card (respects dashboard filters when set)
+- Date range selector: today, 7 days, 30 days, 3 months, 6 months, 1 year
 
 ### Site Detail View
 
-Click on any site to access detailed analytics. The detail view has three tabs:
+Click on any site to access detailed analytics. The view has a **filter panel** (accordion) and these tabs:
 
-#### Summary Tab
-- Key metrics: unique visitors, total pageviews, average time on page, outbound clicks
-- Daily pageview chart
-- Top pages, referrer sources, browsers, operating systems, device types, countries
-- UTM source breakdown and search queries
+#### Summary
+- Key metrics: unique visitors, pageviews, average time on page, outbound clicks, pages/visitor, outbound rate
+- Daily (or hourly for “today”) pageview chart
+- Top pages and top referrer sources
 
-#### Detail Tab
-- Server-side paginated DataTables with full pageview records (UI language follows your account locale)
-- Advanced filtering and search
-- Sortable columns
+#### Real-time
+- Active visitors now and pageviews in the last 5 minutes
+- 30-minute activity chart
+- Live feed of recent pageviews and events (auto-refreshes; respects filters)
 
-#### Events Tab
-- Custom tracking events grouped by name with counts and unique visitors
-- **Goal management**: create goals by linking a label to an event name — the dashboard shows how many times that event fired and how many distinct visitors triggered it
+#### Content
+- Page titles, paths, and on-site search queries (server-side DataTables)
+
+#### Traffic
+- Referrer sources and outbound link destinations
+
+#### UTM
+- Breakdown tables for utm_source, utm_medium, utm_campaign, utm_term, utm_content
+
+#### Technology
+- Browser language, timezone, browser version, browser, OS, device, and **network (ASN)**
+
+#### Geography
+- **Country map** (choropleth) and country table
+
+#### Visitor
+- Tables by **visitor ID** and **visitor type** (human vs bot)
+
+#### Events
+- Configured goals, event name aggregates, and paginated event detail (payload JSON)
+- Goal management: link a label to an event name and track counts over the period
+
+All detail tables use server-side DataTables (sorting, search, pagination). UI language follows your account locale.
 
 ### Filtering
 
-Use the filter system to narrow analytics by:
-- Page path
-- Referrer source
-- Browser, OS, device type
-- Country
-- UTM parameters (source, medium, campaign, term, content)
+Open the **Filters** accordion on any site view. Filters use Tom Select with type-ahead search against your actual data. Once applied, they narrow **all** tabs — summary KPIs, charts, realtime, every DataTable, and Excel export.
+
+Available dimensions are listed in [Recent updates → Filters](#recent-updates) above.
 
 ### Exporting Data
 
-From the site detail view, click **Export** to generate an Excel (XLSX) file with your analytics data for the selected period and filters. The export is processed in the background — you'll be notified when it's ready for download.
+From the site detail view, click **Export** to generate an Excel (XLSX) file for the selected period and active filters. Sheets include pages, page titles, UTM dimensions, search queries, sources, technology breakdowns, countries, **visitors**, **visitor types**, outbound links, events, and goals. Headers and sheet names are translated to your account language. The export runs in the background — download when ready.
 
 ## Public Endpoints (Reference)
 
@@ -392,7 +491,8 @@ npm run build
 - **Authentication**: Laravel Fortify (login, registration, password reset, optional two-factor authentication; email verification not enforced)
 - **Database**: SQLite (default), MySQL/PostgreSQL supported
 - **Queue**: Database driver (default), Redis supported
-- **GeoIP**: MaxMind GeoLite2 (optional)
+- **GeoIP**: MaxMind GeoLite2-Country (optional)
+- **ASN**: DB-IP ASN Lite (optional)
 - **Export**: PhpSpreadsheet (XLSX)
 
 ## License
