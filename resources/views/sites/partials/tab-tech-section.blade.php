@@ -27,10 +27,9 @@
 
 @include('sites.partials.stats-table', [
     'title' => __('Rete (ASN)'),
-    'description' => __('Autonomous System da DB-IP ASN Lite. Clicca una rete per esplorare i profili visitatore e il percorso nel periodo.'),
+    'description' => __('Autonomous System da DB-IP ASN Lite'),
     'dtType' => 'asn',
     'dimLabel' => __('Rete'),
     'site' => $site,
     'range' => $range,
-    'cardClass' => 'pa-asn-profiles-table-card',
 ])

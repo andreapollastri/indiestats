@@ -86,19 +86,6 @@ function renderMetricBar(value, maxOnPage) {
     );
 }
 
-function readAsnProfilesOpenLabel() {
-    const el = document.getElementById('pa-asn-profiles-config');
-    if (!el) {
-        return 'Apri profili visitatore';
-    }
-    try {
-        const parsed = JSON.parse(el.textContent.trim());
-        return parsed?.labels?.openProfiles || 'Apri profili visitatore';
-    } catch {
-        return 'Apri profili visitatore';
-    }
-}
-
 function metricColumn(field) {
     return {
         data: field,
@@ -261,7 +248,6 @@ function tableConfig(type, csrf, tableEl) {
                     {
                         data: 'label',
                         orderable: true,
-                        className: 'pa-asn-profile-trigger-cell',
                         render: function (data, cellType, row) {
                             if (cellType !== 'display' && cellType !== 'filter') {
                                 return row.label || '';
@@ -270,18 +256,7 @@ function tableConfig(type, csrf, tableEl) {
                                 ? '<span class="text-muted font-monospace">AS' + escapeHtml(String(row.asn)) + '</span>'
                                 : '';
                             const org = escapeHtml(row.as_organization || data || '');
-                            return (
-                                '<button type="button" class="btn btn-link btn-sm p-0 text-start pa-asn-profile-trigger" data-asn="' +
-                                escapeHtml(String(row.asn || '')) +
-                                '" data-label="' +
-                                escapeHtml(row.label || '') +
-                                '" title="' +
-                                escapeHtml(readAsnProfilesOpenLabel()) +
-                                '">' +
-                                org +
-                                (asn ? ' ' + asn : '') +
-                                '</button>'
-                            );
+                            return org + (asn ? ' ' + asn : '');
                         },
                     },
                     metricColumn('pageviews'),

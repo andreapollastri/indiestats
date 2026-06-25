@@ -360,8 +360,6 @@
         </div>
         @endif
     </div>
-
-    @include('sites.partials.asn-profiles-modal', ['site' => $site])
 @endsection
 
 @push('scripts')
