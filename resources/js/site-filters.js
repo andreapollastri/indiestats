@@ -14,6 +14,7 @@ const TYPE_TO_PARAM = {
     browser: 'filter_browser',
     os: 'filter_os',
     country: 'filter_country',
+    asn: 'filter_asn',
 };
 
 const FILTER_PARAM_KEYS = [
@@ -30,6 +31,7 @@ const FILTER_PARAM_KEYS = [
     'filter_browser',
     'filter_os',
     'filter_country',
+    'filter_asn',
     'filter_q',
 ];
 

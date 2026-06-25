@@ -68,6 +68,9 @@ class AnalyticsFilterScope
         if ($filters->os !== null) {
             $q->where('os', $filters->os);
         }
+        if ($filters->asn !== null) {
+            $q->where('asn', $filters->asn);
+        }
     }
 
     /**

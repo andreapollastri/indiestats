@@ -63,6 +63,7 @@ class SiteFilterOptionsService
                 $limit
             ),
             'country' => $this->countryOptions($siteId, $from, $to, $like, $limit),
+            'asn' => $this->asnOptions($siteId, $from, $to, $like, $limit),
             'search' => $this->distinctColumn(
                 PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
                     ->whereNotNull('search_query')->where('search_query', '!=', ''),
@@ -92,6 +93,7 @@ class SiteFilterOptionsService
             'browser',
             'os',
             'country',
+            'asn',
             'search',
         ];
         $out = [];
@@ -171,6 +173,42 @@ class SiteFilterOptionsService
             $code = (string) $row->country_code;
             $label = $this->countryLabel($code);
             $out[] = ['value' => $code, 'text' => $label.' ('.$code.')'];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return list<array{value: string, text: string}>
+     */
+    private function asnOptions(int $siteId, CarbonInterface $from, CarbonInterface $to, ?string $like, int $limit): array
+    {
+        $q = PageView::query()
+            ->where('site_id', $siteId)
+            ->whereBetween('created_at', [$from, $to])
+            ->whereNotNull('asn');
+
+        if ($like !== null) {
+            $q->where(function ($w) use ($like): void {
+                $w->whereRaw('CAST(asn AS CHAR) LIKE ?', [$like])
+                    ->orWhere('as_organization', 'like', $like);
+            });
+        }
+
+        $rows = $q->select('asn')
+            ->selectRaw('MAX(as_organization) as as_organization')
+            ->selectRaw('COUNT(*) as c')
+            ->groupBy('asn')
+            ->orderByDesc('c')
+            ->limit($limit)
+            ->get();
+
+        $out = [];
+        foreach ($rows as $row) {
+            $asn = (int) $row->asn;
+            $organization = (string) ($row->as_organization ?? '');
+            $label = $organization !== '' ? 'AS'.$asn.' '.$organization : 'AS'.$asn;
+            $out[] = ['value' => (string) $asn, 'text' => $label];
         }
 
         return $out;

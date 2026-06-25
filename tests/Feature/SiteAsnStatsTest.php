@@ -77,4 +77,31 @@ class SiteAsnStatsTest extends TestCase
             'visitors' => 2,
         ]);
     }
+
+    public function test_asn_filter_options_return_labeled_networks(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'ASN site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'asn' => 15169,
+            'as_organization' => 'Google LLC',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.filter-options', [
+            'site' => $site->public_key,
+            'type' => 'asn',
+            'range' => '7d',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('results.0.value', '15169');
+        $response->assertJsonPath('results.0.text', 'AS15169 Google LLC');
+    }
 }

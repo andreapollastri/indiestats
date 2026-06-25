@@ -244,4 +244,63 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertJsonPath('data.0.name', 'Chrome');
         $response->assertJsonPath('data.0.pageviews', 1);
     }
+
+    public function test_datatable_applies_asn_filter_from_post_body(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Filtered site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v1',
+            'asn' => 15169,
+            'as_organization' => 'Google LLC',
+            'browser' => 'Chrome',
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'v2',
+            'asn' => 13335,
+            'as_organization' => 'Cloudflare, Inc.',
+            'browser' => 'Firefox',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
+            'type' => 'browser',
+            'range' => '7d',
+            'draw' => 1,
+            'start' => 0,
+            'length' => 10,
+            'filter_asn' => '15169',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('recordsTotal', 1);
+        $response->assertJsonPath('data.0.name', 'Chrome');
+    }
+
+    public function test_site_page_includes_asn_filter_field(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'it']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Test site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.show', [
+            'site' => $site->public_key,
+            'range' => '7d',
+            'filter_asn' => '15169',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('id="pa-f-asn"', false);
+        $response->assertSee('data-pa-filter-type="asn"', false);
+        $response->assertSee('filter_asn', false);
+    }
 }

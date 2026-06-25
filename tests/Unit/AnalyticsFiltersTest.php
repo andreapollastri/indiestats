@@ -107,4 +107,23 @@ class AnalyticsFiltersTest extends TestCase
         $this->assertSame('Firefox', $filters->browser);
         $this->assertSame('Linux', $filters->os);
     }
+
+    public function test_from_query_array_parses_asn_filter(): void
+    {
+        $filters = AnalyticsFilters::fromQueryArray([
+            'filter_asn' => '15169',
+        ]);
+
+        $this->assertSame(15169, $filters->asn);
+        $this->assertSame(['filter_asn' => '15169'], $filters->toQueryArray());
+    }
+
+    public function test_from_query_array_ignores_invalid_asn_filter(): void
+    {
+        $filters = AnalyticsFilters::fromQueryArray([
+            'filter_asn' => 'not-a-number',
+        ]);
+
+        $this->assertNull($filters->asn);
+    }
 }

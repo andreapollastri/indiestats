@@ -22,6 +22,7 @@ final class AnalyticsFilters
         'filter_q',
         'filter_browser',
         'filter_os',
+        'filter_asn',
     ];
 
     public function __construct(
@@ -38,6 +39,7 @@ final class AnalyticsFilters
         public readonly ?string $searchQuery = null,
         public readonly ?string $browser = null,
         public readonly ?string $os = null,
+        public readonly ?int $asn = null,
     ) {}
 
     public static function fromRequest(Request $request): self
@@ -89,7 +91,32 @@ final class AnalyticsFilters
             searchQuery: $s('filter_q', 512),
             browser: $s('filter_browser', 64),
             os: $s('filter_os', 64),
+            asn: self::parseAsn($request->input('filter_asn')),
         );
+    }
+
+    private static function parseAsn(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+        if ($value === '' || ! ctype_digit($value)) {
+            return null;
+        }
+
+        $asn = (int) $value;
+
+        return $asn > 0 ? $asn : null;
     }
 
     /**
@@ -137,6 +164,9 @@ final class AnalyticsFilters
         if ($this->os !== null) {
             $o['filter_os'] = $this->os;
         }
+        if ($this->asn !== null) {
+            $o['filter_asn'] = (string) $this->asn;
+        }
 
         return $o;
     }
@@ -159,7 +189,8 @@ final class AnalyticsFilters
             || $this->country !== null
             || $this->searchQuery !== null
             || $this->browser !== null
-            || $this->os !== null;
+            || $this->os !== null
+            || $this->asn !== null;
     }
 
     public function withoutEvent(): self
@@ -178,6 +209,7 @@ final class AnalyticsFilters
             searchQuery: $this->searchQuery,
             browser: $this->browser,
             os: $this->os,
+            asn: $this->asn,
         );
     }
 
@@ -201,6 +233,7 @@ final class AnalyticsFilters
             searchQuery: $this->searchQuery,
             browser: $this->browser,
             os: $this->os,
+            asn: $this->asn,
         );
     }
 
