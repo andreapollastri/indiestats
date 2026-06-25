@@ -363,8 +363,10 @@ class SiteStatsDataTablesTest extends TestCase
         $response->assertSee('data-pa-filter-type="language"', false);
         $response->assertSee('placeholder="'.__('Cerca…').'"', false);
         $response->assertSee('name="filter_language"', false);
-        $response->assertSee('id="pa-f-gclid"', false);
-        $response->assertSee('data-pa-filter-type="gclid"', false);
+        $response->assertSee('id="pa-f-visitor-id"', false);
+        $response->assertSee('data-pa-filter-type="visitor_id"', false);
+        $response->assertDontSee('id="pa-f-gclid"', false);
+        $response->assertDontSee('id="pa-f-session-id"', false);
     }
 
     public function test_filter_options_returns_language_values(): void

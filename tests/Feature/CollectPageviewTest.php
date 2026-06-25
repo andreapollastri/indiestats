@@ -23,14 +23,11 @@ class CollectPageviewTest extends TestCase
         $response = $this->postJson('/collect/pageview', [
             'site_key' => $site->public_key,
             'visitor_id' => 'visitor-abc',
-            'session_id' => 'session-xyz',
             'path' => '/landing',
             'page_title' => 'Landing page',
-            'page_query' => 'utm_source=newsletter&gclid=abc123',
+            'page_query' => 'utm_source=newsletter',
             'referrer' => 'https://google.com/',
             'utm_source' => 'newsletter',
-            'gclid' => 'abc123',
-            'fbclid' => 'fb456',
             'browser_language' => 'it-IT',
             'timezone' => 'Europe/Rome',
             'user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -44,12 +41,9 @@ class CollectPageviewTest extends TestCase
         $pageView = PageView::query()->findOrFail($response->json('id'));
 
         $this->assertSame('visitor-abc', $pageView->visitor_id);
-        $this->assertSame('session-xyz', $pageView->session_id);
         $this->assertSame('/landing', $pageView->path);
         $this->assertSame('Landing page', $pageView->page_title);
-        $this->assertSame('utm_source=newsletter&gclid=abc123', $pageView->page_query);
-        $this->assertSame('abc123', $pageView->gclid);
-        $this->assertSame('fb456', $pageView->fbclid);
+        $this->assertSame('utm_source=newsletter', $pageView->page_query);
         $this->assertSame('it-IT', $pageView->browser_language);
         $this->assertSame('Europe/Rome', $pageView->timezone);
         $this->assertSame('Chrome', $pageView->browser);
@@ -57,30 +51,32 @@ class CollectPageviewTest extends TestCase
         $this->assertFalse($pageView->is_bot);
     }
 
-    public function test_click_ids_datatable_returns_ad_network_counts(): void
+    public function test_visitor_id_datatable_returns_aggregated_visitors(): void
     {
         $user = User::factory()->admin()->create();
         $site = $user->ownedSites()->create([
-            'name' => 'Ads site',
+            'name' => 'Visitor site',
             'allowed_domains' => 'example.com',
         ]);
 
         PageView::factory()->create([
             'site_id' => $site->id,
-            'visitor_id' => 'v1',
-            'gclid' => 'g1',
+            'visitor_id' => 'visitor-a',
             'created_at' => now()->subDay(),
         ]);
         PageView::factory()->create([
             'site_id' => $site->id,
-            'visitor_id' => 'v2',
-            'gclid' => 'g2',
-            'fbclid' => 'f1',
+            'visitor_id' => 'visitor-a',
             'created_at' => now()->subHours(2),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-b',
+            'created_at' => now()->subHours(1),
         ]);
 
         $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
-            'type' => 'click_ids',
+            'type' => 'visitor_id',
             'range' => '7d',
             'draw' => 1,
             'start' => 0,
@@ -88,14 +84,57 @@ class CollectPageviewTest extends TestCase
         ]);
 
         $response->assertOk();
-        $response->assertJsonPath('recordsTotal', 3);
+        $response->assertJsonPath('recordsTotal', 2);
         $response->assertJsonFragment([
-            'name' => 'Google Ads (gclid)',
+            'visitor_id' => 'visitor-a',
             'pageviews' => 2,
-            'visitors' => 2,
+            'visitors' => 1,
         ]);
         $response->assertJsonFragment([
-            'name' => 'Facebook (fbclid)',
+            'visitor_id' => 'visitor-b',
+            'pageviews' => 1,
+            'visitors' => 1,
+        ]);
+    }
+
+    public function test_is_bot_datatable_returns_human_and_bot_counts(): void
+    {
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'Bot site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'human-1',
+            'is_bot' => false,
+            'created_at' => now()->subDay(),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'bot-1',
+            'is_bot' => true,
+            'created_at' => now()->subHours(2),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('sites.stats.datatables', $site->public_key), [
+            'type' => 'is_bot',
+            'range' => '7d',
+            'draw' => 1,
+            'start' => 0,
+            'length' => 10,
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('recordsTotal', 2);
+        $response->assertJsonFragment([
+            'name' => 'Visitatori umani',
+            'pageviews' => 1,
+            'visitors' => 1,
+        ]);
+        $response->assertJsonFragment([
+            'name' => 'Bot / crawler',
             'pageviews' => 1,
             'visitors' => 1,
         ]);

@@ -215,10 +215,15 @@ function tableConfig(type, csrf, tableEl) {
         case 'language':
         case 'timezone':
         case 'browser_version':
-        case 'click_ids':
+        case 'is_bot':
             return {
                 ...base,
                 columns: num('name', true),
+            };
+        case 'visitor_id':
+            return {
+                ...base,
+                columns: num('visitor_id', false),
             };
         case 'page_title':
             return {

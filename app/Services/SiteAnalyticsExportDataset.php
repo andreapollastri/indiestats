@@ -51,6 +51,7 @@ class SiteAnalyticsExportDataset
 
         $header = match ($type) {
             'country' => ['Paese', 'Codice', 'Viste', 'Univoci'],
+            'is_bot' => ['Tipo visitatore', 'Viste', 'Univoci'],
             default => ['Valore', 'Viste', 'Univoci'],
         };
 
@@ -84,6 +85,9 @@ class SiteAnalyticsExportDataset
         if ($type === 'os') {
             $header[0] = 'Sistema operativo';
         }
+        if ($type === 'visitor_id') {
+            $header[0] = 'Visitatore';
+        }
         if (str_starts_with($type, 'utm_')) {
             $header[0] = $type;
         }
@@ -95,47 +99,14 @@ class SiteAnalyticsExportDataset
             if ($type === 'country') {
                 $code = $row->country_code === null ? '' : (string) $row->country_code;
                 $rows[] = [$this->countryLabel($row->country_code), $code, (int) $row->pageviews, (int) $row->visitors];
+            } elseif ($type === 'is_bot') {
+                $rows[] = [$this->isBotLabel((bool) $dim), (int) $row->pageviews, (int) $row->visitors];
             } else {
                 $rows[] = [$val, (int) $row->pageviews, (int) $row->visitors];
             }
         }
 
         return ['header' => $header, 'rows' => $rows];
-    }
-
-    /**
-     * @return array{header: list<string>, rows: list<list<string|int|float>>}
-     */
-    public function clickIdsSheet(
-        int $siteId,
-        CarbonInterface $from,
-        CarbonInterface $to,
-        AnalyticsFilters $filters
-    ): array {
-        $definitions = [
-            ['column' => 'gclid', 'label' => 'Google Ads (gclid)'],
-            ['column' => 'fbclid', 'label' => 'Facebook (fbclid)'],
-            ['column' => 'msclkid', 'label' => 'Microsoft Ads (msclkid)'],
-        ];
-
-        $rows = [];
-        foreach ($definitions as $definition) {
-            $column = $definition['column'];
-            $base = PageView::query();
-            $this->filterScope->applyToPageViews($base, $siteId, $from, $to, $filters);
-            $base->whereNotNull($column)->where($column, '!=', '');
-
-            $rows[] = [
-                $definition['label'],
-                (int) (clone $base)->count(),
-                (int) (clone $base)->distinct('visitor_id')->count('visitor_id'),
-            ];
-        }
-
-        return [
-            'header' => ['Parametro', 'Viste', 'Univoci'],
-            'rows' => $rows,
-        ];
     }
 
     /**
@@ -332,6 +303,10 @@ class SiteAnalyticsExportDataset
             'browser_version' => ['group' => 'browser_version', 'json_key' => 'name', 'where' => function (Builder $q): void {
                 $q->whereNotNull('browser_version')->where('browser_version', '!=', '');
             }],
+            'visitor_id' => ['group' => 'visitor_id', 'json_key' => 'visitor_id', 'where' => function (Builder $q): void {
+                $q->whereNotNull('visitor_id')->where('visitor_id', '!=', '');
+            }],
+            'is_bot' => ['group' => 'is_bot', 'json_key' => 'name', 'where' => null],
         ];
     }
 
@@ -359,6 +334,11 @@ class SiteAnalyticsExportDataset
         } catch (\Throwable) {
             return $code;
         }
+    }
+
+    private function isBotLabel(bool $isBot): string
+    {
+        return $isBot ? __('Bot / crawler') : __('Visitatori umani');
     }
 
     /**

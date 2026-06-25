@@ -59,6 +59,8 @@ class SiteAnalyticsExcelExportService
             'language',
             'timezone',
             'country',
+            'visitor_id',
+            'is_bot',
         ];
 
         $titles = [
@@ -78,6 +80,8 @@ class SiteAnalyticsExcelExportService
             'language' => 'Lingua browser',
             'timezone' => 'Fuso orario',
             'country' => 'Paese',
+            'visitor_id' => 'Visitatore',
+            'is_bot' => 'Tipo visitatore',
         ];
 
         foreach ($pageTypes as $type) {
@@ -86,11 +90,6 @@ class SiteAnalyticsExcelExportService
             $spreadsheet->addSheet($sheet);
             $this->fillDataSheet($sheet, $data);
         }
-
-        $clickIds = $this->dataset->clickIdsSheet($siteId, $from, $to, $filters);
-        $sheetClickIds = new Worksheet($spreadsheet, $this->sheetTitle('Click ID campagne'));
-        $spreadsheet->addSheet($sheetClickIds);
-        $this->fillDataSheet($sheetClickIds, $clickIds);
 
         $out = $this->dataset->outboundSheet($siteId, $from, $to, $filters);
         $sheetOut = new Worksheet($spreadsheet, $this->sheetTitle('Link in uscita'));

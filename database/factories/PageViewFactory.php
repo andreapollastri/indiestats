@@ -66,13 +66,10 @@ class PageViewFactory extends Factory
         $referrerUrl = $referrerSource !== '' ? 'https://www.'.$referrerSource.'.com/' : null;
         $hasUtm = $referrerSource !== '' && fake()->boolean(30);
         $path = fake()->randomElement(self::PATHS);
-        $hasAdsClick = fake()->boolean(12);
-        $adsNetwork = fake()->randomElement(['gclid', 'fbclid', 'msclkid']);
 
         return [
             'site_id' => Site::factory(),
             'visitor_id' => fake()->uuid(),
-            'session_id' => fake()->uuid(),
             'path' => $path,
             'page_title' => fake()->randomElement(self::PAGE_TITLES),
             'page_query' => fake()->boolean(25) ? 'ref='.fake()->word().'&utm_source=test' : null,
@@ -83,9 +80,6 @@ class PageViewFactory extends Factory
             'utm_campaign' => $hasUtm ? fake()->randomElement(['spring_sale', 'launch', 'newsletter', 'retargeting']) : null,
             'utm_term' => null,
             'utm_content' => null,
-            'gclid' => $hasAdsClick && $adsNetwork === 'gclid' ? fake()->regexify('[A-Za-z0-9]{20}') : null,
-            'fbclid' => $hasAdsClick && $adsNetwork === 'fbclid' ? fake()->regexify('[A-Za-z0-9]{24}') : null,
-            'msclkid' => $hasAdsClick && $adsNetwork === 'msclkid' ? fake()->regexify('[A-Za-z0-9]{20}') : null,
             'search_query' => $referrerSource === 'google' ? fake()->words(fake()->numberBetween(1, 3), true) : null,
             'browser' => fake()->randomElement(self::BROWSERS),
             'browser_version' => fake()->randomElement(self::BROWSER_VERSIONS),

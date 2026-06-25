@@ -15,7 +15,6 @@ class PageView extends Model
     protected $fillable = [
         'site_id',
         'visitor_id',
-        'session_id',
         'path',
         'page_title',
         'page_query',
@@ -26,9 +25,6 @@ class PageView extends Model
         'utm_campaign',
         'utm_term',
         'utm_content',
-        'gclid',
-        'fbclid',
-        'msclkid',
         'search_query',
         'browser',
         'browser_version',
