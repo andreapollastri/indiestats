@@ -40,6 +40,33 @@ class SiteExportTest extends TestCase
         Queue::assertPushed(GenerateSiteAnalyticsExportJob::class);
     }
 
+    public function test_store_export_persists_filters_from_post_body(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->admin()->create();
+        $site = $user->ownedSites()->create([
+            'name' => 'My site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(
+            route('sites.exports.store', $site),
+            [
+                'range' => '7d',
+                'filter_utm_source' => 'cernusco.city',
+            ]
+        );
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('site_exports', [
+            'site_id' => $site->id,
+            'user_id' => $user->id,
+            'filters_payload->filter_utm_source' => 'cernusco.city',
+        ]);
+    }
+
     public function test_status_endpoint_returns_json_for_pending_export(): void
     {
         $user = User::factory()->admin()->create();

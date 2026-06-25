@@ -1,3 +1,5 @@
+import { getPaAnalyticsFilterParams } from './site-filters.js';
+
 function readRealtimeConfig() {
     const el = document.getElementById('pa-realtime-config');
     if (!el) {
@@ -267,12 +269,21 @@ function init() {
         return chart;
     }
 
+    function buildRealtimeUrl() {
+        const url = new URL(config.url, window.location.origin);
+        const filters = getPaAnalyticsFilterParams();
+        Object.keys(filters).forEach(function (key) {
+            url.searchParams.set(key, filters[key]);
+        });
+        return url.toString();
+    }
+
     function fetchRealtime() {
         if (inFlight || document.hidden) {
             return;
         }
         inFlight = true;
-        fetch(config.url, {
+        fetch(buildRealtimeUrl(), {
             headers: {
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',

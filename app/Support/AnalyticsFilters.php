@@ -6,6 +6,24 @@ use Illuminate\Http\Request;
 
 final class AnalyticsFilters
 {
+    /** @var list<string> */
+    private const REQUEST_PARAM_KEYS = [
+        'filter_source',
+        'filter_path',
+        'filter_utm',
+        'filter_utm_source',
+        'filter_utm_medium',
+        'filter_utm_campaign',
+        'filter_utm_term',
+        'filter_utm_content',
+        'filter_event',
+        'filter_device',
+        'filter_country',
+        'filter_q',
+        'filter_browser',
+        'filter_os',
+    ];
+
     public function __construct(
         public readonly ?string $source = null,
         public readonly ?string $path = null,
@@ -24,7 +42,10 @@ final class AnalyticsFilters
 
     public static function fromRequest(Request $request): self
     {
-        return self::fromQueryArray($request->query());
+        return self::fromQueryArray(array_merge(
+            $request->query(),
+            $request->only(self::REQUEST_PARAM_KEYS),
+        ));
     }
 
     /**

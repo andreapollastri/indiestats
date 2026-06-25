@@ -18,6 +18,30 @@ class AnalyticsFiltersTest extends TestCase
         $this->assertNull($filters->utmMedium);
     }
 
+    public function test_from_request_reads_filter_params_from_post_body(): void
+    {
+        $request = Request::create('/sites/example/stats/datatables', 'POST', [
+            'type' => 'browser',
+            'range' => '7d',
+            'filter_utm_source' => 'cernusco.city',
+        ]);
+
+        $filters = AnalyticsFilters::fromRequest($request);
+
+        $this->assertSame('cernusco.city', $filters->utmSource);
+    }
+
+    public function test_from_request_prefers_post_body_over_query_string_for_same_key(): void
+    {
+        $request = Request::create('/sites/example/stats/datatables?filter_utm_source=query', 'POST', [
+            'filter_utm_source' => 'body',
+        ]);
+
+        $filters = AnalyticsFilters::fromRequest($request);
+
+        $this->assertSame('body', $filters->utmSource);
+    }
+
     public function test_from_request_prefers_filter_utm_source_over_filter_utm(): void
     {
         $request = Request::create('/test', 'GET', [

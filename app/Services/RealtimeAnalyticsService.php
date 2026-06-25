@@ -3,13 +3,19 @@
 namespace App\Services;
 
 use App\Models\PageView;
+use App\Support\AnalyticsFilters;
 use App\Support\RelativeTimeAgoFormatter;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class RealtimeAnalyticsService
 {
+    public function __construct(
+        private AnalyticsFilterScope $filterScope
+    ) {}
+
     public const ACTIVE_WINDOW_MINUTES = 5;
 
     public const SERIES_MINUTES = 30;
@@ -128,26 +134,20 @@ class RealtimeAnalyticsService
      *   recent: list<array{path: string, country_code: ?string, seconds_ago: int, time_ago: string}>,
      * }
      */
-    public function build(int $siteId, string $timezone): array
+    public function build(int $siteId, string $timezone, ?AnalyticsFilters $filters = null): array
     {
+        $filters = $filters ?? new AnalyticsFilters;
         $now = now();
         $activeSince = $now->copy()->subMinutes(self::ACTIVE_WINDOW_MINUTES);
         $seriesSince = $now->copy()->subMinutes(self::SERIES_MINUTES - 1)->startOfMinute();
 
-        $activeVisitors = (int) PageView::query()
-            ->where('site_id', $siteId)
-            ->where('created_at', '>=', $activeSince)
+        $activeVisitors = (int) $this->filteredPageViewsQuery($siteId, $activeSince, $now, $filters)
             ->selectRaw('COUNT(DISTINCT visitor_id) as c')
             ->value('c');
 
-        $pageviewsLast5m = (int) PageView::query()
-            ->where('site_id', $siteId)
-            ->where('created_at', '>=', $activeSince)
-            ->count();
+        $pageviewsLast5m = (int) $this->filteredPageViewsQuery($siteId, $activeSince, $now, $filters)->count();
 
-        $seriesRows = PageView::query()
-            ->where('site_id', $siteId)
-            ->where('created_at', '>=', $seriesSince)
+        $seriesRows = $this->filteredPageViewsQuery($siteId, $seriesSince, $now, $filters)
             ->select(['created_at', 'visitor_id'])
             ->orderBy('created_at')
             ->get()
@@ -155,8 +155,9 @@ class RealtimeAnalyticsService
 
         $series = $this->fillMinuteSeries($seriesRows, $timezone, self::SERIES_MINUTES);
 
-        $recent = PageView::query()
-            ->where('site_id', $siteId)
+        $recentSince = $now->copy()->subHours(24);
+
+        $recent = $this->filteredPageViewsQuery($siteId, $recentSince, $now, $filters)
             ->orderByDesc('created_at')
             ->limit(8)
             ->get(['path', 'country_code', 'created_at'])
@@ -211,5 +212,17 @@ class RealtimeAnalyticsService
     private function minuteKey(CarbonInterface $instant, string $timezone): string
     {
         return Carbon::parse($instant)->timezone($timezone)->format('Y-m-d H:i:00');
+    }
+
+    private function filteredPageViewsQuery(
+        int $siteId,
+        CarbonInterface $from,
+        CarbonInterface $to,
+        AnalyticsFilters $filters
+    ): Builder {
+        $query = PageView::query();
+        $this->filterScope->applyToPageViews($query, $siteId, $from, $to, $filters);
+
+        return $query;
     }
 }

@@ -620,14 +620,13 @@ class SiteStatsDataTableService
         $orderBy = $orderMap[$orderCol] ?? 'goals.label';
 
         $scope = $this->filterScope;
-        $noAnalyticsFilters = new AnalyticsFilters;
         $query = DB::table('goals')
             ->where('goals.site_id', $siteId)
-            ->leftJoin('tracking_events', function ($join) use ($siteId, $from, $to, $scope, $noAnalyticsFilters): void {
+            ->leftJoin('tracking_events', function ($join) use ($siteId, $from, $to, $scope, $filtersForUrls): void {
                 $join->on('tracking_events.name', '=', 'goals.event_name')
                     ->where('tracking_events.site_id', '=', $siteId)
                     ->whereBetween('tracking_events.created_at', [$from, $to]);
-                $scope->applyToGoalsJoin($join, $siteId, $from, $to, $noAnalyticsFilters);
+                $scope->applyToGoalsJoin($join, $siteId, $from, $to, $filtersForUrls);
             })
             ->select('goals.id', 'goals.label', 'goals.event_name')
             ->selectRaw('COUNT(tracking_events.id) as event_count')

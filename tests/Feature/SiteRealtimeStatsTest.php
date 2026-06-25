@@ -136,4 +136,38 @@ class SiteRealtimeStatsTest extends TestCase
         $response->assertJsonPath('recent.0.time_ago', '3 h fa');
         $response->assertJsonPath('recent.0.path', '/archive');
     }
+
+    public function test_realtime_endpoint_applies_utm_source_filter(): void
+    {
+        $user = User::factory()->admin()->create(['timezone' => 'UTC']);
+        $site = $user->ownedSites()->create([
+            'name' => 'Live site',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-a',
+            'path' => '/filtered',
+            'utm_source' => 'cernusco.city',
+            'created_at' => now()->subMinutes(2),
+        ]);
+        PageView::factory()->create([
+            'site_id' => $site->id,
+            'visitor_id' => 'visitor-b',
+            'path' => '/other',
+            'utm_source' => 'other-source',
+            'created_at' => now()->subMinutes(1),
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('sites.stats.realtime', [
+            'site' => $site->public_key,
+            'filter_utm_source' => 'cernusco.city',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('active_visitors', 1);
+        $response->assertJsonPath('pageviews_last_5m', 1);
+        $response->assertJsonPath('recent.0.path', '/filtered');
+    }
 }
