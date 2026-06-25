@@ -88,7 +88,7 @@ class SiteAsnVisitorProfilesTest extends TestCase
         $response->assertJsonPath('visitors.0.visitor_id', 'visitor-b');
         $response->assertJsonPath('visitors.0.pageviews', 1);
         $response->assertJsonPath('visitors.0.browser', 'Firefox');
-        $response->assertJsonPath('visitors.0.ip_hint', '93.45.xxx.xxx');
+        $response->assertJsonPath('visitors.0.ip_hint', '93.xxx.xxx');
         $response->assertJsonPath('visitors.1.visitor_id', 'visitor-a');
         $response->assertJsonPath('visitors.1.pageviews', 2);
         $response->assertJsonPath('visitors.1.visit_days', 2);
