@@ -53,4 +53,31 @@ class FakeDataSeederTest extends TestCase
 
         $this->assertTrue($oldest->created_at->diffInMonths($newest->created_at) >= 12);
     }
+
+    public function test_seeded_page_views_include_enriched_visitor_context(): void
+    {
+        config(['analytics.seed_fake_data' => true]);
+
+        $this->seed(FakeDataSeeder::class);
+
+        $site = Site::first();
+
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('session_id')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('page_title')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('browser_language')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('timezone')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('ip_address')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('asn')->count());
+        $this->assertGreaterThan(0, $site->pageViews()->where('is_bot', true)->count());
+        $this->assertGreaterThan(0, $site->pageViews()->whereNotNull('search_query')->count());
+
+        $returningVisitors = $site->pageViews()
+            ->select('visitor_id')
+            ->groupBy('visitor_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->get()
+            ->count();
+
+        $this->assertGreaterThan(0, $returningVisitors);
+    }
 }
