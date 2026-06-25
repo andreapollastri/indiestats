@@ -1092,6 +1092,133 @@ pre {
     }
 }
 
+// ASN visitor profiles modal
+.pa-asn-profile-trigger {
+    color: inherit;
+    text-decoration: none;
+    max-width: 100%;
+    white-space: normal;
+
+    &:hover,
+    &:focus {
+        color: #10b981;
+        text-decoration: underline;
+    }
+}
+
+.pa-visitor-profile {
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    &__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        font-size: 0.75rem;
+    }
+
+    &__chip-label {
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    &__chip-value {
+        color: #0f172a;
+        font-weight: 600;
+    }
+}
+
+.pa-visitor-timeline-day {
+    &__title {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+}
+
+.pa-visitor-timeline {
+    position: relative;
+    padding-left: 0.25rem;
+
+    &__item {
+        display: grid;
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        gap: 0.75rem;
+        padding-bottom: 0.85rem;
+        position: relative;
+
+        &:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 2.15rem;
+            top: 1.35rem;
+            bottom: 0;
+            width: 1px;
+            background: #e2e8f0;
+        }
+    }
+
+    &__time {
+        font-size: 0.75rem;
+        color: #64748b;
+        padding-top: 0.1rem;
+    }
+
+    &__body {
+        min-width: 0;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.55rem 0.75rem;
+    }
+
+    &__kind {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
+    }
+
+    &__item--pageview &__body {
+        border-left: 3px solid #10b981;
+    }
+
+    &__item--event &__body {
+        border-left: 3px solid #06b6d4;
+    }
+
+    &__item--outbound &__body {
+        border-left: 3px solid #8b5cf6;
+    }
+
+    &__path {
+        font-size: 0.8125rem;
+        word-break: break-word;
+    }
+
+    &__meta {
+        margin-top: 0.25rem;
+    }
+}
+
 // Detail tab jump navigation
 .pa-detail-jump-nav {
     display: flex;
