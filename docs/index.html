@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IndieStats — Privacy-friendly, self-hosted analytics</title>
+  <meta name="description" content="Self-hosted web analytics on Laravel 13. Real-time dashboards, advanced filters, country map, ASN detection, and localized Excel export — no cookies, no consent banners.">
+  <meta property="og:title" content="IndieStats — Privacy-friendly, self-hosted analytics">
+  <meta property="og:description" content="Privacy-friendly analytics on your own infrastructure. Multiple sites, real-time dashboards, and localized exports — without handing data to third parties.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://indiestats.web.ap.it">
+  <meta name="theme-color" content="#0d9488">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0c1929;
+      --ink-soft: #243647;
+      --muted: #5a6b7a;
+      --line: #c5d3de;
+      --paper: #e8f0f4;
+      --surface: #f2f7f9;
+      --white: #ffffff;
+      --signal: #0d9488;
+      --signal-deep: #0f766e;
+      --phosphor: #2dd4bf;
+      --terminal: #0c1929;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --sans: "Source Sans 3", Georgia, sans-serif;
+      --display: "Space Grotesk", var(--sans);
+      --max: 1120px;
+      --docs-sidebar: 200px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 5rem;
+    }
+
+    body {
+      font-family: var(--sans);
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.55;
+      font-size: 1.0625rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+    code, pre { font-family: var(--mono); }
+
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 45% at 8% -8%, rgba(13, 148, 136, 0.14), transparent 55%),
+        radial-gradient(ellipse 55% 40% at 95% 15%, rgba(12, 25, 41, 0.06), transparent 50%),
+        linear-gradient(180deg, var(--surface) 0%, var(--paper) 42%, var(--paper) 100%);
+    }
+
+    .atmosphere::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(12, 25, 41, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(12, 25, 41, 0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, #000 0%, transparent 65%);
+    }
+
+    /* Nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 1.5rem;
+      background: rgba(242, 247, 249, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-brand {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--ink);
+    }
+
+    .nav-brand svg { width: 1.55rem; height: 1.55rem; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.35rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--signal); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--white) !important;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: var(--signal);
+      border-color: var(--signal);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: 0;
+      cursor: pointer;
+      padding: 0.35rem;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--ink);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 3.6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    .hero-plane {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 70% 40%, rgba(45, 212, 191, 0.14), transparent 55%),
+        linear-gradient(165deg, #07131f 0%, #0c1929 45%, #123044 100%);
+    }
+
+    .hero-plane::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(45, 212, 191, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 212, 191, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(180deg, #000 20%, transparent 90%);
+      animation: grid-drift 28s linear infinite;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max);
+      width: 100%;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 2.25rem;
+    }
+
+    .hero-brand {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(3.4rem, 12vw, 7.5rem);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+      color: var(--white);
+      animation: rise 0.75s ease both;
+    }
+
+    .hero-brand span { color: var(--phosphor); }
+
+    .hero-content h1 {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      color: rgba(255, 255, 255, 0.92);
+      margin: 1.15rem 0 0.65rem;
+      max-width: 34rem;
+      animation: rise 0.75s 0.08s ease both;
+    }
+
+    .hero-content > p {
+      color: rgba(220, 236, 244, 0.72);
+      max-width: 34rem;
+      font-size: 1.05rem;
+      animation: rise 0.75s 0.14s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      animation: rise 0.75s 0.2s ease both;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.1rem;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: var(--phosphor);
+      color: var(--ink);
+      border-color: var(--phosphor);
+    }
+
+    .btn-primary:hover {
+      background: #5eead4;
+      border-color: #5eead4;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255, 255, 255, 0.55);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero-terminal {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      margin-top: auto;
+      background: rgba(5, 12, 20, 0.92);
+      border-top: 1px solid rgba(45, 212, 191, 0.22);
+      animation: rise 0.85s 0.22s ease both;
+    }
+
+    .hero-terminal-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem 1.5rem;
+      font-family: var(--mono);
+      font-size: clamp(0.78rem, 1.6vw, 0.92rem);
+      line-height: 1.65;
+      color: rgba(220, 236, 244, 0.88);
+      overflow-x: auto;
+    }
+
+    .hero-terminal .prompt { color: var(--phosphor); }
+    .hero-terminal .dim { color: rgba(220, 236, 244, 0.45); }
+    .hero-terminal .ok { color: var(--phosphor); }
+    .hero-terminal .val { color: #7dd3fc; }
+
+    .caret {
+      display: inline-block;
+      width: 0.55ch;
+      height: 1.05em;
+      background: var(--phosphor);
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 1.05s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes grid-drift {
+      from { background-position: 0 0; }
+      to { background-position: 40px 40px; }
+    }
+
+    /* Docs shell */
+    .docs {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: var(--docs-sidebar) minmax(0, 1fr);
+      gap: 3rem;
+    }
+
+    .docs-nav {
+      position: sticky;
+      top: 5rem;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .docs-nav-label {
+      font-family: var(--display);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+
+    .docs-nav a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      font-weight: 500;
+      padding: 0.35rem 0.5rem;
+      border-left: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .docs-nav a:hover,
+    .docs-nav a.active {
+      color: var(--signal-deep);
+      border-left-color: var(--signal);
+      background: rgba(13, 148, 136, 0.06);
+    }
+
+    .docs-main { min-width: 0; }
+
+    .docs-main section {
+      padding-bottom: 2.75rem;
+      margin-bottom: 2.75rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .docs-main section:last-of-type {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .docs-main h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.55rem, 2.8vw, 1.9rem);
+      letter-spacing: -0.035em;
+      margin-bottom: 0.55rem;
+    }
+
+    .docs-main h3 {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      margin: 1.75rem 0 0.55rem;
+    }
+
+    .docs-main p,
+    .docs-main li { color: var(--ink-soft); }
+
+    .docs-main p + p { margin-top: 0.85rem; }
+
+    .docs-main .lead {
+      font-size: 1.12rem;
+      color: var(--muted);
+      max-width: 40rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .docs-main ul,
+    .docs-main ol {
+      margin: 0.85rem 0 0 1.2rem;
+    }
+
+    .docs-main li + li { margin-top: 0.35rem; }
+
+    .docs-main code {
+      font-size: 0.88em;
+      background: rgba(12, 25, 41, 0.06);
+      padding: 0.12em 0.35em;
+      border-radius: 3px;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line);
+      margin-top: 1.25rem;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    @media (min-width: 700px) {
+      .feature-row {
+        grid-template-columns: 11rem 1fr;
+        gap: 1.25rem;
+        align-items: baseline;
+      }
+    }
+
+    .feature-row .name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+
+    .feature-row .desc {
+      color: var(--muted);
+      font-size: 0.97rem;
+    }
+
+    .shots {
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .shot {
+      margin: 0;
+    }
+
+    .shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .shot figcaption {
+      margin-top: 0.65rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .code-block {
+      position: relative;
+      margin: 1rem 0;
+      background: var(--terminal);
+      color: #d7e8ef;
+      border: 1px solid #1a3344;
+      overflow: hidden;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .code-block .copy {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      border: 1px solid rgba(45, 212, 191, 0.35);
+      background: rgba(12, 25, 41, 0.85);
+      color: var(--phosphor);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 0.28rem 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .code-block .copy:hover,
+    .code-block .copy.copied {
+      background: var(--phosphor);
+      color: var(--ink);
+      border-color: var(--phosphor);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(12, 25, 41, 0.03);
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    td code { white-space: nowrap; }
+
+    .note {
+      margin: 1.1rem 0;
+      padding: 0.9rem 1rem;
+      border-left: 3px solid var(--signal);
+      background: rgba(13, 148, 136, 0.08);
+      color: var(--ink-soft);
+      font-size: 0.97rem;
+    }
+
+    .note strong { color: var(--ink); }
+
+    .steps {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line);
+      margin-top: 1.25rem;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 1rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .step .n {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding-top: 0.2rem;
+    }
+
+    .step h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.05rem;
+    }
+
+    .step p { margin: 0; }
+
+    .pair {
+      margin-top: 3rem;
+      padding: 1.75rem 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .pair h2 { margin-bottom: 0.4rem; }
+
+    .pair .btn {
+      margin-top: 1.1rem;
+      background: var(--ink);
+      color: var(--white);
+      border-color: var(--ink);
+    }
+
+    .pair .btn:hover {
+      background: var(--signal);
+      border-color: var(--signal);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 2rem 1.5rem 2.75rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    footer a {
+      color: var(--signal-deep);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    footer p + p { margin-top: 0.35rem; }
+
+    @media (max-width: 880px) {
+      .docs {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding-top: 2.5rem;
+      }
+
+      .docs-nav {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .docs-nav-label { width: 100%; }
+
+      .docs-nav a {
+        border-left: 0;
+        border-bottom: 2px solid transparent;
+        padding: 0.3rem 0.55rem;
+      }
+
+      .docs-nav a:hover,
+      .docs-nav a.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--signal);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hamburger { display: flex; }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 0.5rem 1rem 1rem;
+        background: rgba(242, 247, 249, 0.97);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav-links.open { display: flex; }
+
+      .nav-links a {
+        padding: 0.75rem 0.25rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav-cta { justify-content: center; margin-top: 0.5rem; border: 0; }
+
+      .hero { min-height: auto; }
+      .hero-content { padding-top: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <a class="nav-brand" href="/">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#0C1929"/>
+        <path d="M7.5 21.5 L12.5 14.5 L17 18.5 L24.5 9.5" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="24.5" cy="9.5" r="1.6" fill="#2DD4BF"/>
+      </svg>
+      IndieStats
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#tracking">Tracking</a>
+      <a href="#production">Production</a>
+      <a class="nav-cta" href="https://github.com/andreapollastri/indiestats" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-plane" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-brand">IndieStats<span>.</span></div>
+      <h1>Privacy-friendly analytics on your own infrastructure.</h1>
+      <p>Self-hosted Laravel analytics: real-time dashboards, advanced filters, and localized exports — multiple sites, no cookies, no mandatory consent banners.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#install">Quick start</a>
+        <a class="btn btn-ghost" href="https://github.com/andreapollastri/indiestats" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </div>
+    <div class="hero-terminal" aria-hidden="true">
+      <div class="hero-terminal-inner">
+        <div><span class="prompt">$</span> composer run setup</div>
+        <div class="dim">Installing · building assets · migrating…</div>
+        <div class="ok">✓ App ready on APP_URL</div>
+        <div><span class="prompt">$</span> composer run dev</div>
+        <div class="dim">Dashboard · Last 30 days</div>
+        <div>&nbsp;&nbsp;pageviews <span class="val">12.4k</span> &nbsp; uniques <span class="val">3.2k</span> &nbsp; avg time <span class="val">48s</span></div>
+        <div><span class="prompt">$</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs" id="docs">
+    <aside class="docs-nav" aria-label="Documentation">
+      <div class="docs-nav-label">Documentation</div>
+      <a href="#features">Features</a>
+      <a href="#screenshots">Screenshots</a>
+      <a href="#install">Install</a>
+      <a href="#quickstart">Quick start</a>
+      <a href="#tracking">Tracking</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#filters">Filters</a>
+      <a href="#production">Production</a>
+      <a href="#scheduler">Scheduler</a>
+      <a href="#queue">Queue</a>
+    </aside>
+
+    <div class="docs-main">
+      <section id="features">
+        <h2>Features</h2>
+        <p class="lead">Everything you need in one place — without handing visitor data to third parties or weighing down the sites you track.</p>
+        <div class="feature-list">
+          <div class="feature-row">
+            <div class="name">Pageviews &amp; context</div>
+            <div class="desc">localStorage visitor IDs (no cookies), time on page, <code>document.title</code>, query string, language, timezone, search terms, and bot detection.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Real-time</div>
+            <div class="desc">Active visitors, last-5-minute pageviews, a 30-minute activity chart, and a live feed — on the dashboard and per site.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Nine analytics tabs</div>
+            <div class="desc">Summary, Real-time, Content, Traffic, UTM, Technology, Geography, Visitor, and Events — each with server-side DataTables.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Advanced filters</div>
+            <div class="desc">Tom Select type-ahead across source, path, title, UTM, device, country, ASN, visitor, and more — applied to every tab and export.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Geography &amp; ASN</div>
+            <div class="desc">Choropleth country map via MaxMind GeoLite2. ISP / hosting provider via DB-IP ASN Lite.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Events &amp; outbound</div>
+            <div class="desc">Custom events with up to 20 properties, goals, and clicks to external domains.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Localized export</div>
+            <div class="desc">Background XLSX jobs with sheet titles and headers in IT, EN, DE, FR, or ES.</div>
+          </div>
+          <div class="feature-row">
+            <div class="name">Multi-site</div>
+            <div class="desc">Multiple sites per account, domain allowlists, Cloudflare-aware client IP, noscript pixel, and scheduled pruning.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screenshots">
+        <h2>Screenshots</h2>
+        <p class="lead">From the multi-site overview down to the snippet you paste on your pages.</p>
+        <div class="shots">
+          <figure class="shot">
+            <img src="img/dashboard.jpg" width="1024" height="522" loading="lazy" decoding="async" alt="IndieStats multi-site dashboard with trend charts and unique visitors">
+            <figcaption>Multi-site overview — unique visitors and trends for every site at a glance.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/site.jpg" width="1024" height="525" loading="lazy" decoding="async" alt="Per-site analytics with summary metrics and daily trend chart">
+            <figcaption>Per-site detail — summary metrics, filters, and the daily pageviews trend.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/conf.jpg" width="1024" height="517" loading="lazy" decoding="async" alt="Site configuration with allowed domains and tracking snippet">
+            <figcaption>Sites &amp; snippets — add a site, set allowed domains, and copy the tracking code.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2>Install</h2>
+        <p class="lead">One command. PHP 8.3+, Composer, and Node 20+. SQLite by default — MySQL and PostgreSQL work too.</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>git clone https://github.com/andreapollastri/indiestats.git
+cd indiestats
+composer run setup</pre>
+        </div>
+        <p>The <code>setup</code> script installs dependencies, runs the Vite build, creates <code>.env</code>, generates the app key, and runs migrations.</p>
+        <h3>Manual install</h3>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>composer install
+npm install
+npm run build
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate</pre>
+        </div>
+      </section>
+
+      <section id="quickstart">
+        <h2>Quick start</h2>
+        <p class="lead">From zero to your first metrics in three steps.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="n">01</div>
+            <div>
+              <h3>Install &amp; run</h3>
+              <p>Clone the repo, run <code>composer run setup</code>, then start the stack with <code>composer run dev</code>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="n">02</div>
+            <div>
+              <h3>Create a site &amp; paste the snippet</h3>
+              <p>Add a site with a name and allowed domains. Copy the async script and <code>noscript</code> fallback before the closing <code>body</code> tag — the base URL is your <code>APP_URL</code>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="n">03</div>
+            <div>
+              <h3>Open the dashboard</h3>
+              <p>Multi-site overview with live visitor counts, then nine per-site tabs — all narrowed by the same filters and exportable to localized Excel.</p>
+            </div>
+          </div>
+        </div>
+        <h3>Optional demo data</h3>
+        <p>Add <code>SEED_FAKE_DATA=true</code> to <code>.env</code>, then:</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>php artisan db:seed</pre>
+        </div>
+        <p>Creates an admin user (<code>admin@users.test</code> / <code>password</code>) and, when seeding is enabled, sample analytics.</p>
+      </section>
+
+      <section id="tracking">
+        <h2>Tracking</h2>
+        <p class="lead">A lightweight async snippet plus a 1×1 pixel for visitors without JavaScript.</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>&lt;script async src="https://your-indiestats-url/i/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"&gt;&lt;/script&gt;
+&lt;noscript&gt;&lt;img src="https://your-indiestats-url/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&amp;p=/" width="1" height="1" /&gt;&lt;/noscript&gt;</pre>
+        </div>
+        <p>The script tracks pageviews, time on page, outbound clicks, UTM parameters, on-site search queries, page title, query string, language, timezone, and a per-tab session ID.</p>
+        <h3>Custom events</h3>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>indiestats.track('signup');
+
+indiestats.track('purchase', {
+  plan: 'pro',
+  price: '29.99',
+  currency: 'USD'
+});</pre>
+        </div>
+        <p>Up to 20 key–value properties per event. Tie events to goals in the dashboard to watch conversions.</p>
+        <div class="note">
+          <strong>Allowlist:</strong> only domains listed on the site can send data (validated via <code>Origin</code> / <code>Referer</code>). Always set allowed domains in production.
+        </div>
+      </section>
+
+      <section id="dashboard">
+        <h2>Dashboard</h2>
+        <p class="lead">A multi-site overview, then dedicated tabs for every angle of traffic.</p>
+        <ul>
+          <li><strong>Overview</strong> — unique visitors, pageviews, sparklines, live counts, and date ranges (today → 1 year).</li>
+          <li><strong>Summary</strong> — headline metrics, top pages, and top sources.</li>
+          <li><strong>Real-time</strong> — active visitors, last 5 minutes, 30-minute chart, live activity feed.</li>
+          <li><strong>Content / Traffic / UTM</strong> — paths, titles, referrers, search queries, and campaigns.</li>
+          <li><strong>Technology</strong> — device, browser, OS, language, timezone, and ASN.</li>
+          <li><strong>Geography</strong> — country table plus interactive choropleth map.</li>
+          <li><strong>Visitor / Events</strong> — visitor IDs, human vs bot, custom events and goals.</li>
+        </ul>
+        <p>UI is localized in IT, EN, DE, FR, and ES — including DataTables, country names, and export sheets.</p>
+      </section>
+
+      <section id="filters">
+        <h2>Filters</h2>
+        <p class="lead">One filter bar. Every tab, chart, realtime count, DataTables AJAX call, and Excel export respects it.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Filter</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Source</td><td>Referrer / engine</td></tr>
+              <tr><td>Search term</td><td>On-site search query</td></tr>
+              <tr><td>Page / Page title</td><td>Path and <code>document.title</code></td></tr>
+              <tr><td>Query string</td><td>Full landing-page query</td></tr>
+              <tr><td>UTM (5)</td><td>source, medium, campaign, term, content</td></tr>
+              <tr><td>Event</td><td>Custom event name</td></tr>
+              <tr><td>Device / Browser / OS</td><td>From User-Agent</td></tr>
+              <tr><td>Language / Timezone</td><td>From the tracker script</td></tr>
+              <tr><td>Visitor / type</td><td>Persistent ID · human vs bot</td></tr>
+              <tr><td>Country / ASN</td><td>GeoIP and network</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="production">
+        <h2>Production</h2>
+        <p class="lead">Deploy without surprises. Set <code>APP_URL</code> to HTTPS, build assets, run the scheduler and a queue worker.</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache</pre>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>APP_URL</code></td>
+                <td>Required. Public HTTPS URL used by the tracker snippet.</td>
+              </tr>
+              <tr>
+                <td><code>APP_ENV</code> / <code>APP_DEBUG</code></td>
+                <td><code>production</code> / <code>false</code></td>
+              </tr>
+              <tr>
+                <td><code>QUEUE_CONNECTION</code></td>
+                <td>Needed for Excel exports (default <code>database</code>)</td>
+              </tr>
+              <tr>
+                <td><code>ANALYTICS_RETENTION_DAYS</code></td>
+                <td>Raw data pruning window (default <code>375</code>)</td>
+              </tr>
+              <tr>
+                <td><code>GEOIP_*</code></td>
+                <td>Optional MaxMind / ASN database paths and license key</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <strong>Proxies:</strong> behind Cloudflare, <code>CF-Connecting-IP</code> is used for GeoIP and ASN. For other reverse proxies, configure Laravel trusted proxies.
+        </div>
+      </section>
+
+      <section id="scheduler">
+        <h2>Scheduler</h2>
+        <p class="lead">One cron entry drives pruning, weekly GeoIP updates, and monthly ASN downloads.</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>* * * * * cd /path-to-indiestats &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</pre>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Schedule</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>analytics:prune</code></td>
+                <td>Daily 02:00</td>
+                <td>Remove raw pageviews, events, and outbound clicks past retention</td>
+              </tr>
+              <tr>
+                <td><code>geoip:update</code></td>
+                <td>Mondays 04:15</td>
+                <td>Download GeoLite2-Country when a MaxMind key is set</td>
+              </tr>
+              <tr>
+                <td><code>dbip-asn:update</code></td>
+                <td>3rd of month 04:30</td>
+                <td>Download DB-IP ASN Lite</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="queue">
+        <h2>Queue</h2>
+        <p class="lead">Excel exports run as background jobs. Locally, <code>composer run dev</code> covers the worker. In production, keep one running:</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>php artisan queue:work --sleep=3 --tries=3</pre>
+        </div>
+        <p>Use Supervisor (or equivalent) so the worker restarts automatically.</p>
+      </section>
+
+      <div class="pair" id="cipi">
+        <h2>Deploy with Cipi</h2>
+        <p class="lead" style="margin-bottom:0">Run IndieStats on any Ubuntu VPS with <a href="https://cipi.sh" target="_blank" rel="noopener" style="color:var(--signal-deep);font-weight:600;text-decoration:none">cipi.sh</a> — PHP-FPM, MariaDB, Nginx, Let's Encrypt, zero-downtime releases, and queue workers.</p>
+        <a class="btn" href="https://cipi.sh" target="_blank" rel="noopener">Explore cipi.sh →</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Open source · MIT · Laravel 13 · <a href="https://github.com/andreapollastri/indiestats" target="_blank" rel="noopener">GitHub</a></p>
+    <p>Made by <a href="https://web.ap.it" target="_blank" rel="noopener">Andrea Pollastri</a></p>
+  </footer>
+
+  <script>
+    (function () {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('nav-links');
+
+      hamburger.addEventListener('click', () => {
+        const open = navLinks.classList.toggle('open');
+        hamburger.classList.toggle('open', open);
+        hamburger.setAttribute('aria-expanded', open);
+      });
+
+      navLinks.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      async function copyText(text, button) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+          button.textContent = 'Copied';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.textContent = 'Copy';
+            button.classList.remove('copied');
+          }, 1600);
+        } catch (_) {
+          button.textContent = 'Select manually';
+        }
+      }
+
+      document.querySelectorAll('[data-copy]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const pre = button.parentElement.querySelector('pre');
+          if (pre) copyText(pre.textContent, button);
+        });
+      });
+
+      const sections = [...document.querySelectorAll('.docs-main section[id]')];
+      const sideLinks = [...document.querySelectorAll('.docs-nav a')];
+
+      function setActive() {
+        const y = window.scrollY + 120;
+        let current = sections[0]?.id;
+        for (const section of sections) {
+          if (section.offsetTop <= y) current = section.id;
+        }
+        sideLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+      }
+
+      setActive();
+      window.addEventListener('scroll', setActive, { passive: true });
+    })();
+  </script>
+  <script async src="https://stats.web.ap.it/i/653a9bed-ff67-4d6f-81ea-8a18f2755ad5.js"></script>
+  <noscript><img src="https://stats.web.ap.it/collect/pixel.gif?k=653a9bed-ff67-4d6f-81ea-8a18f2755ad5&p=/" width="1" height="1" alt=""></noscript>
+</body>
+</html>

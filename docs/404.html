@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — IndieStats</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0d9488">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0c1929;
+      --muted: #5a6b7a;
+      --line: #c5d3de;
+      --paper: #e8f0f4;
+      --surface: #f2f7f9;
+      --signal: #0d9488;
+      --phosphor: #2dd4bf;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --sans: "Source Sans 3", Georgia, sans-serif;
+      --display: "Space Grotesk", var(--sans);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(ellipse 70% 45% at 8% -8%, rgba(13, 148, 136, 0.12), transparent 55%),
+        linear-gradient(180deg, var(--surface), var(--paper));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.5rem;
+      border-bottom: 1px solid var(--line);
+      background: rgba(242, 247, 249, 0.88);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-brand {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+      text-decoration: none;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .nav-brand svg { width: 1.55rem; height: 1.55rem; }
+
+    .nav a:not(.nav-brand) {
+      color: var(--signal);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .panel { max-width: 28rem; width: 100%; }
+
+    .code {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      background: #0c1929;
+      color: #d7e8ef;
+      padding: 1.1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #1a3344;
+    }
+
+    .code .prompt { color: var(--phosphor); }
+    .code .err { color: #ff8f8f; }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 0.65rem;
+    }
+
+    p { color: var(--muted); margin-bottom: 1.25rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.7rem 1.1rem;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid var(--ink);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--signal);
+      border-color: var(--signal);
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="nav-brand" href="/">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#0C1929"/>
+        <path d="M7.5 21.5 L12.5 14.5 L17 18.5 L24.5 9.5" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="24.5" cy="9.5" r="1.6" fill="#2DD4BF"/>
+      </svg>
+      IndieStats
+    </a>
+    <a href="/">Home</a>
+  </nav>
+  <main>
+    <div class="panel">
+      <div class="code" aria-hidden="true">
+        <div><span class="prompt">$</span> curl https://indiestats.web.ap.it/missing</div>
+        <div class="err">HTTP 404 — Not Found</div>
+      </div>
+      <h1>This path is not tracked.</h1>
+      <p>The page you asked for does not exist. Head back to the IndieStats docs.</p>
+      <a class="btn" href="/">Back to IndieStats</a>
+    </div>
+  </main>
+</body>
+</html>
