@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function (): void {
         ->name('dashboard.stats.realtime');
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
+    Route::put('sites/{site}', [SiteController::class, 'update'])->name('sites.update')->whereUuid('site');
     Route::get('sites/{site}', [SiteController::class, 'show'])->name('sites.show')->whereUuid('site');
     Route::match(['get', 'post'], 'sites/{site}/stats/datatables', SiteStatsDataTablesController::class)->name('sites.stats.datatables')->whereUuid('site');
     Route::get('sites/{site}/stats/country-map', SiteCountryMapController::class)

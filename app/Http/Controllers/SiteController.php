@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateSiteRequest;
 use App\Models\Site;
 use App\Services\AnalyticsQueryService;
 use App\Services\SiteFilterOptionsService;
@@ -148,6 +149,19 @@ class SiteController extends Controller
             'filter_presets' => $filterPresets,
             'site_tab' => $siteTab,
         ]);
+    }
+
+    public function update(UpdateSiteRequest $request, Site $site): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $site->update([
+            'name' => $data['name'],
+            'allowed_domains' => $data['allowed_domains'],
+        ]);
+
+        return redirect()->route('sites.index')
+            ->with('success', __('Sito aggiornato.'));
     }
 
     public function destroy(Request $request, Site $site): RedirectResponse

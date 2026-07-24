@@ -86,6 +86,7 @@
         @php
             $sitesIndexConfig = [
                 'canManageSites' => $canManageSites,
+                'editSitePublicKey' => session('edit_site_public_key'),
                 'sites' => collect($sites)->map(fn (array $site) => [
                     'name' => $site['name'],
                     'public_key' => $site['public_key'],
@@ -94,12 +95,14 @@
                     'created_at_label' => \Illuminate\Support\Carbon::parse($site['created_at'])->translatedFormat('j M Y'),
                     'embed_code' => $site['embed_code'],
                     'show_url' => route('sites.show', $site['public_key']),
+                    'update_url' => $canManageSites ? route('sites.update', $site['public_key']) : null,
                     'destroy_url' => $canManageSites ? route('sites.destroy', $site['public_key']) : null,
                 ])->values()->all(),
                 'labels' => [
                     'stats' => __('Statistiche'),
                     'copy' => __('Copia snippet'),
                     'copyDone' => __('Copiato'),
+                    'edit' => __('Modifica'),
                     'delete' => __('Elimina'),
                 ],
             ];
@@ -109,6 +112,37 @@
         </script>
 
         @if ($canManageSites)
+            <div class="modal fade" id="editSiteModal" tabindex="-1" aria-labelledby="editSiteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="editSiteForm" method="POST" action="">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editSiteModalLabel">{{ __('Modifica sito') }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Chiudi') }}"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="edit_site_name" class="form-label">{{ __('Nome') }}</label>
+                                    <input id="edit_site_name" name="name" type="text" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required autocomplete="off">
+                                    @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="mb-0">
+                                    <label for="edit_site_allowed_domains" class="form-label">{{ __('Domini consentiti') }} <span class="text-danger">*</span></label>
+                                    <input id="edit_site_allowed_domains" name="allowed_domains" type="text" class="form-control @error('allowed_domains') is-invalid @enderror" value="{{ old('allowed_domains') }}" required autocomplete="off" placeholder="{{ __('esempio.com, www.esempio.com') }}">
+                                    @error('allowed_domains')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Annulla') }}</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Salva modifiche') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="deleteSiteModal" tabindex="-1" aria-labelledby="deleteSiteModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">

@@ -156,6 +156,7 @@ function init() {
                     }
                     const statsLabel = labels.stats || 'Stats';
                     const copyDone = labels.copyDone || 'Copied';
+                    const editLabel = labels.edit || 'Edit';
                     const deleteLabel = labels.delete || 'Delete';
                     let html =
                         '<div class="d-inline-flex flex-wrap justify-content-end gap-1">' +
@@ -171,6 +172,21 @@ function init() {
                         '" title="' +
                         escapeHtml(labels.copy || 'Copy') +
                         '"><i class="fas fa-copy"></i></button>';
+
+                    if (canManage && row.update_url) {
+                        html +=
+                            '<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#editSiteModal" data-update-url="' +
+                            escapeHtml(row.update_url) +
+                            '" data-site-name="' +
+                            escapeHtml(row.name || '') +
+                            '" data-site-domains="' +
+                            escapeHtml(row.allowed_domains || '') +
+                            '" title="' +
+                            escapeHtml(editLabel) +
+                            '" aria-label="' +
+                            escapeHtml(editLabel) +
+                            '"><i class="fas fa-pen"></i></button>';
+                    }
 
                     if (canManage && row.destroy_url) {
                         html +=

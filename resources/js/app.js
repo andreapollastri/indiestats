@@ -262,6 +262,62 @@ window.Chart = Chart;
         }
     })();
 
+    const editSiteModal = document.getElementById("editSiteModal");
+    if (editSiteModal && typeof jQuery !== "undefined") {
+        jQuery(editSiteModal).on("show.bs.modal", function (event) {
+            const btn = event.relatedTarget;
+            if (!btn || !btn.getAttribute) {
+                return;
+            }
+            const url = btn.getAttribute("data-update-url");
+            const name = btn.getAttribute("data-site-name");
+            const domains = btn.getAttribute("data-site-domains");
+            const form = document.getElementById("editSiteForm");
+            const nameInput = document.getElementById("edit_site_name");
+            const domainsInput = document.getElementById("edit_site_allowed_domains");
+            if (form && url) {
+                form.setAttribute("action", url);
+            }
+            if (nameInput && !nameInput.classList.contains("is-invalid")) {
+                nameInput.value = name || "";
+            }
+            if (domainsInput && !domainsInput.classList.contains("is-invalid")) {
+                domainsInput.value = domains || "";
+            }
+        });
+    }
+
+    const sitesIndexConfigEl = document.getElementById("pa-sites-index-config");
+    if (editSiteModal && sitesIndexConfigEl && typeof bootstrap !== "undefined") {
+        try {
+            const sitesIndexConfig = JSON.parse(sitesIndexConfigEl.textContent.trim());
+            const editSitePublicKey = sitesIndexConfig?.editSitePublicKey;
+            const hasValidationErrors = Boolean(
+                document.querySelector("#editSiteForm .is-invalid"),
+            );
+            if (editSitePublicKey && Array.isArray(sitesIndexConfig.sites)) {
+                const site = sitesIndexConfig.sites.find(function (row) {
+                    return row.public_key === editSitePublicKey;
+                });
+                const form = document.getElementById("editSiteForm");
+                const nameInput = document.getElementById("edit_site_name");
+                const domainsInput = document.getElementById("edit_site_allowed_domains");
+                if (site && form && site.update_url) {
+                    form.setAttribute("action", site.update_url);
+                }
+                if (site && nameInput && !hasValidationErrors) {
+                    nameInput.value = site.name || "";
+                }
+                if (site && domainsInput && !hasValidationErrors) {
+                    domainsInput.value = site.allowed_domains || "";
+                }
+                bootstrap.Modal.getOrCreateInstance(editSiteModal).show();
+            }
+        } catch {
+            // ignore invalid config
+        }
+    }
+
     const deleteSiteModal = document.getElementById("deleteSiteModal");
     if (deleteSiteModal && typeof jQuery !== "undefined") {
         jQuery(deleteSiteModal).on("show.bs.modal", function (event) {
