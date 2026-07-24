@@ -78,4 +78,21 @@ class SiteIndexTest extends TestCase
         $response->assertDontSee('id="pa-sites-index-table"', false);
         $response->assertSee(__('Nessun sito ancora. Creane uno qui sopra.'), false);
     }
+
+    public function test_sites_index_shows_edit_site_labels_in_user_locale(): void
+    {
+        $user = User::factory()->admin()->create(['locale' => 'en']);
+
+        $user->ownedSites()->create([
+            'name' => 'Blog demo',
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.index'));
+
+        $response->assertOk();
+        $response->assertSee('Edit site', false);
+        $response->assertSee('Save changes', false);
+        $response->assertSee('"edit":"Edit"', false);
+    }
 }
