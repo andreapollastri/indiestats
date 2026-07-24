@@ -25,9 +25,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/account', [AccountController::class, 'edit'])
         ->name('account.edit');
+    Route::put('settings/account', [ProfileController::class, 'update'])
+        ->name('account.update');
 
-    Route::redirect('settings/profile', '/settings/account');
-    Route::redirect('settings/security', '/settings/account');
+    Route::get('settings/profile', fn () => redirect('/settings/account'));
+    Route::get('settings/security', fn () => redirect('/settings/account'));
 
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 });

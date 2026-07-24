@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IndieStats — Privacy-friendly, self-hosted analytics</title>
-  <meta name="description" content="Self-hosted web analytics on Laravel 13. Real-time dashboards, advanced filters, country map, ASN detection, and localized Excel export — no cookies, no consent banners.">
+  <meta name="description"
+    content="Self-hosted web analytics on Laravel 13. Real-time dashboards, advanced filters, country map, ASN detection, and localized Excel export — no cookies, no consent banners.">
   <meta property="og:title" content="IndieStats — Privacy-friendly, self-hosted analytics">
-  <meta property="og:description" content="Privacy-friendly analytics on your own infrastructure. Multiple sites, real-time dashboards, and localized exports — without handing data to third parties.">
+  <meta property="og:description"
+    content="Privacy-friendly analytics on your own infrastructure. Multiple sites, real-time dashboards, and localized exports — without handing data to third parties.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://indiestats.web.ap.it">
   <meta name="theme-color" content="#0d9488">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --ink: #0c1929;
@@ -34,7 +39,13 @@
       --docs-sidebar: 200px;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     html {
       scroll-behavior: smooth;
@@ -50,8 +61,14 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    a { color: inherit; }
-    code, pre { font-family: var(--mono); }
+    a {
+      color: inherit;
+    }
+
+    code,
+    pre {
+      font-family: var(--mono);
+    }
 
     .atmosphere {
       position: fixed;
@@ -102,7 +119,10 @@
       color: var(--ink);
     }
 
-    .nav-brand svg { width: 1.55rem; height: 1.55rem; }
+    .nav-brand svg {
+      width: 1.55rem;
+      height: 1.55rem;
+    }
 
     .nav-links {
       display: flex;
@@ -118,7 +138,9 @@
       transition: color 0.2s;
     }
 
-    .nav-links a:hover { color: var(--signal); }
+    .nav-links a:hover {
+      color: var(--signal);
+    }
 
     .nav-cta {
       display: inline-flex;
@@ -156,9 +178,17 @@
       transition: transform 0.2s, opacity 0.2s;
     }
 
-    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
 
     /* Hero */
     .hero {
@@ -209,7 +239,9 @@
       animation: rise 0.75s ease both;
     }
 
-    .hero-brand span { color: var(--phosphor); }
+    .hero-brand span {
+      color: var(--phosphor);
+    }
 
     .hero-content h1 {
       font-family: var(--display);
@@ -223,7 +255,7 @@
       animation: rise 0.75s 0.08s ease both;
     }
 
-    .hero-content > p {
+    .hero-content>p {
       color: rgba(220, 236, 244, 0.72);
       max-width: 34rem;
       font-size: 1.05rem;
@@ -253,7 +285,9 @@
       transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
     }
 
-    .btn:active { transform: translateY(1px); }
+    .btn:active {
+      transform: translateY(1px);
+    }
 
     .btn-primary {
       background: var(--phosphor);
@@ -298,10 +332,21 @@
       overflow-x: auto;
     }
 
-    .hero-terminal .prompt { color: var(--phosphor); }
-    .hero-terminal .dim { color: rgba(220, 236, 244, 0.45); }
-    .hero-terminal .ok { color: var(--phosphor); }
-    .hero-terminal .val { color: #7dd3fc; }
+    .hero-terminal .prompt {
+      color: var(--phosphor);
+    }
+
+    .hero-terminal .dim {
+      color: rgba(220, 236, 244, 0.45);
+    }
+
+    .hero-terminal .ok {
+      color: var(--phosphor);
+    }
+
+    .hero-terminal .val {
+      color: #7dd3fc;
+    }
 
     .caret {
       display: inline-block;
@@ -314,17 +359,31 @@
     }
 
     @keyframes blink {
-      50% { opacity: 0; }
+      50% {
+        opacity: 0;
+      }
     }
 
     @keyframes rise {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes grid-drift {
-      from { background-position: 0 0; }
-      to { background-position: 40px 40px; }
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: 40px 40px;
+      }
     }
 
     /* Docs shell */
@@ -373,7 +432,9 @@
       background: rgba(13, 148, 136, 0.06);
     }
 
-    .docs-main { min-width: 0; }
+    .docs-main {
+      min-width: 0;
+    }
 
     .docs-main section {
       padding-bottom: 2.75rem;
@@ -404,9 +465,13 @@
     }
 
     .docs-main p,
-    .docs-main li { color: var(--ink-soft); }
+    .docs-main li {
+      color: var(--ink-soft);
+    }
 
-    .docs-main p + p { margin-top: 0.85rem; }
+    .docs-main p+p {
+      margin-top: 0.85rem;
+    }
 
     .docs-main .lead {
       font-size: 1.12rem;
@@ -420,7 +485,9 @@
       margin: 0.85rem 0 0 1.2rem;
     }
 
-    .docs-main li + li { margin-top: 0.35rem; }
+    .docs-main li+li {
+      margin-top: 0.35rem;
+    }
 
     .docs-main code {
       font-size: 0.88em;
@@ -539,7 +606,8 @@
       font-size: 0.95rem;
     }
 
-    th, td {
+    th,
+    td {
       text-align: left;
       padding: 0.7rem 0.9rem;
       border-bottom: 1px solid var(--line);
@@ -556,9 +624,13 @@
       background: rgba(12, 25, 41, 0.03);
     }
 
-    tr:last-child td { border-bottom: 0; }
+    tr:last-child td {
+      border-bottom: 0;
+    }
 
-    td code { white-space: nowrap; }
+    td code {
+      white-space: nowrap;
+    }
 
     .note {
       margin: 1.1rem 0;
@@ -569,7 +641,9 @@
       font-size: 0.97rem;
     }
 
-    .note strong { color: var(--ink); }
+    .note strong {
+      color: var(--ink);
+    }
 
     .steps {
       display: grid;
@@ -598,7 +672,9 @@
       font-size: 1.05rem;
     }
 
-    .step p { margin: 0; }
+    .step p {
+      margin: 0;
+    }
 
     .pair {
       margin-top: 3rem;
@@ -606,7 +682,9 @@
       border-top: 1px solid var(--line);
     }
 
-    .pair h2 { margin-bottom: 0.4rem; }
+    .pair h2 {
+      margin-bottom: 0.4rem;
+    }
 
     .pair .btn {
       margin-top: 1.1rem;
@@ -634,9 +712,13 @@
       font-weight: 600;
     }
 
-    footer a:hover { text-decoration: underline; }
+    footer a:hover {
+      text-decoration: underline;
+    }
 
-    footer p + p { margin-top: 0.35rem; }
+    footer p+p {
+      margin-top: 0.35rem;
+    }
 
     @media (max-width: 880px) {
       .docs {
@@ -654,7 +736,9 @@
         border-bottom: 1px solid var(--line);
       }
 
-      .docs-nav-label { width: 100%; }
+      .docs-nav-label {
+        width: 100%;
+      }
 
       .docs-nav a {
         border-left: 0;
@@ -670,7 +754,9 @@
     }
 
     @media (max-width: 720px) {
-      .hamburger { display: flex; }
+      .hamburger {
+        display: flex;
+      }
 
       .nav-links {
         display: none;
@@ -686,29 +772,42 @@
         border-bottom: 1px solid var(--line);
       }
 
-      .nav-links.open { display: flex; }
+      .nav-links.open {
+        display: flex;
+      }
 
       .nav-links a {
         padding: 0.75rem 0.25rem;
         border-bottom: 1px solid var(--line);
       }
 
-      .nav-cta { justify-content: center; margin-top: 0.5rem; border: 0; }
+      .nav-cta {
+        justify-content: center;
+        margin-top: 0.5rem;
+        border: 0;
+      }
 
-      .hero { min-height: auto; }
-      .hero-content { padding-top: 3rem; }
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-content {
+        padding-top: 3rem;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="atmosphere" aria-hidden="true"></div>
 
   <nav class="nav">
     <a class="nav-brand" href="/">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="#0C1929"/>
-        <path d="M7.5 21.5 L12.5 14.5 L17 18.5 L24.5 9.5" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <circle cx="24.5" cy="9.5" r="1.6" fill="#2DD4BF"/>
+        <rect width="32" height="32" rx="7" fill="#0C1929" />
+        <path d="M7.5 21.5 L12.5 14.5 L17 18.5 L24.5 9.5" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round" fill="none" />
+        <circle cx="24.5" cy="9.5" r="1.6" fill="#2DD4BF" />
       </svg>
       IndieStats
     </a>
@@ -729,10 +828,12 @@
     <div class="hero-content">
       <div class="hero-brand">IndieStats<span>.</span></div>
       <h1>Privacy-friendly analytics on your own infrastructure.</h1>
-      <p>Self-hosted Laravel analytics: real-time dashboards, advanced filters, and localized exports — multiple sites, no cookies, no mandatory consent banners.</p>
+      <p>Self-hosted Laravel analytics: real-time dashboards, advanced filters, and localized exports — multiple sites,
+        no cookies, no mandatory consent banners.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#install">Quick start</a>
-        <a class="btn btn-ghost" href="https://github.com/andreapollastri/indiestats" target="_blank" rel="noopener">View on GitHub</a>
+        <a class="btn btn-ghost" href="https://github.com/andreapollastri/indiestats" target="_blank"
+          rel="noopener">View on GitHub</a>
       </div>
     </div>
     <div class="hero-terminal" aria-hidden="true">
@@ -742,7 +843,8 @@
         <div class="ok">✓ App ready on APP_URL</div>
         <div><span class="prompt">$</span> composer run dev</div>
         <div class="dim">Dashboard · Last 30 days</div>
-        <div>&nbsp;&nbsp;pageviews <span class="val">12.4k</span> &nbsp; uniques <span class="val">3.2k</span> &nbsp; avg time <span class="val">48s</span></div>
+        <div>&nbsp;&nbsp;pageviews <span class="val">12.4k</span> &nbsp; uniques <span class="val">3.2k</span> &nbsp;
+          avg time <span class="val">48s</span></div>
         <div><span class="prompt">$</span> <span class="caret"></span></div>
       </div>
     </div>
@@ -766,27 +868,33 @@
     <div class="docs-main">
       <section id="features">
         <h2>Features</h2>
-        <p class="lead">Everything you need in one place — without handing visitor data to third parties or weighing down the sites you track.</p>
+        <p class="lead">Everything you need in one place — without handing visitor data to third parties or weighing
+          down the sites you track.</p>
         <div class="feature-list">
           <div class="feature-row">
             <div class="name">Pageviews &amp; context</div>
-            <div class="desc">localStorage visitor IDs (no cookies), time on page, <code>document.title</code>, query string, language, timezone, search terms, and bot detection.</div>
+            <div class="desc">localStorage visitor IDs (no cookies), time on page, <code>document.title</code>, query
+              string, language, timezone, search terms, and bot detection.</div>
           </div>
           <div class="feature-row">
             <div class="name">Real-time</div>
-            <div class="desc">Active visitors, last-5-minute pageviews, a 30-minute activity chart, and a live feed — on the dashboard and per site.</div>
+            <div class="desc">Active visitors, last-5-minute pageviews, a 30-minute activity chart, and a live feed — on
+              the dashboard and per site.</div>
           </div>
           <div class="feature-row">
             <div class="name">Nine analytics tabs</div>
-            <div class="desc">Summary, Real-time, Content, Traffic, UTM, Technology, Geography, Visitor, and Events — each with server-side DataTables.</div>
+            <div class="desc">Summary, Real-time, Content, Traffic, UTM, Technology, Geography, Visitor, and Events —
+              each with server-side DataTables.</div>
           </div>
           <div class="feature-row">
             <div class="name">Advanced filters</div>
-            <div class="desc">Tom Select type-ahead across source, path, title, UTM, device, country, ASN, visitor, and more — applied to every tab and export.</div>
+            <div class="desc">Tom Select type-ahead across source, path, title, UTM, device, country, ASN, visitor, and
+              more — applied to every tab and export.</div>
           </div>
           <div class="feature-row">
             <div class="name">Geography &amp; ASN</div>
-            <div class="desc">Choropleth country map via MaxMind GeoLite2. ISP / hosting provider via DB-IP ASN Lite.</div>
+            <div class="desc">Choropleth country map via MaxMind GeoLite2. ISP / hosting provider via DB-IP ASN Lite.
+            </div>
           </div>
           <div class="feature-row">
             <div class="name">Events &amp; outbound</div>
@@ -798,7 +906,8 @@
           </div>
           <div class="feature-row">
             <div class="name">Multi-site</div>
-            <div class="desc">Multiple sites per account, domain allowlists, Cloudflare-aware client IP, noscript pixel, and scheduled pruning.</div>
+            <div class="desc">Multiple sites per account, domain allowlists, Cloudflare-aware client IP, noscript pixel,
+              and scheduled pruning.</div>
           </div>
         </div>
       </section>
@@ -808,15 +917,18 @@
         <p class="lead">From the multi-site overview down to the snippet you paste on your pages.</p>
         <div class="shots">
           <figure class="shot">
-            <img src="img/dashboard.jpg" width="1024" height="522" loading="lazy" decoding="async" alt="IndieStats multi-site dashboard with trend charts and unique visitors">
+            <img src="img/dashboard.jpg" width="1024" height="522" loading="lazy" decoding="async"
+              alt="IndieStats multi-site dashboard with trend charts and unique visitors">
             <figcaption>Multi-site overview — unique visitors and trends for every site at a glance.</figcaption>
           </figure>
           <figure class="shot">
-            <img src="img/site.jpg" width="1024" height="525" loading="lazy" decoding="async" alt="Per-site analytics with summary metrics and daily trend chart">
+            <img src="img/site.jpg" width="1024" height="525" loading="lazy" decoding="async"
+              alt="Per-site analytics with summary metrics and daily trend chart">
             <figcaption>Per-site detail — summary metrics, filters, and the daily pageviews trend.</figcaption>
           </figure>
           <figure class="shot">
-            <img src="img/conf.jpg" width="1024" height="517" loading="lazy" decoding="async" alt="Site configuration with allowed domains and tracking snippet">
+            <img src="img/conf.jpg" width="1024" height="517" loading="lazy" decoding="async"
+              alt="Site configuration with allowed domains and tracking snippet">
             <figcaption>Sites &amp; snippets — add a site, set allowed domains, and copy the tracking code.</figcaption>
           </figure>
         </div>
@@ -824,14 +936,16 @@
 
       <section id="install">
         <h2>Install</h2>
-        <p class="lead">One command. PHP 8.3+, Composer, and Node 20+. SQLite by default — MySQL and PostgreSQL work too.</p>
+        <p class="lead">One command. PHP 8.3+, Composer, and Node 20+. SQLite by default — MySQL and PostgreSQL work
+          too.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>git clone https://github.com/andreapollastri/indiestats.git
 cd indiestats
 composer run setup</pre>
         </div>
-        <p>The <code>setup</code> script installs dependencies, runs the Vite build, creates <code>.env</code>, generates the app key, and runs migrations.</p>
+        <p>The <code>setup</code> script installs dependencies, runs the Vite build, creates <code>.env</code>,
+          generates the app key, and runs migrations.</p>
         <h3>Manual install</h3>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
@@ -853,21 +967,24 @@ php artisan migrate</pre>
             <div class="n">01</div>
             <div>
               <h3>Install &amp; run</h3>
-              <p>Clone the repo, run <code>composer run setup</code>, then start the stack with <code>composer run dev</code>.</p>
+              <p>Clone the repo, run <code>composer run setup</code>, then start the stack with
+                <code>composer run dev</code>.</p>
             </div>
           </div>
           <div class="step">
             <div class="n">02</div>
             <div>
               <h3>Create a site &amp; paste the snippet</h3>
-              <p>Add a site with a name and allowed domains. Copy the async script and <code>noscript</code> fallback before the closing <code>body</code> tag — the base URL is your <code>APP_URL</code>.</p>
+              <p>Add a site with a name and allowed domains. Copy the async script and <code>noscript</code> fallback
+                before the closing <code>body</code> tag — the base URL is your <code>APP_URL</code>.</p>
             </div>
           </div>
           <div class="step">
             <div class="n">03</div>
             <div>
               <h3>Open the dashboard</h3>
-              <p>Multi-site overview with live visitor counts, then nine per-site tabs — all narrowed by the same filters and exportable to localized Excel.</p>
+              <p>Multi-site overview with live visitor counts, then nine per-site tabs — all narrowed by the same
+                filters and exportable to localized Excel.</p>
             </div>
           </div>
         </div>
@@ -877,7 +994,8 @@ php artisan migrate</pre>
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>php artisan db:seed</pre>
         </div>
-        <p>Creates an admin user (<code>admin@users.test</code> / <code>password</code>) and, when seeding is enabled, sample analytics.</p>
+        <p>Creates an admin user (<code>admin@users.test</code> / <code>password</code>) and, when seeding is enabled,
+          sample analytics.</p>
       </section>
 
       <section id="tracking">
@@ -888,7 +1006,8 @@ php artisan migrate</pre>
           <pre>&lt;script async src="https://your-indiestats-url/i/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"&gt;&lt;/script&gt;
 &lt;noscript&gt;&lt;img src="https://your-indiestats-url/collect/pixel.gif?k=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&amp;p=/" width="1" height="1" /&gt;&lt;/noscript&gt;</pre>
         </div>
-        <p>The script tracks pageviews, time on page, outbound clicks, UTM parameters, on-site search queries, page title, query string, language, timezone, and a per-tab session ID.</p>
+        <p>The script tracks pageviews, time on page, outbound clicks, UTM parameters, on-site search queries, page
+          title, query string, language, timezone, and a per-tab session ID.</p>
         <h3>Custom events</h3>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
@@ -902,7 +1021,8 @@ indiestats.track('purchase', {
         </div>
         <p>Up to 20 key–value properties per event. Tie events to goals in the dashboard to watch conversions.</p>
         <div class="note">
-          <strong>Allowlist:</strong> only domains listed on the site can send data (validated via <code>Origin</code> / <code>Referer</code>). Always set allowed domains in production.
+          <strong>Allowlist:</strong> only domains listed on the site can send data (validated via <code>Origin</code> /
+          <code>Referer</code>). Always set allowed domains in production.
         </div>
       </section>
 
@@ -910,7 +1030,8 @@ indiestats.track('purchase', {
         <h2>Dashboard</h2>
         <p class="lead">A multi-site overview, then dedicated tabs for every angle of traffic.</p>
         <ul>
-          <li><strong>Overview</strong> — unique visitors, pageviews, sparklines, live counts, and date ranges (today → 1 year).</li>
+          <li><strong>Overview</strong> — unique visitors, pageviews, sparklines, live counts, and date ranges (today →
+            1 year).</li>
           <li><strong>Summary</strong> — headline metrics, top pages, and top sources.</li>
           <li><strong>Real-time</strong> — active visitors, last 5 minutes, 30-minute chart, live activity feed.</li>
           <li><strong>Content / Traffic / UTM</strong> — paths, titles, referrers, search queries, and campaigns.</li>
@@ -923,7 +1044,8 @@ indiestats.track('purchase', {
 
       <section id="filters">
         <h2>Filters</h2>
-        <p class="lead">One filter bar. Every tab, chart, realtime count, DataTables AJAX call, and Excel export respects it.</p>
+        <p class="lead">One filter bar. Every tab, chart, realtime count, DataTables AJAX call, and Excel export
+          respects it.</p>
         <div class="table-wrap">
           <table>
             <thead>
@@ -933,16 +1055,46 @@ indiestats.track('purchase', {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Source</td><td>Referrer / engine</td></tr>
-              <tr><td>Search term</td><td>On-site search query</td></tr>
-              <tr><td>Page / Page title</td><td>Path and <code>document.title</code></td></tr>
-              <tr><td>Query string</td><td>Full landing-page query</td></tr>
-              <tr><td>UTM (5)</td><td>source, medium, campaign, term, content</td></tr>
-              <tr><td>Event</td><td>Custom event name</td></tr>
-              <tr><td>Device / Browser / OS</td><td>From User-Agent</td></tr>
-              <tr><td>Language / Timezone</td><td>From the tracker script</td></tr>
-              <tr><td>Visitor / type</td><td>Persistent ID · human vs bot</td></tr>
-              <tr><td>Country / ASN</td><td>GeoIP and network</td></tr>
+              <tr>
+                <td>Source</td>
+                <td>Referrer / engine</td>
+              </tr>
+              <tr>
+                <td>Search term</td>
+                <td>On-site search query</td>
+              </tr>
+              <tr>
+                <td>Page / Page title</td>
+                <td>Path and <code>document.title</code></td>
+              </tr>
+              <tr>
+                <td>Query string</td>
+                <td>Full landing-page query</td>
+              </tr>
+              <tr>
+                <td>UTM (5)</td>
+                <td>source, medium, campaign, term, content</td>
+              </tr>
+              <tr>
+                <td>Event</td>
+                <td>Custom event name</td>
+              </tr>
+              <tr>
+                <td>Device / Browser / OS</td>
+                <td>From User-Agent</td>
+              </tr>
+              <tr>
+                <td>Language / Timezone</td>
+                <td>From the tracker script</td>
+              </tr>
+              <tr>
+                <td>Visitor / type</td>
+                <td>Persistent ID · human vs bot</td>
+              </tr>
+              <tr>
+                <td>Country / ASN</td>
+                <td>GeoIP and network</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -950,7 +1102,8 @@ indiestats.track('purchase', {
 
       <section id="production">
         <h2>Production</h2>
-        <p class="lead">Deploy without surprises. Set <code>APP_URL</code> to HTTPS, build assets, run the scheduler and a queue worker.</p>
+        <p class="lead">Deploy without surprises. Set <code>APP_URL</code> to HTTPS, build assets, run the scheduler and
+          a queue worker.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>npm run build
@@ -991,7 +1144,8 @@ php artisan view:cache</pre>
           </table>
         </div>
         <div class="note">
-          <strong>Proxies:</strong> behind Cloudflare, <code>CF-Connecting-IP</code> is used for GeoIP and ASN. For other reverse proxies, configure Laravel trusted proxies.
+          <strong>Proxies:</strong> behind Cloudflare, <code>CF-Connecting-IP</code> is used for GeoIP and ASN. For
+          other reverse proxies, configure Laravel trusted proxies.
         </div>
       </section>
 
@@ -1034,7 +1188,8 @@ php artisan view:cache</pre>
 
       <section id="queue">
         <h2>Queue</h2>
-        <p class="lead">Excel exports run as background jobs. Locally, <code>composer run dev</code> covers the worker. In production, keep one running:</p>
+        <p class="lead">Excel exports run as background jobs. Locally, <code>composer run dev</code> covers the worker.
+          In production, keep one running:</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>php artisan queue:work --sleep=3 --tries=3</pre>
@@ -1044,14 +1199,18 @@ php artisan view:cache</pre>
 
       <div class="pair" id="cipi">
         <h2>Deploy with Cipi</h2>
-        <p class="lead" style="margin-bottom:0">Run IndieStats on any Ubuntu VPS with <a href="https://cipi.sh" target="_blank" rel="noopener" style="color:var(--signal-deep);font-weight:600;text-decoration:none">cipi.sh</a> — PHP-FPM, MariaDB, Nginx, Let's Encrypt, zero-downtime releases, and queue workers.</p>
+        <p class="lead" style="margin-bottom:0">Run IndieStats on any Ubuntu VPS with <a href="https://cipi.sh"
+            target="_blank" rel="noopener"
+            style="color:var(--signal-deep);font-weight:600;text-decoration:none">cipi.sh</a> — PHP-FPM, MariaDB, Nginx,
+          Let's Encrypt, zero-downtime releases, and queue workers.</p>
         <a class="btn" href="https://cipi.sh" target="_blank" rel="noopener">Explore cipi.sh →</a>
       </div>
     </div>
   </div>
 
   <footer>
-    <p>Open source · MIT · <a href="https://github.com/andreapollastri/indiestats" target="_blank" rel="noopener">GitHub</a></p>
+    <p>Open source · MIT · <a href="https://github.com/andreapollastri/indiestats" target="_blank"
+        rel="noopener">GitHub</a></p>
     <p>Made by <a href="https://web.ap.it" target="_blank" rel="noopener">Andrea Pollastri</a></p>
   </footer>
 
@@ -1124,7 +1283,9 @@ php artisan view:cache</pre>
       window.addEventListener('scroll', setActive, { passive: true });
     })();
   </script>
-  <script async src="https://stats.web.ap.it/i/653a9bed-ff67-4d6f-81ea-8a18f2755ad5.js"></script>
-  <noscript><img src="https://stats.web.ap.it/collect/pixel.gif?k=653a9bed-ff67-4d6f-81ea-8a18f2755ad5&p=/" width="1" height="1" alt=""></noscript>
+  <script async src="https://stats.misterdev.it/i/d5ae6205-94b4-4fe8-b031-9e514a54f401.js"></script>
+  <noscript><img src="https://stats.misterdev.it/collect/pixel.gif?k=d5ae6205-94b4-4fe8-b031-9e514a54f401&p=/" width="1"
+      height="1" /></noscript>
 </body>
+
 </html>

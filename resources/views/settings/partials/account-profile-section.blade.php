@@ -3,9 +3,9 @@
         <h6 class="m-0" style="color: #10b981;">{{ __('Informazioni profilo') }}</h6>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('profile.update') }}">
+        <form method="POST" action="{{ route('account.update') }}">
             @csrf
-            @method('PATCH')
+            @method('PUT')
             <div class="mb-3">
                 <label for="name" class="form-label">{{ __('Nome') }}</label>
                 <input id="name" type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required class="form-control @error('name') is-invalid @enderror" autocomplete="name">
