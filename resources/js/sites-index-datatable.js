@@ -122,18 +122,6 @@ function init() {
                 },
             },
             {
-                data: 'public_key',
-                className: 'font-monospace text-muted',
-                render: function (data, cellType) {
-                    if (cellType !== 'display') {
-                        return data || '';
-                    }
-                    return (
-                        '<span class="user-select-all">' + escapeHtml(data || '') + '</span>'
-                    );
-                },
-            },
-            {
                 data: 'allowed_domains',
                 render: function (data, cellType) {
                     if (cellType !== 'display') {

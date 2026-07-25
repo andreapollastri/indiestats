@@ -26,6 +26,9 @@ class SiteIndexTest extends TestCase
         $response->assertSee('id="pa-sites-index-config"', false);
         $response->assertSee('id="pa-sites-index-filter"', false);
         $response->assertSee(__('Domini consentiti'), false);
+        $response->assertDontSee('<th>'.__('Chiave').'</th>', false);
+        $response->assertSee('id="createSiteModal"', false);
+        $response->assertSee('data-bs-target="#createSiteModal"', false);
         $response->assertSee('Blog demo', false);
     }
 
@@ -108,7 +111,27 @@ class SiteIndexTest extends TestCase
 
         $response->assertOk();
         $response->assertDontSee('id="pa-sites-index-table"', false);
-        $response->assertSee(__('Nessun sito ancora. Creane uno qui sopra.'), false);
+        $response->assertSee('id="createSiteModal"', false);
+        $response->assertSee(__('Nessun sito ancora. Creane uno con Nuovo sito.'), false);
+    }
+
+    public function test_create_site_validation_errors_reopen_create_modal(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->from(route('sites.index'))->post(route('sites.store'), [
+            'name' => '',
+            'allowed_domains' => '',
+        ]);
+
+        $response->assertRedirect(route('sites.index'));
+        $response->assertSessionHasErrors(['name', 'allowed_domains']);
+        $response->assertSessionHas('open_create_site_modal', true);
+
+        $followUp = $this->actingAs($user)->get(route('sites.index'));
+        $followUp->assertOk();
+        $followUp->assertSee('data-pa-open-on-load="1"', false);
+        $followUp->assertSee('id="createSiteModal"', false);
     }
 
     public function test_sites_index_shows_edit_site_labels_in_user_locale(): void

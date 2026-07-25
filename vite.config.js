@@ -8,4 +8,20 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    // Bootstrap still relies on Sass @import / legacy APIs; silence until Bootstrap migrates.
+    // https://getbootstrap.com/docs/5.3/getting-started/vite/
+    css: {
+        preprocessorOptions: {
+            scss: {
+                quietDeps: true,
+                silenceDeprecations: [
+                    'import',
+                    'mixed-decls',
+                    'color-functions',
+                    'global-builtin',
+                    'if-function',
+                ],
+            },
+        },
+    },
 });

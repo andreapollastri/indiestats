@@ -288,34 +288,49 @@ window.Chart = Chart;
         });
     }
 
+    const createSiteModal = document.getElementById("createSiteModal");
     const sitesIndexConfigEl = document.getElementById("pa-sites-index-config");
-    if (editSiteModal && sitesIndexConfigEl && typeof bootstrap !== "undefined") {
-        try {
-            const sitesIndexConfig = JSON.parse(sitesIndexConfigEl.textContent.trim());
-            const editSitePublicKey = sitesIndexConfig?.editSitePublicKey;
+    if (typeof bootstrap !== "undefined") {
+        let openCreateSiteModal = Boolean(
+            createSiteModal && createSiteModal.getAttribute("data-pa-open-on-load") === "1",
+        );
+        let editSitePublicKey = null;
+        let sitesIndexConfig = null;
+
+        if (sitesIndexConfigEl) {
+            try {
+                sitesIndexConfig = JSON.parse(sitesIndexConfigEl.textContent.trim());
+                editSitePublicKey = sitesIndexConfig?.editSitePublicKey || null;
+                if (sitesIndexConfig?.openCreateSiteModal) {
+                    openCreateSiteModal = true;
+                }
+            } catch {
+                // ignore invalid config
+            }
+        }
+
+        if (editSiteModal && editSitePublicKey && sitesIndexConfig && Array.isArray(sitesIndexConfig.sites)) {
             const hasValidationErrors = Boolean(
                 document.querySelector("#editSiteForm .is-invalid"),
             );
-            if (editSitePublicKey && Array.isArray(sitesIndexConfig.sites)) {
-                const site = sitesIndexConfig.sites.find(function (row) {
-                    return row.public_key === editSitePublicKey;
-                });
-                const form = document.getElementById("editSiteForm");
-                const nameInput = document.getElementById("edit_site_name");
-                const domainsInput = document.getElementById("edit_site_allowed_domains");
-                if (site && form && site.update_url) {
-                    form.setAttribute("action", site.update_url);
-                }
-                if (site && nameInput && !hasValidationErrors) {
-                    nameInput.value = site.name || "";
-                }
-                if (site && domainsInput && !hasValidationErrors) {
-                    domainsInput.value = site.allowed_domains || "";
-                }
-                bootstrap.Modal.getOrCreateInstance(editSiteModal).show();
+            const site = sitesIndexConfig.sites.find(function (row) {
+                return row.public_key === editSitePublicKey;
+            });
+            const form = document.getElementById("editSiteForm");
+            const nameInput = document.getElementById("edit_site_name");
+            const domainsInput = document.getElementById("edit_site_allowed_domains");
+            if (site && form && site.update_url) {
+                form.setAttribute("action", site.update_url);
             }
-        } catch {
-            // ignore invalid config
+            if (site && nameInput && !hasValidationErrors) {
+                nameInput.value = site.name || "";
+            }
+            if (site && domainsInput && !hasValidationErrors) {
+                domainsInput.value = site.allowed_domains || "";
+            }
+            bootstrap.Modal.getOrCreateInstance(editSiteModal).show();
+        } else if (createSiteModal && openCreateSiteModal) {
+            bootstrap.Modal.getOrCreateInstance(createSiteModal).show();
         }
     }
 

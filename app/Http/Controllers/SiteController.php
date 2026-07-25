@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSiteRequest;
 use App\Http\Requests\UpdateSiteRequest;
 use App\Models\Site;
 use App\Services\AnalyticsQueryService;
@@ -12,7 +13,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ViewErrorBag;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SiteController extends Controller
@@ -42,30 +42,17 @@ class SiteController extends Controller
             'sites' => $sites,
             'canManageSites' => $canManageSites,
             'siteCreated' => session('site_created'),
+            'openCreateSiteModal' => (bool) session('open_create_site_modal'),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreSiteRequest $request): RedirectResponse
     {
-        $this->authorize('create', Site::class);
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'allowed_domains' => 'required|string|max:2000',
-        ], [
-            'allowed_domains.required' => __('Indica almeno un dominio consentito.'),
-        ]);
-
-        $allowedDomains = trim($data['allowed_domains']);
-        if ($allowedDomains === '') {
-            throw ValidationException::withMessages([
-                'allowed_domains' => __('Indica almeno un dominio consentito.'),
-            ]);
-        }
+        $data = $request->validated();
 
         $site = $request->user()->ownedSites()->create([
             'name' => $data['name'],
-            'allowed_domains' => $allowedDomains,
+            'allowed_domains' => $data['allowed_domains'],
         ]);
 
         return redirect()->route('sites.index')
