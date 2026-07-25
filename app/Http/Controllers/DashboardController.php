@@ -23,8 +23,9 @@ class DashboardController extends Controller
         $filters = AnalyticsFilters::fromRequest($request);
 
         $sites = $request->user()->accessibleSitesQuery()
-            ->orderBy('name')
             ->get()
+            ->sortBy(fn (Site $site) => $site->name, SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
             ->map(function (Site $site) use ($analytics, $from, $to, $filters, $range) {
                 $stats = $analytics->build($site->id, $from, $to, $filters, $range);
                 $byDay = $range === 'today'

@@ -67,9 +67,30 @@
             'updateSiteCards' => true,
         ])
 
-        <div class="row g-3">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+            <p class="small mb-0 pa-text-muted-soft">{{ __('I tuoi siti') }}</p>
+            <div class="pa-sites-filter" style="min-width: min(100%, 16rem);">
+                <label for="pa-dashboard-sites-filter" class="visually-hidden">{{ __('Cerca sito…') }}</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" aria-hidden="true"><i class="fas fa-search"></i></span>
+                    <input
+                        type="search"
+                        id="pa-dashboard-sites-filter"
+                        class="form-control"
+                        placeholder="{{ __('Cerca sito…') }}"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3" id="pa-dashboard-sites-grid">
             @foreach ($sites as $site)
-                <div class="col-xl-4 col-lg-6">
+                <div
+                    class="col-xl-4 col-lg-6"
+                    data-pa-site-filter-item
+                    data-pa-site-name="{{ $site['name'] }}"
+                >
                     <div class="card h-100 pa-site-card overflow-hidden">
                         <div class="card-body position-relative pb-3">
                             <div class="d-flex justify-content-between align-items-start mb-2 pe-2">
@@ -95,6 +116,7 @@
                 </div>
             @endforeach
         </div>
+        <p id="pa-dashboard-sites-filter-empty" class="small pa-text-muted-soft d-none mb-0 mt-3">{{ __('Nessun sito corrisponde alla ricerca.') }}</p>
     @endif
 @endsection
 

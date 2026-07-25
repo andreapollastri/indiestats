@@ -81,7 +81,7 @@ function init() {
     const labels = config.labels || {};
     const canManage = Boolean(config.canManageSites);
 
-    new DataTable(table, {
+    const dt = new DataTable(table, {
         data: config.sites,
         responsive: true,
         order: [[0, 'asc']],
@@ -91,10 +91,17 @@ function init() {
             [10, 25, 50, 100],
         ],
         language: dtLang,
+        layout: {
+            topStart: 'pageLength',
+            topEnd: null,
+            bottomStart: 'info',
+            bottomEnd: 'paging',
+        },
         columnDefs: [
             { responsivePriority: 1, targets: 0 },
             { responsivePriority: 2, targets: -1 },
             { orderable: false, searchable: false, targets: -1 },
+            { type: 'string', targets: 0 },
         ],
         columns: [
             {
@@ -162,9 +169,11 @@ function init() {
                         '<div class="d-inline-flex flex-wrap justify-content-end gap-1">' +
                         '<a href="' +
                         escapeHtml(row.show_url || '#') +
-                        '" class="btn btn-outline-primary btn-sm">' +
+                        '" class="btn btn-outline-primary btn-sm" title="' +
                         escapeHtml(statsLabel) +
-                        '</a>' +
+                        '" aria-label="' +
+                        escapeHtml(statsLabel) +
+                        '"><i class="fas fa-eye"></i></a>' +
                         '<button type="button" class="btn btn-outline-secondary btn-sm" data-copy="' +
                         escapeHtml(row.embed_code || '') +
                         '" data-copy-done="' +
@@ -207,6 +216,15 @@ function init() {
             },
         ],
     });
+
+    const filterInput = document.getElementById('pa-sites-index-filter');
+    if (filterInput) {
+        const applyFilter = () => {
+            dt.search(filterInput.value).draw();
+        };
+        filterInput.addEventListener('input', applyFilter);
+        filterInput.addEventListener('search', applyFilter);
+    }
 }
 
 if (document.readyState === 'loading') {

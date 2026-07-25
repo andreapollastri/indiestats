@@ -24,8 +24,40 @@ class SiteIndexTest extends TestCase
         $response->assertOk();
         $response->assertSee('id="pa-sites-index-table"', false);
         $response->assertSee('id="pa-sites-index-config"', false);
+        $response->assertSee('id="pa-sites-index-filter"', false);
         $response->assertSee(__('Domini consentiti'), false);
         $response->assertSee('Blog demo', false);
+    }
+
+    public function test_sites_index_lists_sites_alphabetically(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $user->ownedSites()->create([
+            'name' => 'Zebra Analytics',
+            'allowed_domains' => 'zebra.test',
+        ]);
+        $user->ownedSites()->create([
+            'name' => 'alpha blog',
+            'allowed_domains' => 'alpha.test',
+        ]);
+        $user->ownedSites()->create([
+            'name' => 'Middle Site',
+            'allowed_domains' => 'middle.test',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('sites.index'));
+
+        $response->assertOk();
+
+        preg_match('/id="pa-sites-index-config">\s*(\{.*?\})\s*<\/script>/s', $response->getContent(), $matches);
+        $this->assertNotEmpty($matches[1] ?? null);
+
+        /** @var array{sites: list<array{name: string}>} $config */
+        $config = json_decode($matches[1], true, flags: JSON_THROW_ON_ERROR);
+        $names = array_column($config['sites'], 'name');
+
+        $this->assertSame(['alpha blog', 'Middle Site', 'Zebra Analytics'], $names);
     }
 
     public function test_creating_site_shows_embed_code_and_instructions(): void

@@ -58,8 +58,25 @@
     @else
         <div class="card mb-4 pa-stats-table-card">
             <div class="card-header py-3">
-                <h6 class="m-0">{{ __('Siti') }}</h6>
-                <small>{{ __('Cerca, ordina e filtra l\'elenco dei siti') }}</small>
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                    <div>
+                        <h6 class="m-0">{{ __('Siti') }}</h6>
+                        <small>{{ __('Cerca, ordina e filtra l\'elenco dei siti') }}</small>
+                    </div>
+                    <div class="pa-sites-filter" style="min-width: min(100%, 16rem);">
+                        <label for="pa-sites-index-filter" class="visually-hidden">{{ __('Cerca sito…') }}</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text" aria-hidden="true"><i class="fas fa-search"></i></span>
+                            <input
+                                type="search"
+                                id="pa-sites-index-filter"
+                                class="form-control"
+                                placeholder="{{ __('Cerca sito…') }}"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

@@ -22,8 +22,9 @@ class SiteController extends Controller
         $canManageSites = $request->user()->isAdmin();
 
         $sites = $request->user()->accessibleSitesQuery()
-            ->orderBy('name')
             ->get()
+            ->sortBy(fn (Site $site) => $site->name, SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
             ->map(fn (Site $s) => [
                 'id' => $s->id,
                 'name' => $s->name,

@@ -5,6 +5,7 @@ import "./site-country-map.js";
 import "./site-realtime.js";
 import "./site-stats-datatables.js";
 import "./sites-index-datatable.js";
+import "./sites-list-filter.js";
 import "./site-stats-ui.js";
 import "./site-filters.js";
 import "./site-export.js";
