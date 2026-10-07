@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PageView;
 use App\Models\TrackingEvent;
+use App\Support\UserAnalyticsRange;
 use Carbon\CarbonInterface;
 
 class SiteFilterOptionsService
@@ -19,13 +20,13 @@ class SiteFilterOptionsService
 
         return match ($type) {
             'source' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to)),
                 'referrer_source',
                 $like,
                 $limit
             ),
             'path' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to)),
                 'path',
                 $like,
                 $limit
@@ -38,20 +39,20 @@ class SiteFilterOptionsService
             'utm_term' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_term', $like, $limit),
             'utm_content' => $this->utmDistinctColumn($siteId, $from, $to, 'utm_content', $like, $limit),
             'event' => $this->distinctColumn(
-                TrackingEvent::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
+                TrackingEvent::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to)),
                 'name',
                 $like,
                 $limit
             ),
             'device' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereNotNull('device_type'),
                 'device_type',
                 $like,
                 $limit
             ),
             'browser' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereNotNull('browser'),
                 'browser',
                 $like,
@@ -59,7 +60,7 @@ class SiteFilterOptionsService
             ),
             'browser_version' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'browser_version', $like, $limit),
             'os' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereNotNull('os'),
                 'os',
                 $like,
@@ -69,7 +70,7 @@ class SiteFilterOptionsService
             'language' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'browser_language', $like, $limit),
             'timezone' => $this->nonEmptyDistinctColumn($siteId, $from, $to, 'timezone', $like, $limit),
             'visitor_id' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to]),
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to)),
                 'visitor_id',
                 $like,
                 $limit
@@ -77,7 +78,7 @@ class SiteFilterOptionsService
             'is_bot' => $this->isBotOptions(),
             'asn' => $this->asnOptions($siteId, $from, $to, $q, $limit),
             'search' => $this->distinctColumn(
-                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', [$from, $to])
+                PageView::query()->where('site_id', $siteId)->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereNotNull('search_query')->where('search_query', '!=', ''),
                 'search_query',
                 $like,
@@ -136,7 +137,7 @@ class SiteFilterOptionsService
     ): array {
         $q = PageView::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
             ->whereNotNull($column)
             ->where($column, '!=', '');
 
@@ -161,7 +162,7 @@ class SiteFilterOptionsService
     {
         $q = PageView::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
             ->whereNotNull($column)
             ->where($column, '!=', '');
 
@@ -204,7 +205,7 @@ class SiteFilterOptionsService
     {
         $q = PageView::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
             ->whereNotNull('country_code');
 
         if ($like !== null) {
@@ -238,7 +239,7 @@ class SiteFilterOptionsService
 
         $query = PageView::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to))
             ->whereNotNull('asn');
 
         if ($like !== null) {

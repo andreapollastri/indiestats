@@ -158,7 +158,7 @@ class SiteController extends Controller
 
         $site->delete();
 
-        return redirect()->route('sites.index')->with('success', 'Sito eliminato.');
+        return redirect()->route('sites.index')->with('success', __('Sito eliminato.'));
     }
 
     private function embedCode(Site $site): string

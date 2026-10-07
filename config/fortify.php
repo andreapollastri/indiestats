@@ -77,6 +77,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Redirects
+    |--------------------------------------------------------------------------
+    |
+    | Password confirmation is only used to manage two-factor authentication
+    | from the account page, so a successful confirmation without an
+    | "intended" URL returns there instead of the dashboard.
+    |
+    */
+
+    'redirects' => [
+        'password-confirmation' => '/settings/account',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Fortify Routes Prefix / Subdomain
     |--------------------------------------------------------------------------
     |

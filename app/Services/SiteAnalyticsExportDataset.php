@@ -6,6 +6,7 @@ use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Models\TrackingEvent;
 use App\Support\AnalyticsFilters;
+use App\Support\UserAnalyticsRange;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -120,7 +121,7 @@ class SiteAnalyticsExportDataset
     ): array {
         $base = OutboundClick::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
         $this->filterScope->constrainVisitorForOutbound($base, 'visitor_id', $siteId, $from, $to, $filters);
 
         $dataQuery = $base
@@ -240,7 +241,7 @@ class SiteAnalyticsExportDataset
             ->leftJoin('tracking_events', function ($join) use ($siteId, $from, $to, $scope, $noAnalyticsFilters): void {
                 $join->on('tracking_events.name', '=', 'goals.event_name')
                     ->where('tracking_events.site_id', '=', $siteId)
-                    ->whereBetween('tracking_events.created_at', [$from, $to]);
+                    ->whereBetween('tracking_events.created_at', UserAnalyticsRange::utcBounds($from, $to));
                 $scope->applyToGoalsJoin($join, $siteId, $from, $to, $noAnalyticsFilters);
             })
             ->select('goals.label', 'goals.event_name')

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Support\AnalyticsFilters;
+use App\Support\UserAnalyticsRange;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -14,7 +15,7 @@ class AnalyticsFilterScope
     public function applyToPageViews(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
 
         $this->applyPageViewRowConditions($q, $filters);
 
@@ -25,7 +26,7 @@ class AnalyticsFilterScope
                     ->from('tracking_events')
                     ->where('site_id', $siteId)
                     ->where('name', $filters->event)
-                    ->whereBetween('created_at', [$from, $to]);
+                    ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
             });
         }
     }
@@ -129,7 +130,7 @@ class AnalyticsFilterScope
                 $sub->select('visitor_id')
                     ->from('page_views')
                     ->where('site_id', $siteId)
-                    ->whereBetween('created_at', [$from, $to]);
+                    ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
                 $this->applyPageViewRowConditions($sub, $pv);
             });
         }
@@ -141,7 +142,7 @@ class AnalyticsFilterScope
                     ->from('tracking_events')
                     ->where('site_id', $siteId)
                     ->where('name', $filters->event)
-                    ->whereBetween('created_at', [$from, $to]);
+                    ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
             });
         }
     }
@@ -180,7 +181,7 @@ class AnalyticsFilterScope
                 $sub->from('page_views as pv')
                     ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
                     ->where('pv.site_id', $siteId)
-                    ->whereBetween('pv.created_at', [$from, $to])
+                    ->whereBetween('pv.created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
                 $this->applyPageViewRowConditions($sub, $pvFilters);
             });
@@ -193,7 +194,7 @@ class AnalyticsFilterScope
                     ->from('tracking_events')
                     ->where('site_id', $siteId)
                     ->where('name', $filters->event)
-                    ->whereBetween('created_at', [$from, $to]);
+                    ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
             });
         }
     }
@@ -201,7 +202,7 @@ class AnalyticsFilterScope
     public function applyToTrackingEvents(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
 
         $eventNamed = $filters->event !== null;
         if ($eventNamed) {
@@ -215,7 +216,7 @@ class AnalyticsFilterScope
     public function applyToEventNamesAggregation(Builder $q, int $siteId, CarbonInterface $from, CarbonInterface $to, AnalyticsFilters $filters): void
     {
         $q->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
 
         $this->constrainVisitorForTrackingEvents($q, $siteId, $from, $to, $filters, false);
     }
@@ -233,7 +234,7 @@ class AnalyticsFilterScope
                 $sub->from('page_views as pv')
                     ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
                     ->where('pv.site_id', $siteId)
-                    ->whereBetween('pv.created_at', [$from, $to])
+                    ->whereBetween('pv.created_at', UserAnalyticsRange::utcBounds($from, $to))
                     ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
                 $this->applyPageViewRowConditions($sub, $pv);
             });
@@ -246,7 +247,7 @@ class AnalyticsFilterScope
                     ->from('tracking_events')
                     ->where('site_id', $siteId)
                     ->where('name', $filters->event)
-                    ->whereBetween('created_at', [$from, $to]);
+                    ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
             });
         }
     }
@@ -270,7 +271,7 @@ class AnalyticsFilterScope
             ->select('pv.path')
             ->whereColumn('pv.visitor_id', 'tracking_events.visitor_id')
             ->where('pv.site_id', $siteId)
-            ->whereBetween('pv.created_at', [$from, $to])
+            ->whereBetween('pv.created_at', UserAnalyticsRange::utcBounds($from, $to))
             ->whereColumn('pv.created_at', '<=', 'tracking_events.created_at');
         $this->applyPageViewRowConditions($q, $pvFilters);
 

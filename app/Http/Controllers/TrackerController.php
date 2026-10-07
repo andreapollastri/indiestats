@@ -91,11 +91,10 @@ return ctx;
 function sendPageview(){
 if(pathSent)return;
 pathSent=true;
-referralOrigin();
 var m=utm();
 var u=new URL(location.href);
 var sq=u.searchParams.get('q')||u.searchParams.get('query')||u.searchParams.get('s');
-var body={site_key:K,visitor_id:vid(),path:pagePath(),referrer:document.referrer||null};
+var body={site_key:K,visitor_id:vid(),path:pagePath(),referrer:referralOrigin()};
 Object.assign(body,m);
 Object.assign(body,clientContext());
 if(sq)body.search_query=sq;

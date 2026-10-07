@@ -857,6 +857,7 @@
       <a href="#screenshots">Screenshots</a>
       <a href="#install">Install</a>
       <a href="#quickstart">Quick start</a>
+      <a href="#demo">Demo</a>
       <a href="#tracking">Tracking</a>
       <a href="#dashboard">Dashboard</a>
       <a href="#filters">Filters</a>
@@ -914,29 +915,55 @@
 
       <section id="screenshots">
         <h2>Screenshots</h2>
-        <p class="lead">From the multi-site overview down to the snippet you paste on your pages.</p>
+        <p class="lead">From the multi-site overview down to the snippet you paste on your pages. Every screenshot
+          comes from the built-in <a href="#demo">demo data</a>.</p>
         <div class="shots">
           <figure class="shot">
-            <img src="img/dashboard.jpg" width="1024" height="522" loading="lazy" decoding="async"
-              alt="IndieStats multi-site dashboard with trend charts and unique visitors">
-            <figcaption>Multi-site overview — unique visitors and trends for every site at a glance.</figcaption>
+            <img src="img/dashboard.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="IndieStats dashboard with real-time activity across all sites and a trend for each site">
+            <figcaption>Multi-site overview — live visitors across sites, then unique visitors and trends for each one.</figcaption>
           </figure>
           <figure class="shot">
-            <img src="img/site.jpg" width="1024" height="525" loading="lazy" decoding="async"
-              alt="Per-site analytics with summary metrics and daily trend chart">
-            <figcaption>Per-site detail — summary metrics, filters, and the daily pageviews trend.</figcaption>
+            <img src="img/site.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="Per-site summary with visitors, pageviews, time on page, outbound clicks, top pages and top sources">
+            <figcaption>Per-site summary — headline metrics, top pages, top sources and the daily trend.</figcaption>
           </figure>
           <figure class="shot">
-            <img src="img/conf.jpg" width="1024" height="517" loading="lazy" decoding="async"
-              alt="Site configuration with allowed domains and tracking snippet">
+            <img src="img/realtime.jpg" width="1600" height="878" loading="lazy" decoding="async"
+              alt="Real-time tab with active visitors, pageviews in the last five minutes and a live activity feed">
+            <figcaption>Real-time — active visitors, a 30-minute chart and the pages being viewed right now.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/filters.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="Filter panel with source and device filters applied">
+            <figcaption>Filters — 21 dimensions with type-ahead search, applied to every tab, table and export.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/geography.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="Geography tab with a world map shaded by visits">
+            <figcaption>Geography — a choropleth map and country breakdown in the user's language.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/events.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="Events tab with goals for purchases, add to cart, subscriptions and newsletter signups">
+            <figcaption>Events &amp; goals — custom events with properties, and goals to follow conversions.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/conf.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+              alt="New site confirmation with the tracking snippet ready to copy">
             <figcaption>Sites &amp; snippets — add a site, set allowed domains, and copy the tracking code.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/mobile.jpg" width="1600" height="1577" loading="lazy" decoding="async"
+              alt="Dashboard and site summary on a phone">
+            <figcaption>Responsive — the dashboard and every site tab work on a phone.</figcaption>
           </figure>
         </div>
       </section>
 
       <section id="install">
         <h2>Install</h2>
-        <p class="lead">One command. PHP 8.3+, Composer, and Node 20+. SQLite by default — MySQL and PostgreSQL work
+        <p class="lead">One command. PHP 8.4+, Composer, and Node 20+. SQLite by default — MySQL and PostgreSQL work
           too.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
@@ -955,7 +982,8 @@ npm run build
 cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
-php artisan migrate</pre>
+php artisan migrate
+php artisan db:seed</pre>
         </div>
       </section>
 
@@ -967,8 +995,9 @@ php artisan migrate</pre>
             <div class="n">01</div>
             <div>
               <h3>Install &amp; run</h3>
-              <p>Clone the repo, run <code>composer run setup</code>, then start the stack with
-                <code>composer run dev</code>.</p>
+              <p>Clone the repo, run <code>composer run setup</code> and <code>php artisan db:seed</code> to create
+                the first admin (<code>admin@users.test</code> / <code>password</code> — change it), then serve the app
+                with <code>php artisan serve</code> or Laravel Herd.</p>
             </div>
           </div>
           <div class="step">
@@ -988,14 +1017,30 @@ php artisan migrate</pre>
             </div>
           </div>
         </div>
-        <h3>Optional demo data</h3>
-        <p>Add <code>SEED_FAKE_DATA=true</code> to <code>.env</code>, then:</p>
+      </section>
+
+      <section id="demo">
+        <h2>Demo</h2>
+        <p class="lead">Explore every screen without installing the snippet anywhere: one command builds a realistic
+          year of traffic.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
-          <pre>php artisan db:seed</pre>
+          <pre>php artisan migrate:fresh --seed --seeder=DemoDataSeeder</pre>
         </div>
-        <p>Creates an admin user (<code>admin@users.test</code> / <code>password</code>) and, when seeding is enabled,
-          sample analytics.</p>
+        <p>Sign in as <code>admin@users.test</code> / <code>password</code>. The demo creates five fictional sites — a
+          developer blog, open-source docs, a coffee shop, a SaaS landing page and a design studio — with about 230,000
+          pageviews, growth and seasonality, returning visitors, UTM campaigns, a Hacker News spike, purchase funnels,
+          crawlers, a small team with roles and live activity. It takes about 10 seconds on SQLite and only uses
+          <code>.example</code> domains.</p>
+        <p>Real-time views show the last few minutes. Refresh them right before a demo:</p>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>php artisan db:seed --class=DemoLiveTrafficSeeder</pre>
+        </div>
+        <div class="note">
+          <strong>Safe by default:</strong> both demo seeders refuse to run when <code>APP_ENV=production</code>, and
+          re-running the demo replaces only the demo sites.
+        </div>
       </section>
 
       <section id="tracking">
@@ -1151,7 +1196,7 @@ php artisan view:cache</pre>
 
       <section id="scheduler">
         <h2>Scheduler</h2>
-        <p class="lead">One cron entry drives pruning, weekly GeoIP updates, and monthly ASN downloads.</p>
+        <p class="lead">One cron entry drives backups, pruning, weekly GeoIP updates, and monthly ASN downloads.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>* * * * * cd /path-to-indiestats &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</pre>
@@ -1166,6 +1211,16 @@ php artisan view:cache</pre>
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td><code>backup:run</code></td>
+                <td>Daily 00:00</td>
+                <td>Back up the database, <code>.env</code> and <code>storage/app</code> to <code>BACKUP_DISK</code></td>
+              </tr>
+              <tr>
+                <td><code>backup:clean</code></td>
+                <td>Daily 01:00</td>
+                <td>Remove old backups</td>
+              </tr>
               <tr>
                 <td><code>analytics:prune</code></td>
                 <td>Daily 02:00</td>
@@ -1188,7 +1243,7 @@ php artisan view:cache</pre>
 
       <section id="queue">
         <h2>Queue</h2>
-        <p class="lead">Excel exports run as background jobs. Locally, <code>composer run dev</code> covers the worker.
+        <p class="lead">Excel exports run as background jobs. Locally, run <code>php artisan queue:listen</code> next to the server.
           In production, keep one running:</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>

@@ -34,7 +34,20 @@ class PasswordConfirmationTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('account.edit'));
         $response->assertSessionHas('auth.password_confirmed_at');
+    }
+
+    public function test_password_confirmation_still_honours_the_intended_url(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withSession(['url.intended' => route('sites.index')])
+            ->post(route('password.confirm.store'), [
+                'password' => 'password',
+            ]);
+
+        $response->assertRedirect(route('sites.index'));
     }
 }

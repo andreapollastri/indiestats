@@ -29,6 +29,18 @@ class UserManagementTest extends TestCase
             ->assertSee(__('users.last_login'), false);
     }
 
+    public function test_last_login_is_shown_in_the_viewer_timezone(): void
+    {
+        $admin = User::factory()->admin()->create(['locale' => 'it', 'timezone' => 'Europe/Rome']);
+        $member = User::factory()->base()->create(['timezone' => 'America/New_York']);
+        $member->forceFill(['last_login_at' => '2026-10-07 08:00:00'])->save();
+
+        $this->actingAs($admin)->get(route('users.index'))
+            ->assertOk()
+            ->assertSee('07/10/2026 10:00')
+            ->assertDontSee('07/10/2026 04:00');
+    }
+
     public function test_admin_cannot_delete_own_account_via_users_section(): void
     {
         $admin = User::factory()->admin()->create();

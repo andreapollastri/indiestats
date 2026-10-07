@@ -223,11 +223,11 @@ return [
         'notifiable' => Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_MAIL_TO', 'admin@newsletter.test'),
+            'to' => env('BACKUP_MAIL_TO', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
 
             'from' => [
-                'address' => env('MAIL_FROM_ADDRESS', 'backup@newsletter.test'),
-                'name' => env('MAIL_FROM_NAME', 'Newsletter Backup'),
+                'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+                'name' => env('MAIL_FROM_NAME', 'IndieStats Backup'),
             ],
         ],
 
@@ -266,8 +266,8 @@ return [
      */
     'monitor_backups' => [
         [
-            'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['local'],
+            'name' => env('BACKUP_APP_NAME', 'indiestats-backup'),
+            'disks' => [env('BACKUP_DISK', 's3')],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,

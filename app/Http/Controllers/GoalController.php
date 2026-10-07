@@ -32,7 +32,7 @@ class GoalController extends Controller
             'event_name' => trim($data['event_name']),
         ]);
 
-        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', 'Evento salvato.');
+        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', __('Evento salvato.'));
     }
 
     public function destroy(Request $request, Site $site, Goal $goal): RedirectResponse
@@ -53,7 +53,7 @@ class GoalController extends Controller
             $goal->delete();
         });
 
-        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', 'Evento eliminato.');
+        return $this->redirectToSiteShowGoalsTab($request, $site)->with('success', __('Evento eliminato.'));
     }
 
     private function redirectToSiteShowGoalsTab(Request $request, Site $site): RedirectResponse

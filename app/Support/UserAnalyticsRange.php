@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -35,5 +36,18 @@ final class UserAnalyticsRange
         };
 
         return ['from' => $from, 'to' => $to, 'range' => $range];
+    }
+
+    /**
+     * Convert user-local range bounds to UTC for comparisons against `created_at` (stored in UTC).
+     *
+     * Query bindings format dates in their own timezone, so passing local bounds directly would
+     * shift the window by the user's UTC offset (e.g. "today" in Europe/Rome would start at 02:00).
+     *
+     * @return array{0: CarbonInterface, 1: CarbonInterface}
+     */
+    public static function utcBounds(CarbonInterface $from, CarbonInterface $to): array
+    {
+        return [$from->copy()->utc(), $to->copy()->utc()];
     }
 }

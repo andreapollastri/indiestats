@@ -35,7 +35,7 @@
                             </td>
                             <td class="align-middle small text-nowrap">
                                 @if ($u->last_login_at)
-                                    {{ $u->last_login_at->timezone($u->timezone ?? config('app.timezone'))->locale(app()->getLocale())->translatedFormat(__('users.last_login_datetime_pattern')) }}
+                                    {{ $u->last_login_at->timezone(user_timezone())->locale(app()->getLocale())->translatedFormat(__('users.last_login_datetime_pattern')) }}
                                 @else
                                     <span class="text-muted">{{ __('users.last_login_never') }}</span>
                                 @endif

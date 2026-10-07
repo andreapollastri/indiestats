@@ -32,7 +32,7 @@
 
         <p class="small pa-text-muted-soft mt-3 mb-0">
             {{ __('Lo script registra automaticamente visualizzazioni, tempo in pagina, click in uscita e parametri UTM. Per eventi personalizzati usa') }}
-            <code>window.indiestats.track('nome_evento')</code>.
+            <code>window.indiestats.track('signup')</code>.
         </p>
     </div>
 </div>

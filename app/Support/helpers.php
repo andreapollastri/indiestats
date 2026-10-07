@@ -51,3 +51,21 @@ if (! function_exists('format_user_datetime')) {
         return $carbon->timezone(user_timezone())->format($format);
     }
 }
+
+if (! function_exists('format_decimal')) {
+    /**
+     * Format a number with the decimal and thousands separators of the current locale (e.g. 2.5 in English, 2,5 in Italian).
+     */
+    function format_decimal(float|int $value, int $decimals = 1): string
+    {
+        $locale = app()->getLocale();
+
+        [$decimalSeparator, $thousandsSeparator] = match (true) {
+            str_starts_with($locale, 'en') => ['.', ','],
+            str_starts_with($locale, 'fr') => [',', "\u{202F}"],
+            default => [',', '.'],
+        };
+
+        return number_format($value, $decimals, $decimalSeparator, $thousandsSeparator);
+    }
+}

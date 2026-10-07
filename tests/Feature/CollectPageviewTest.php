@@ -53,6 +53,29 @@ class CollectPageviewTest extends TestCase
         $this->assertFalse($pageView->is_bot);
     }
 
+    public function test_crawler_pageview_stores_the_crawler_name_as_browser(): void
+    {
+        $site = Site::factory()->create([
+            'allowed_domains' => 'example.com',
+        ]);
+
+        $response = $this->postJson('/collect/pageview', [
+            'site_key' => $site->public_key,
+            'visitor_id' => 'crawler-1',
+            'path' => '/',
+            'user_agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        ], [
+            'HTTP_ORIGIN' => 'https://example.com',
+        ]);
+
+        $response->assertOk();
+
+        $pageView = PageView::query()->findOrFail($response->json('id'));
+
+        $this->assertTrue($pageView->is_bot);
+        $this->assertSame('Googlebot', $pageView->browser);
+    }
+
     public function test_visitor_id_datatable_returns_aggregated_visitors(): void
     {
         $user = User::factory()->admin()->create();

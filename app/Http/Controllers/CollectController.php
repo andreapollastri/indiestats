@@ -219,7 +219,11 @@ class CollectController extends Controller
         $agent = new Agent;
         $agent->setUserAgent($userAgent);
 
-        $browser = $agent->browser() ?: 'unknown';
+        $isBot = $agent->isRobot();
+        $robot = $isBot ? $agent->robot() : false;
+
+        // Crawlers usually report a generic "Mozilla" browser: store the crawler name instead.
+        $browser = is_string($robot) && $robot !== '' ? mb_substr($robot, 0, 64) : ($agent->browser() ?: 'unknown');
         $version = $agent->version($browser);
         $browserVersion = is_string($version) && $version !== '' ? mb_substr($version, 0, 32) : null;
 
@@ -228,7 +232,7 @@ class CollectController extends Controller
             'browser_version' => $browserVersion,
             'os' => $agent->platform() ?: 'unknown',
             'device_type' => $agent->isTablet() ? 'tablet' : ($agent->isPhone() ? 'mobile' : 'desktop'),
-            'is_bot' => $agent->isRobot(),
+            'is_bot' => $isBot,
         ];
     }
 

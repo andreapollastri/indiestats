@@ -278,5 +278,18 @@
     "is updated monthly and requires no API key.": "viene aggiornato mensilmente e non richiede chiavi API.",
     "navigator.language del visitatore": "navigator.language del visitatore",
     "nessuno": "nessuno",
-    "su ogni pagina del sito, oppure nel layout condiviso (header\/footer del tema).": "su ogni pagina del sito, oppure nel layout condiviso (header\/footer del tema)."
+    "su ogni pagina del sito, oppure nel layout condiviso (header\/footer del tema).": "su ogni pagina del sito, oppure nel layout condiviso (header\/footer del tema).",
+    "Configurazione 2FA annullata. Puoi riattivarla quando vuoi.": "Configurazione 2FA annullata. Puoi riattivarla quando vuoi.",
+    "Nessuna configurazione 2FA da annullare.": "Nessuna configurazione 2FA da annullare.",
+    "Indica almeno un dominio consentito.": "Indica almeno un dominio consentito.",
+    "The scheduler also runs :command monthly (with cron configured).": "Lo scheduler esegue anche :command mensilmente (con cron configurato).",
+    "Sito eliminato.": "Sito eliminato.",
+    "Evento salvato.": "Evento salvato.",
+    "Evento eliminato.": "Evento eliminato.",
+    ":count minute|:count minutes": ":count minuto|:count minuti",
+    ":count hour|:count hours": ":count ora|:count ore",
+    ":count day|:count days": ":count giorno|:count giorni",
+    ":count month|:count months": ":count mese|:count mesi",
+    ":count year|:count years": ":count anno|:count anni",
+    ":duration and :remainder": ":duration e :remainder"
 }

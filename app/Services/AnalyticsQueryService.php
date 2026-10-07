@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\OutboundClick;
 use App\Models\PageView;
 use App\Support\AnalyticsFilters;
+use App\Support\UserAnalyticsRange;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
@@ -85,11 +86,7 @@ class AnalyticsQueryService
         $to = $to->copy();
         $filters = $filters ?? new AnalyticsFilters;
 
-        $driver = DB::connection()->getDriverName();
-        $dateExpr = match ($driver) {
-            'sqlite' => "strftime('%Y-%m-%d', created_at)",
-            default => 'DATE(created_at)',
-        };
+        $dateExpr = $this->localDateExpression($to->utcOffset());
 
         $pvBase = PageView::query();
         $this->filterScope->applyToPageViews($pvBase, $siteId, $from, $to, $filters);
@@ -110,7 +107,7 @@ class AnalyticsQueryService
 
         $outboundBase = OutboundClick::query()
             ->where('site_id', $siteId)
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', UserAnalyticsRange::utcBounds($from, $to));
         $this->filterScope->constrainVisitorForOutbound($outboundBase, 'visitor_id', $siteId, $from, $to, $filters);
         $outboundClicks = (int) $outboundBase->count();
 
@@ -121,6 +118,21 @@ class AnalyticsQueryService
             'by_day' => $byDay,
             'outbound_clicks' => $outboundClicks,
         ];
+    }
+
+    /**
+     * SQL expression for the calendar day of `created_at` (UTC) shifted into the viewer's timezone.
+     *
+     * Uses a single offset for the whole range (the one at its end), so days across a DST change
+     * may be off by one hour at the edges; this keeps the grouping in SQL instead of loading rows.
+     */
+    private function localDateExpression(int $offsetMinutes): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'sqlite' => sprintf("strftime('%%Y-%%m-%%d', created_at, '%+d minutes')", $offsetMinutes),
+            'pgsql' => sprintf("DATE(created_at + INTERVAL '%d minutes')", $offsetMinutes),
+            default => sprintf('DATE(DATE_ADD(created_at, INTERVAL %d MINUTE))', $offsetMinutes),
+        };
     }
 
     /**

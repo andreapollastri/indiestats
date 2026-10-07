@@ -1,15 +1,18 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "andreapollastri/indiestats",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Privacy-friendly, self-hosted web analytics built with Laravel.",
     "keywords": [
-        "laravel",
-        "framework"
+        "analytics",
+        "web-analytics",
+        "privacy",
+        "self-hosted",
+        "laravel"
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "andreapollastri/boogle-client": "^1.0",
         "andreapollastri/checkpoint": "^1.0",
         "cipi/agent": "^1.5",

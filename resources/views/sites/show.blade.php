@@ -35,10 +35,10 @@
     }
 
     $pagesPerVisitor = $stats['unique_visitors'] > 0
-        ? number_format($stats['total_pageviews'] / $stats['unique_visitors'], 1, ',', '.')
+        ? format_decimal($stats['total_pageviews'] / $stats['unique_visitors'])
         : '—';
     $outboundRate = $stats['total_pageviews'] > 0
-        ? number_format(($stats['outbound_clicks'] / $stats['total_pageviews']) * 100, 1, ',', '.').'%'
+        ? format_decimal(($stats['outbound_clicks'] / $stats['total_pageviews']) * 100).'%'
         : '—';
 @endphp
 
@@ -252,7 +252,7 @@
             <small class="d-block mt-1 pa-text-muted-soft">{{ __('Volte e visitatori nella tabella: intero periodo sopra, senza i filtri analitici.') }}</small>
         </div>
         <div class="card-body">
-            <p class="small mb-2 pa-text-muted-soft">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('nome_tag', { opzionale: 'valore' })</code></p>
+            <p class="small mb-2 pa-text-muted-soft">{{ __('Esempio:') }} <code class="user-select-all">window.indiestats.track('signup', { plan: 'pro' })</code></p>
             <form method="POST" action="{{ route('sites.goals.store', $site['public_key']) }}" class="mb-4">
                 @csrf
                 <input type="hidden" name="range" value="{{ $range }}">
