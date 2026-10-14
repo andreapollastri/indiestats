@@ -6,6 +6,8 @@ use App\Models\SiteExport;
 use App\Models\User;
 use App\Policies\SiteExportPolicy;
 use App\Policies\UserPolicy;
+use App\Updates\Updater;
+use App\Updates\UpdateState;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
@@ -25,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->afterResolving('translator', function ($translator): void {
             $translator->getLoader()->addJsonPath(lang_path('extensions'));
         });
+
+        $this->app->singleton(Updater::class, fn (): Updater => new Updater(new UpdateState((string) config('updates.state'))));
     }
 
     /**

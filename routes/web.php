@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UpdateController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CollectController;
 use App\Http\Controllers\DashboardController;
@@ -37,6 +38,15 @@ Route::get('/i/{publicKey}.js', [TrackerController::class, 'script'])
 
 Route::middleware(['auth', 'admin'])->group(function (): void {
     Route::resource('users', UserController::class)->except(['show']);
+
+    Route::get('updates', [UpdateController::class, 'index'])->name('updates.index');
+    Route::get('updates/status', [UpdateController::class, 'status'])->name('updates.status');
+    Route::post('updates/check', [UpdateController::class, 'check'])
+        ->middleware('throttle:12,1')
+        ->name('updates.check');
+    Route::post('updates', [UpdateController::class, 'update'])->name('updates.update');
+    Route::put('updates/channel', [UpdateController::class, 'channel'])->name('updates.channel');
+    Route::put('updates/automatic', [UpdateController::class, 'automatic'])->name('updates.automatic');
 });
 
 Route::middleware(['auth'])->group(function (): void {

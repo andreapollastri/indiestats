@@ -40,6 +40,7 @@
 - [Scheduler, queue and backups](#scheduler-queue-and-backups)
 - [Production checklist](#production-checklist)
 - [Deploying with Cipi](#deploying-with-cipi)
+- [Updates](#updates)
 - [Public endpoints](#public-endpoints)
 - [Development](#development)
 - [Tech stack](#tech-stack)
@@ -70,6 +71,7 @@
 - Two-factor authentication (TOTP) with recovery codes
 - Interface in English, Italian, German, French and Spanish
 - Scheduled data retention, GeoIP/ASN database updates and backups
+- Self-updates from GitHub: stable releases or the `main` branch, nightly or on demand, with a database backup and automatic rollback
 - A realistic demo dataset and a test suite that runs in CI
 
 ## A tour of the app
@@ -304,7 +306,7 @@ Raw pageviews, events and outbound clicks are deleted after `ANALYTICS_RETENTION
 
 | Role | Can do |
 | --- | --- |
-| **Admin** | See and manage every site, manage users, configure GeoIP/ASN databases |
+| **Admin** | See and manage every site, manage users, configure GeoIP/ASN databases, install updates |
 | **Base** | See only the sites an admin assigns to them |
 
 Every user picks their own language and timezone in **Settings**, and can enable two-factor authentication in **Account**. Guest pages such as the login follow the browser's language.
@@ -331,6 +333,7 @@ Every user picks their own language and timezone in **Settings**, and can enable
 | `BACKUP_ARCHIVE_PASSWORD` | Optional password for backup archives | _empty_ |
 | `BOOGLE_KEY` / `BOOGLE_PROJECT_KEY` | Optional exception reporting to [Boogle](https://boogle.app) (production only) | _empty_ |
 | `SEED_FAKE_DATA` | Let `db:seed` create random bulk data | `false` |
+| `APP_UPDATES`, `APP_UPDATE_*` | Self-updates, see [Updates](#updates) | on in production |
 
 ### GeoIP (countries)
 
@@ -365,6 +368,8 @@ Add the Laravel scheduler to cron:
 | `analytics:prune` | Daily 02:00 | Delete raw analytics older than the retention period |
 | `geoip:update` | Mondays 04:15 | Download GeoLite2-Country (when a license key is set) |
 | `dbip-asn:update` | 3rd of the month, 04:30 | Download DB-IP ASN Lite |
+| `app:update pending` | Every minute | Start the update an admin asked for on the **Updates** page |
+| `app:update apply --auto` | Daily at `APP_UPDATE_TIME` (04:00) | Install the newest build of the update channel, while automatic updates are on |
 
 All of them can be run by hand; `php artisan geoip:update --key=YOUR_KEY` downloads with a one-off key.
 
@@ -428,6 +433,47 @@ after('deploy:vendors', 'npm:build');
 ```
 
 Then add the scheduler cron for the app user. See the [Cipi documentation](https://cipi.sh) for details.
+
+Updates work on Cipi too: a Cipi app is a deploy of releases (`releases/`, `current`, `shared/`), so IndieStats builds the new release next to the running one and switches `current` to it, and Cipi's workers restart on it. The scheduler cron above is what runs them; a later `cipi deploy` keeps working as before. See [Updates](#updates).
+
+## Updates
+
+IndieStats keeps itself up to date. Admins find **Updates** in the sidebar: the installed release, the newest one, **Check now**, **Update to …** and **Force update**, the channel and the nightly update.
+
+- **Channels**: *Stable* installs the release tags (`1.2.3`) and nothing in between; *Beta* follows the head of `main`, for a server you test on.
+- **Never backwards**: a build is installed only when it contains the installed one. Back on stable after beta, IndieStats keeps its `main` build until a release contains it. **Force update** installs the channel's newest build again (or one whose history differs), never an older one.
+- **Every night** at `APP_UPDATE_TIME` (04:00 by default) while automatic updates are on; an update asked for on the page starts within a minute. Both run from the scheduler, so the [cron entry](#scheduler-queue-and-backups) is required: the page warns when the scheduler has not run in the last few minutes.
+- **Safe**: each update backs up the database (`storage/app/updates/backups`, the newest 5 are kept), installs the build, runs `composer install --no-dev`, migrates, rebuilds the caches, restarts the queue workers and checks that IndieStats boots. If a step fails, the previous code and the database come back. The log of the last run is on the page and in `storage/app/updates/update.log`. Built assets are part of every release, so updates never need Node.
+
+Two kinds of installation update themselves:
+
+| Installation | How it is updated |
+| --- | --- |
+| A git checkout (`git clone`, as in [Quick start](#quick-start)) | In place: maintenance mode, checkout of the new build (detached), `composer install`, migrations. Tracked files changed by hand stop the update; **Force update** discards them. |
+| A release of a deploy: `releases/<x>`, `current`, `shared/` ([Cipi](#deploying-with-cipi), Deployer) | The new build is cloned into `releases/<build>` next to the running one, shares its `.env` and `storage`, is built and migrated, then `current` points at it. |
+
+Any other installation (an upload, a container image) shows a notice on the page and is updated the way it was installed. The scheduler's user runs the update, so it needs `git`, `composer` and the database client (`mysqldump`/`mysql`, `pg_dump`/`psql`) on its `PATH`, and write access to the application. From the command line:
+
+```bash
+php artisan app:update status          # what the last check and the last run said (JSON)
+php artisan app:update check           # what the channel would install
+php artisan app:update apply [--force] # update now
+php artisan app:update channel stable  # or beta
+php artisan app:update auto off        # or on
+```
+
+| Variable | Default | |
+| --- | --- | --- |
+| `APP_UPDATES` | on in production | `false` turns updates off |
+| `APP_UPDATE_REPOSITORY` | `https://github.com/andreapollastri/indiestats.git` | Where builds come from |
+| `APP_UPDATE_CHANNEL` | `stable` | The channel until an admin picks one |
+| `APP_UPDATE_AUTO` | `true` | The nightly update until an admin switches it |
+| `APP_UPDATE_TIME` | `04:00` | When the nightly update runs |
+| `APP_UPDATE_BACKUP` | `true` | The database backup before each update |
+| `APP_UPDATE_ASSETS` | `true` | Build the assets (`npm`) when a release does not carry them in `public/build` (IndieStats releases do) |
+| `APP_UPDATE_PHP`, `APP_UPDATE_COMPOSER`, `APP_UPDATE_NPM` | found on the `PATH` | The tools, when the scheduler's `PATH` does not have them |
+
+The installed release is in the `VERSION` file (`config('app.version')`).
 
 ## Public endpoints
 

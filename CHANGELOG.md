@@ -2,7 +2,9 @@
 
 Notable changes to IndieStats. Dates are in YYYY-MM-DD format.
 
-## Unreleased
+## 1.0.0 — 2026-10-14
+
+The first versioned release. The installed version is in the `VERSION` file; releases are tagged `MAJOR.MINOR.PATCH`.
 
 ### Security
 
@@ -22,6 +24,7 @@ Notable changes to IndieStats. Dates are in YYYY-MM-DD format.
 
 ### Added
 
+- **Updates.** IndieStats updates itself from the new **Updates** page (admins only) or with `php artisan app:update`: stable releases or the `main` branch (beta), nightly or on demand, never to an older build, with a database backup and automatic rollback. Works on git checkouts and on Cipi/Deployer releases; see [Updates](README.md#updates).
 - `DemoDataSeeder`: five realistic demo sites with a year of traffic (about 230,000 pageviews), campaigns, traffic spikes, goals and funnels, crawlers, a team with roles and live activity. `DemoLiveTrafficSeeder` refreshes the real-time views.
 - GitHub Actions workflow running Pint and the test suite on PHP 8.4 and 8.5.
 - Tests for the tracker script, referrer classification, timezone-aware ranges, decimal formatting, the demo seeders and translation coverage across all five languages.

@@ -50,6 +50,12 @@
                         <span>{{ __('users.page_title') }}</span>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->routeIs('updates.*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('updates.index') }}">
+                        <i class="fas fa-fw fa-arrows-rotate"></i>
+                        <span>{{ __('Updates') }}</span>
+                    </a>
+                </li>
             @endif
             <li class="nav-item {{ request()->routeIs('preferences.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('preferences.edit') }}">
