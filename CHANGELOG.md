@@ -2,6 +2,12 @@
 
 Notable changes to IndieStats. Dates are in YYYY-MM-DD format.
 
+## 1.0.1 — 2026-10-15
+
+### Documentation
+
+- Updates documented on the website and in the README: channels, what an update does, installations, settings, command line, upgrading from before 1.0.0, troubleshooting.
+
 ## 1.0.0 — 2026-10-14
 
 The first versioned release. The installed version is in the `VERSION` file; releases are tagged `MAJOR.MINOR.PATCH`.
