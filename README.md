@@ -71,7 +71,6 @@
 - Two-factor authentication (TOTP) with recovery codes
 - Interface in English, Italian, German, French and Spanish
 - Scheduled data retention, GeoIP/ASN database updates and backups
-- Self-updates from GitHub: stable releases or the `main` branch, nightly or on demand, with a database backup and automatic rollback
 - A realistic demo dataset and a test suite that runs in CI
 
 ## A tour of the app
@@ -399,6 +398,7 @@ stdout_logfile=/path-to-indiestats/storage/logs/worker.log
 6. Set allowed domains on every site.
 7. Behind a proxy, configure trusted proxies so GeoIP and ASN see the real visitor IP.
 8. Optionally run `php artisan checkpoint:scan` for a security audit of the installation.
+9. The scheduler also runs the [updates](#updates): its user needs `git`, `composer` and the database client.
 
 <details>
 <summary>Troubleshooting: <code>Vite manifest not found</code></summary>
@@ -434,16 +434,16 @@ after('deploy:vendors', 'npm:build');
 
 Then add the scheduler cron for the app user. See the [Cipi documentation](https://cipi.sh) for details.
 
-Updates work on Cipi too: a Cipi app is a deploy of releases (`releases/`, `current`, `shared/`), so IndieStats builds the new release next to the running one and switches `current` to it, and Cipi's workers restart on it. The scheduler cron above is what runs them; a later `cipi deploy` keeps working as before. See [Updates](#updates).
+Updates work on Cipi too: a Cipi app is a deploy of releases (`releases/`, `current`, `shared/`), so IndieStats builds the new release next to the running one, switches `current` to it and restarts Cipi's workers on it. The scheduler cron above is what runs them. A later `cipi deploy` keeps working as before: it deploys the branch the app was created with, and updates go on from that build, never back to an older one. See [Updates](#updates).
 
 ## Updates
 
 IndieStats keeps itself up to date. Admins find **Updates** in the sidebar: the installed release, the newest one, **Check now**, **Update to …** and **Force update**, the channel and the nightly update.
 
-- **Channels**: *Stable* installs the release tags (`1.2.3`) and nothing in between; *Beta* follows the head of `main`, for a server you test on.
+- **Channels**: *Stable* installs the release tags (`1.2.3`; `v1.2.3` and `1.2` count too) and nothing in between; *Beta* follows the head of `main`, for a server you test on.
 - **Never backwards**: a build is installed only when it contains the installed one. Back on stable after beta, IndieStats keeps its `main` build until a release contains it. **Force update** installs the channel's newest build again (or one whose history differs), never an older one.
 - **Every night** at `APP_UPDATE_TIME` (04:00 by default) while automatic updates are on; an update asked for on the page starts within a minute. Both run from the scheduler, so the [cron entry](#scheduler-queue-and-backups) is required: the page warns when the scheduler has not run in the last few minutes.
-- **Safe**: each update backs up the database (`storage/app/updates/backups`, the newest 5 are kept), installs the build, runs `composer install --no-dev`, migrates, rebuilds the caches, restarts the queue workers and checks that IndieStats boots. If a step fails, the previous code and the database come back. The log of the last run is on the page and in `storage/app/updates/update.log`. Built assets are part of every release, so updates never need Node.
+- **Safe**: each update backs up the database (`storage/app/updates/backups`, the newest 5 are kept), installs the build, runs `composer install --no-dev`, migrates, refreshes the caches, restarts the queue workers and checks that IndieStats boots. If a step fails, the previous code and the database come back. The log of the last run is on the page and in `storage/app/updates/update.log`. Built assets are part of every release, so updates never need Node.
 
 Two kinds of installation update themselves:
 
@@ -462,6 +462,8 @@ php artisan app:update channel stable  # or beta
 php artisan app:update auto off        # or on
 ```
 
+The scheduler runs `app:update pending` every minute (the update asked for on the page) and `app:update apply --auto` every night.
+
 | Variable | Default | |
 | --- | --- | --- |
 | `APP_UPDATES` | on in production | `false` turns updates off |
@@ -471,9 +473,31 @@ php artisan app:update auto off        # or on
 | `APP_UPDATE_TIME` | `04:00` | When the nightly update runs |
 | `APP_UPDATE_BACKUP` | `true` | The database backup before each update |
 | `APP_UPDATE_ASSETS` | `true` | Build the assets (`npm`) when a release does not carry them in `public/build` (IndieStats releases do) |
-| `APP_UPDATE_PHP`, `APP_UPDATE_COMPOSER`, `APP_UPDATE_NPM` | found on the `PATH` | The tools, when the scheduler's `PATH` does not have them |
+| `APP_UPDATE_PHP`, `APP_UPDATE_COMPOSER`, `APP_UPDATE_NPM`, `APP_UPDATE_GIT` | found on the `PATH` (PHP: the one running the update) | The tools, when the scheduler's `PATH` does not have them |
 
 The installed release is in the `VERSION` file (`config('app.version')`).
+
+> **Upgrading from before 1.0.0:** the updater ships with 1.0.0. Update an older installation once the way it was installed (`git pull`, then `composer install --no-dev` and `php artisan migrate --force`; or `cipi deploy`). From then on it updates itself.
+
+<details>
+<summary>Troubleshooting: updates</summary>
+
+The message of the last run is on the **Updates** page; the full log is in `storage/app/updates/update.log`.
+
+| Message | What to do |
+| --- | --- |
+| The scheduler has not run in the last few minutes | Add the [cron entry](#scheduler-queue-and-backups) for the user that runs IndieStats. Nothing asked for on the page starts without it. |
+| Updates are off on this installation / not one the updater can update | `APP_UPDATES=false` or a non-production `APP_ENV`, or the application is neither a git checkout nor a release of a deploy. Update it the way it was installed. |
+| Files tracked by git were changed | Commit or discard the local changes, or use **Force update**, which discards them. |
+| Composer (or npm) is not on the PATH | Set `APP_UPDATE_COMPOSER` (or `APP_UPDATE_NPM`) to its full path; the scheduler's `PATH` is often shorter than your shell's. |
+| `mysqldump or mariadb-dump` / `pg_dump` is not installed | Install the database client, or turn the backup off with `APP_UPDATE_BACKUP=false` (a failed update then cannot put the database back). |
+| storage is not shared between releases | In a releases deploy, `storage` must be a symlink to `shared/storage`, as Cipi and Deployer make it. |
+| The repository is not reachable | Check the server's outbound access to GitHub and `APP_UPDATE_REPOSITORY`. |
+| This installation runs …, newer than … | Expected after switching from beta to stable: the `main` build stays until a release contains it. |
+| … does not contain the installed … (the history differs) | **Force update** installs the channel's build anyway. |
+| THE DATABASE COULD NOT BE RESTORED | The code is back but the database is not: restore the named file from `storage/app/updates/backups` by hand. |
+
+</details>
 
 ## Public endpoints
 

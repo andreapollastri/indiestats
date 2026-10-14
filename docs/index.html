@@ -864,6 +864,7 @@
       <a href="#production">Production</a>
       <a href="#scheduler">Scheduler</a>
       <a href="#queue">Queue</a>
+      <a href="#updates">Updates</a>
     </aside>
 
     <div class="docs-main">
@@ -1196,7 +1197,8 @@ php artisan view:cache</pre>
 
       <section id="scheduler">
         <h2>Scheduler</h2>
-        <p class="lead">One cron entry drives backups, pruning, weekly GeoIP updates, and monthly ASN downloads.</p>
+        <p class="lead">One cron entry drives backups, pruning, weekly GeoIP updates, monthly ASN downloads, and
+          self-updates.</p>
         <div class="code-block">
           <button class="copy" type="button" data-copy>Copy</button>
           <pre>* * * * * cd /path-to-indiestats &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</pre>
@@ -1236,6 +1238,16 @@ php artisan view:cache</pre>
                 <td>3rd of month 04:30</td>
                 <td>Download DB-IP ASN Lite</td>
               </tr>
+              <tr>
+                <td><code>app:update pending</code></td>
+                <td>Every minute</td>
+                <td>Start the update an admin asked for on the <a href="#updates">Updates</a> page</td>
+              </tr>
+              <tr>
+                <td><code>app:update apply --auto</code></td>
+                <td>Daily at <code>APP_UPDATE_TIME</code> (04:00)</td>
+                <td>Install the newest build of the channel, while automatic updates are on</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -1252,20 +1264,62 @@ php artisan view:cache</pre>
         <p>Use Supervisor (or equivalent) so the worker restarts automatically.</p>
       </section>
 
+      <section id="updates">
+        <h2>Updates</h2>
+        <p class="lead">A production installation updates itself from GitHub, from the scheduler.</p>
+        <p>Admins manage it on the <strong>Updates</strong> page: the installed release, the channel, the nightly
+          update (<code>APP_UPDATE_TIME</code>, 04:00) and an update on demand, which starts within a minute. The
+          <a href="#scheduler">cron entry</a> is required.</p>
+        <ul>
+          <li><strong>Stable</strong> installs the release tags (<code>1.2.3</code>; <code>v1.2.3</code> and
+            <code>1.2</code> count too); <strong>Beta</strong> follows the head of <code>main</code>.</li>
+          <li>An update never goes backwards. <strong>Force update</strong> installs the channel's newest build again
+            (or one whose history differs), never an older one.</li>
+          <li>Each update backs up the database (<code>storage/app/updates/backups</code>, the newest 5 are kept),
+            installs the build, runs <code>composer install --no-dev</code> (assets are committed, so no Node),
+            migrates, refreshes the caches, restarts the queue workers and checks that IndieStats boots. If a step
+            fails, the previous code and the database come back; the log is in
+            <code>storage/app/updates/update.log</code>.</li>
+          <li>A git checkout is updated in place; a releases deploy (<a href="#cipi">Cipi</a>, Deployer) gets a new
+            <code>releases/&lt;build&gt;</code> next to the running one, sharing its <code>.env</code> and
+            <code>storage</code>, and <code>current</code> is switched to it.</li>
+        </ul>
+        <div class="code-block">
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre>php artisan app:update status          # the last check and the last run (JSON)
+php artisan app:update check           # what the channel would install
+php artisan app:update apply [--force] # update now
+php artisan app:update channel stable  # or beta
+php artisan app:update auto off        # or on</pre>
+        </div>
+        <p>The scheduler's user needs <code>git</code>, <code>composer</code> and the database client. Settings:
+          <code>APP_UPDATES</code> (on in production), <code>APP_UPDATE_REPOSITORY</code>,
+          <code>APP_UPDATE_CHANNEL</code>, <code>APP_UPDATE_AUTO</code>, <code>APP_UPDATE_TIME</code>,
+          <code>APP_UPDATE_BACKUP</code>, <code>APP_UPDATE_ASSETS</code>, and <code>APP_UPDATE_PHP</code>,
+          <code>APP_UPDATE_COMPOSER</code>, <code>APP_UPDATE_NPM</code>, <code>APP_UPDATE_GIT</code> for tools missing
+          from its <code>PATH</code>.
+          Installations from before 1.0.0 need one last manual update (<code>git pull</code> or
+          <code>cipi deploy</code>).</p>
+      </section>
+
       <div class="pair" id="cipi">
         <h2>Deploy with Cipi</h2>
         <p class="lead" style="margin-bottom:0">Run IndieStats on any Ubuntu VPS with <a href="https://cipi.sh"
             target="_blank" rel="noopener"
             style="color:var(--signal-deep);font-weight:600;text-decoration:none">cipi.sh</a> — PHP-FPM, MariaDB, Nginx,
           Let's Encrypt, zero-downtime releases, and queue workers.</p>
+        <p>Updates work there too: IndieStats builds the new release next to the running one, switches
+          <code>current</code> to it and restarts Cipi's workers. A later <code>cipi deploy</code> keeps working as
+          before.</p>
         <a class="btn" href="https://cipi.sh" target="_blank" rel="noopener">Explore cipi.sh →</a>
       </div>
     </div>
   </div>
 
   <footer>
-    <p>Open source · MIT · <a href="https://github.com/andreapollastri/indiestats" target="_blank"
-        rel="noopener">GitHub</a></p>
+    <p>Version <a href="https://github.com/andreapollastri/indiestats/releases/tag/1.0.0" target="_blank"
+        rel="noopener">1.0.0</a> · Open source · MIT · <a href="https://github.com/andreapollastri/indiestats"
+        target="_blank" rel="noopener">GitHub</a></p>
     <p>Made by <a href="https://web.ap.it" target="_blank" rel="noopener">Andrea Pollastri</a></p>
   </footer>
 
