@@ -409,7 +409,7 @@ The release has no `public/build/manifest.json`. Run `npm ci && npm run build` i
 
 ## Deploying with Cipi
 
-[Cipi](https://cipi.sh) is an open-source CLI for Ubuntu servers: LEMP stack, isolated apps, zero-downtime deploys, Let's Encrypt and Supervisor workers. IndieStats ships with the Cipi agent for webhook deploys and health checks.
+[Cipi](https://cipi.sh) is an open-source CLI for Ubuntu servers: LEMP stack, isolated apps, zero-downtime deploys, Let's Encrypt and Supervisor workers.
 
 ```bash
 # On the server (one time)
@@ -542,7 +542,7 @@ GitHub Actions runs Pint and the test suite on PHP 8.4 and 8.5 for every push to
 - **Data:** SQLite, MySQL/MariaDB or PostgreSQL; database queue by default
 - **Enrichment:** MaxMind GeoLite2-Country and DB-IP ASN Lite (both optional)
 - **Export:** PhpSpreadsheet (XLSX)
-- **Operations:** spatie/laravel-backup, Cipi agent, Checkpoint security scanner
+- **Operations:** spatie/laravel-backup, Checkpoint security scanner
 
 ## License
 
